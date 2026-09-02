@@ -238,6 +238,10 @@
   .chips button { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; transition: all .14s; }
   .chips button.sel { background: var(--violet); color: var(--on-violet); border-color: var(--violet); }
 
+  .tbd { align-self: flex-start; margin-top: 3px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft); font-size: 11.5px; font-weight: 600; padding: 6px 11px; border-radius: 999px; }
+  .tbd.on { background: var(--violet); color: var(--on-violet); border-color: var(--violet); }
+  .control.tbd-set { color: var(--ink-faint); font-style: italic; }
+
   /* swatches */
   .swatch-row { display: flex; gap: 9px; align-items: center; }
   .swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line-strong); cursor: pointer; }
@@ -409,11 +413,13 @@
               <p class="s-sub">Choose the type of event you&rsquo;re planning.</p>
               <div class="occ" id="occ">
                 <button data-v="birthday" class="sel"><span class="g">&#127874;</span>Birthday</button>
+                <button data-v="wedding"><span class="g">&#128146;</span>Wedding</button>
                 <button data-v="baby"><span class="g">&#127868;</span>Baby shower</button>
                 <button data-v="bridal"><span class="g">&#128141;</span>Bridal shower</button>
                 <button data-v="engagement"><span class="g">&#128149;</span>Engagement</button>
                 <button data-v="anniversary"><span class="g">&#127870;</span>Anniversary</button>
                 <button data-v="grad"><span class="g">&#127891;</span>Graduation</button>
+                <button data-v="holiday"><span class="g">&#127876;</span>Holiday party</button>
                 <button data-v="corporate"><span class="g">&#127970;</span>Corporate</button>
                 <button data-v="other"><span class="g">&#10022;</span>Other</button>
               </div>
@@ -427,7 +433,10 @@
               <p class="s-sub">Let&rsquo;s get a few details to get started.</p>
               <div class="stack">
                 <label class="field"><span>Event name</span><div class="control">Jerrica&rsquo;s 36th Birthday</div></label>
-                <label class="field"><span>Date</span><div class="control between"><span>October 17, 2026</span><svg class="ic"><use href="#i-cal"/></svg></div></label>
+                <div class="field"><span>Date</span>
+                  <div class="control between" id="dateControl"><span id="dateVal">October 17, 2026</span><svg class="ic"><use href="#i-cal"/></svg></div>
+                  <button type="button" class="tbd" id="tbdToggle">Set date later (TBD)</button>
+                </div>
                 <label class="field"><span>Location</span><div class="control between"><span>Brockton, MA</span><svg class="ic"><use href="#i-pin"/></svg></div></label>
                 <label class="field"><span>Guest count</span><div class="control"><svg class="ic"><use href="#i-user"/></svg><span>50</span></div></label>
                 <label class="field"><span>Estimated budget</span><div class="control between"><span>$2,500 &ndash; $5,000</span><svg class="ic"><use href="#i-down"/></svg></div></label>
@@ -479,9 +488,12 @@
               <p class="s-sub">Select the services you need for your event.</p>
               <div class="card" style="padding:2px 12px;">
                 <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127963;&#65039;</span><span class="lbl">Venue</span></label>
-                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127869;&#65039;</span><span class="lbl">Catering</span></label>
-                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127856;</span><span class="lbl">Cake</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127869;&#65039;</span><span class="lbl">Catering / private chef</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#129473;</span><span class="lbl">Cake &amp; cupcakes</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127850;</span><span class="lbl">Cake pops, cookies &amp; treats</span></label>
                 <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127880;</span><span class="lbl">Balloons &amp; decor</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#128444;&#65039;</span><span class="lbl">Backdrops</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127802;</span><span class="lbl">Flower walls</span></label>
                 <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#129681;</span><span class="lbl">Tables &amp; chairs</span></label>
                 <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#129525;</span><span class="lbl">Linens</span></label>
                 <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127800;</span><span class="lbl">Florals</span></label>
@@ -514,11 +526,12 @@
                 </div>
                 <div class="hr" style="margin:12px 0 4px;"></div>
                 <div class="plan-grp">Essentials</div>
-                <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Catering</div>
-                <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Cake</div>
+                <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Catering / private chef</div>
+                <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Cake &amp; cupcakes</div>
                 <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Tables &amp; chairs</div>
                 <div class="plan-grp">Recommended</div>
                 <div class="plan-item"><span class="dot r"><svg class="ic"><use href="#i-check"/></svg></span>Balloons &amp; decor</div>
+                <div class="plan-item"><span class="dot r"><svg class="ic"><use href="#i-check"/></svg></span>Flower walls</div>
                 <div class="plan-item"><span class="dot r"><svg class="ic"><use href="#i-check"/></svg></span>Photography</div>
                 <div class="plan-item"><span class="dot r"><svg class="ic"><use href="#i-check"/></svg></span>Photo booth</div>
                 <div class="plan-grp">Optional</div>
@@ -949,6 +962,14 @@
     if (sw) sw.addEventListener("click", function (e) {
       var s = e.target.closest(".swatch:not(.add)");
       if (s) s.classList.toggle("on");
+    });
+
+    var tbd = document.getElementById("tbdToggle");
+    if (tbd) tbd.addEventListener("click", function () {
+      var on = tbd.classList.toggle("on");
+      document.getElementById("dateVal").textContent = on ? "To be decided" : "October 17, 2026";
+      document.getElementById("dateControl").classList.toggle("tbd-set", on);
+      tbd.textContent = on ? "Date is TBD ✓" : "Set date later (TBD)";
     });
 
     function jump(id) { var i = indexOfId(id); if (i >= 0) go(i); }
