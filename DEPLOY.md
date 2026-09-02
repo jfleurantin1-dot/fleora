@@ -8,9 +8,12 @@ at each other:
 | Database + login | **Supabase**       | Yes       | Every table, every user account       |
 | The website      | **Vercel**         | Yes       | The Next.js app, rebuilt on every push |
 
-> **Before the first deploy succeeds:** this codebase has not been compiled yet.
-> Expect the first build to fail with a few TypeScript errors. Send the build log
-> to Claude and they'll be fixed — this is normal for a fresh scaffold.
+> **Build status:** `npm run build` passes locally (verified). If a Vercel build
+> ever fails, open the deployment's **Building** log, copy the red error, and send
+> it to Claude.
+>
+> **Run it locally first (optional):** `npm install` then `npm run dev` →
+> <http://localhost:3000>. Needs a `.env.local` with the four keys from Step 1.4.
 
 You'll need: a GitHub account (done — the repo is pushed), a Supabase account, and
 a Vercel account. Sign into both with "Continue with GitHub".
