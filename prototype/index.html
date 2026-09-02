@@ -1,672 +1,377 @@
 <title>Fleora Prototype</title>
-<meta name="description" content="Interactive walkthrough of the Fleora event-planning marketplace — client journey and vendor console." />
+<meta name="description" content="Interactive walkthrough of the Fleora event-planning app — plan an event, get matched with vendors, compare quotes, and book." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link
   rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
 />
 
 <style>
-  /* ============================================================
-     Fleora prototype — design tokens
-     Palette: warm porcelain ground, mulberry accent, dusty blush,
-     antique brass for "match" highlights, garden green for booked.
-     Type: Fraunces (display) / Instrument Sans (UI) / IBM Plex Mono (labels)
-     ============================================================ */
+  /* ===========================================================
+     Fleora prototype
+     Palette: soft lavender ground, white cards, violet primary,
+     blush imagery, green = booked, amber = in progress.
+     Type: Plus Jakarta Sans (UI) · Fraunces light (wordmark)
+     =========================================================== */
   :root {
     color-scheme: light;
-    --ground: #fbf7f4;
-    --backdrop: #f0e7e0;
+    --page: #f1edf8;
+    --page-2: #e9e3f4;
     --surface: #ffffff;
-    --surface-2: #f6efe9;
-    --ink: #2a2320;
-    --ink-soft: #6e6259;
-    --ink-faint: #9a8d83;
-    --line: #e7ddd6;
-    --line-strong: #d8ccc2;
-    --plum: #7a3e63;
-    --plum-deep: #5c2c4a;
-    --plum-tint: #f3e6ee;
-    --on-plum: #fdf6fa;
-    --blush: #e0949d;
-    --blush-tint: #fbe9ea;
-    --gold: #a9772f;
-    --gold-tint: #f6ecdb;
-    --good: #3f7d5a;
-    --good-tint: #e4f0e8;
-    --radius: 18px;
-    --radius-sm: 12px;
-    --shadow-lg: 30px 40px 80px -20px rgba(58, 38, 52, 0.28);
-    --shadow-card: 0 1px 2px rgba(42, 35, 32, 0.06), 0 8px 24px -12px rgba(42, 35, 32, 0.12);
+    --surface-2: #f7f5fb;
+    --ink: #2a2633;
+    --ink-soft: #6c6579;
+    --ink-faint: #9c95a8;
+    --line: #ece8f2;
+    --line-strong: #ded8ec;
+    --violet: #7c5cbd;
+    --violet-press: #6a49ac;
+    --violet-deep: #4e3a82;
+    --violet-tint: #efebf9;
+    --violet-tint-2: #f6f3fc;
+    --on-violet: #ffffff;
+    --pink: #e6a0c3;
+    --pink-tint: #fbedf4;
+    --good: #3e9b77;
+    --good-tint: #e7f4ef;
+    --amber: #b9832f;
+    --amber-tint: #f7eede;
+    --shadow-phone: 40px 50px 90px -30px rgba(60, 40, 100, 0.35);
+    --shadow-card: 0 1px 2px rgba(50, 35, 80, 0.05), 0 6px 20px -12px rgba(50, 35, 80, 0.14);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       color-scheme: dark;
-      --ground: #17130f;
-      --backdrop: #100d0b;
-      --surface: #221c19;
-      --surface-2: #2b2420;
-      --ink: #f2e9e1;
-      --ink-soft: #b3a79d;
-      --ink-faint: #8a7d73;
-      --line: #362e29;
-      --line-strong: #473c35;
-      --plum: #dd9fc4;
-      --plum-deep: #efc9e0;
-      --plum-tint: #33232e;
-      --on-plum: #2a1622;
-      --blush: #e6a2ab;
-      --blush-tint: #362528;
-      --gold: #dcab63;
-      --gold-tint: #362c1d;
-      --good: #6fb98f;
-      --good-tint: #21322a;
-      --shadow-lg: 30px 40px 90px -20px rgba(0, 0, 0, 0.6);
-      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.55);
+      --page: #15121c;
+      --page-2: #0f0d15;
+      --surface: #211d29;
+      --surface-2: #2a2534;
+      --ink: #f0ecf6;
+      --ink-soft: #b3aac2;
+      --ink-faint: #877e98;
+      --line: #332c40;
+      --line-strong: #453b56;
+      --violet: #b89ce9;
+      --violet-press: #a686df;
+      --violet-deep: #d8c8f3;
+      --violet-tint: #2c2440;
+      --violet-tint-2: #251f34;
+      --on-violet: #221830;
+      --pink: #e6a0c3;
+      --pink-tint: #372634;
+      --good: #6fc3a0;
+      --good-tint: #21332c;
+      --amber: #d6a866;
+      --amber-tint: #352c1d;
+      --shadow-phone: 40px 50px 100px -30px rgba(0, 0, 0, 0.65);
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 22px -14px rgba(0, 0, 0, 0.5);
     }
   }
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --ground: #17130f;
-    --backdrop: #100d0b;
-    --surface: #221c19;
-    --surface-2: #2b2420;
-    --ink: #f2e9e1;
-    --ink-soft: #b3a79d;
-    --ink-faint: #8a7d73;
-    --line: #362e29;
-    --line-strong: #473c35;
-    --plum: #dd9fc4;
-    --plum-deep: #efc9e0;
-    --plum-tint: #33232e;
-    --on-plum: #2a1622;
-    --blush: #e6a2ab;
-    --blush-tint: #362528;
-    --gold: #dcab63;
-    --gold-tint: #362c1d;
-    --good: #6fb98f;
-    --good-tint: #21322a;
-    --shadow-lg: 30px 40px 90px -20px rgba(0, 0, 0, 0.6);
-    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.55);
+    --page: #15121c;
+    --page-2: #0f0d15;
+    --surface: #211d29;
+    --surface-2: #2a2534;
+    --ink: #f0ecf6;
+    --ink-soft: #b3aac2;
+    --ink-faint: #877e98;
+    --line: #332c40;
+    --line-strong: #453b56;
+    --violet: #b89ce9;
+    --violet-press: #a686df;
+    --violet-deep: #d8c8f3;
+    --violet-tint: #2c2440;
+    --violet-tint-2: #251f34;
+    --on-violet: #221830;
+    --pink: #e6a0c3;
+    --pink-tint: #372634;
+    --good: #6fc3a0;
+    --good-tint: #21332c;
+    --amber: #d6a866;
+    --amber-tint: #352c1d;
+    --shadow-phone: 40px 50px 100px -30px rgba(0, 0, 0, 0.65);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 22px -14px rgba(0, 0, 0, 0.5);
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
   body {
     margin: 0;
     background:
-      radial-gradient(1200px 700px at 12% -8%, var(--blush-tint), transparent 60%),
-      radial-gradient(900px 600px at 100% 0%, var(--gold-tint), transparent 55%),
-      var(--backdrop);
+      radial-gradient(1100px 620px at 15% -10%, var(--violet-tint), transparent 60%),
+      radial-gradient(800px 500px at 100% 0%, var(--pink-tint), transparent 55%),
+      var(--page-2);
     color: var(--ink);
-    font-family: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-family: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
-  h1, h2, h3, h4 {
-    font-family: "Fraunces", Georgia, "Times New Roman", serif;
-    font-weight: 500;
-    text-wrap: balance;
-    margin: 0;
-  }
-  button {
-    font: inherit;
-    color: inherit;
-    cursor: pointer;
-  }
-  :focus-visible {
-    outline: 2px solid var(--plum);
-    outline-offset: 2px;
-    border-radius: 4px;
-  }
-  .mono {
-    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
-  }
-  .eyebrow {
-    font-family: "IBM Plex Mono", ui-monospace, monospace;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-  }
+  h1, h2, h3 { margin: 0; font-weight: 600; letter-spacing: -0.01em; text-wrap: balance; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--violet); outline-offset: 2px; border-radius: 6px; }
+  svg.ic { width: 20px; height: 20px; display: block; flex-shrink: 0; }
 
   /* ---------- shell ---------- */
-  .stage {
-    max-width: 1060px;
-    margin: 0 auto;
-    padding: 34px 22px 64px;
-  }
-  .pitch {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 18px 24px;
-    margin-bottom: 30px;
-  }
-  .wordmark {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
+  .stage { max-width: 1040px; margin: 0 auto; padding: 34px 22px 60px; }
+  .pitch { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px 24px; margin-bottom: 28px; }
+  .wordmark { display: flex; align-items: center; gap: 7px; }
   .wordmark b {
     font-family: "Fraunces", Georgia, serif;
-    font-weight: 600;
+    font-weight: 400;
     font-size: 30px;
-    letter-spacing: -0.01em;
-  }
-  .wordmark .dot {
-    width: 9px;
-    height: 9px;
-    border-radius: 50%;
-    background: var(--blush);
-    align-self: center;
-  }
-  .pitch p {
-    margin: 6px 0 0;
-    max-width: 42ch;
-    color: var(--ink-soft);
-    font-size: 15px;
-  }
-
-  .segmented {
-    display: inline-flex;
-    background: var(--surface-2);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 4px;
-    gap: 2px;
-  }
-  .segmented button {
-    border: 0;
-    background: transparent;
-    color: var(--ink-soft);
-    padding: 8px 16px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
     letter-spacing: 0.01em;
-    transition: background 0.16s, color 0.16s;
+    color: var(--violet-deep);
   }
-  .segmented button[aria-pressed="true"] {
-    background: var(--plum);
-    color: var(--on-plum);
-  }
+  .wordmark .spark { color: var(--pink); font-size: 15px; }
+  .pitch p { margin: 6px 0 0; max-width: 44ch; color: var(--ink-soft); font-size: 14.5px; }
 
-  /* ---------- workspace ---------- */
-  .workspace {
-    display: grid;
-    grid-template-columns: 210px minmax(0, 1fr);
-    gap: 34px;
-    align-items: start;
-  }
-  .rail {
-    position: sticky;
-    top: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-  .rail .rail-head {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--ink-faint);
-    padding: 6px 10px 10px;
-  }
-  .rail button {
-    display: flex;
-    gap: 10px;
-    align-items: baseline;
-    text-align: left;
-    border: 0;
-    background: transparent;
-    color: var(--ink-soft);
-    padding: 8px 10px;
-    border-radius: 10px;
-    font-size: 13.5px;
-    line-height: 1.35;
-    transition: background 0.14s, color 0.14s;
-  }
-  .rail button .n {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 11px;
-    color: var(--ink-faint);
-    min-width: 14px;
-  }
-  .rail button:hover {
-    background: var(--surface-2);
-    color: var(--ink);
-  }
-  .rail button[aria-current="true"] {
-    background: var(--plum-tint);
-    color: var(--plum-deep);
-    font-weight: 600;
-  }
-  .rail button[aria-current="true"] .n {
-    color: var(--plum);
-  }
+  .segmented { display: inline-flex; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px; padding: 4px; gap: 2px; box-shadow: var(--shadow-card); }
+  .segmented button { border: 0; background: transparent; color: var(--ink-soft); padding: 8px 15px; border-radius: 999px; font-size: 13px; font-weight: 600; transition: background .16s, color .16s; }
+  .segmented button[aria-pressed="true"] { background: var(--violet); color: var(--on-violet); }
 
-  .device-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 16px;
-  }
+  .workspace { display: grid; grid-template-columns: 196px minmax(0, 1fr); gap: 34px; align-items: start; }
+  .rail { position: sticky; top: 22px; display: flex; flex-direction: column; gap: 2px; }
+  .rail .rail-head { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); font-weight: 600; padding: 4px 10px 10px; }
+  .rail button { display: flex; gap: 9px; align-items: baseline; text-align: left; border: 0; background: transparent; color: var(--ink-soft); padding: 7px 10px; border-radius: 9px; font-size: 13px; line-height: 1.3; transition: background .14s, color .14s; }
+  .rail button .n { font-size: 11px; color: var(--ink-faint); min-width: 13px; font-variant-numeric: tabular-nums; }
+  .rail button:hover { background: var(--surface); color: var(--ink); }
+  .rail button[aria-current="true"] { background: var(--violet-tint); color: var(--violet-deep); font-weight: 600; }
+  .rail button[aria-current="true"] .n { color: var(--violet); }
+
+  .device-col { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 
   /* ---------- phone ---------- */
   .phone {
-    width: 380px;
-    max-width: 100%;
-    height: 724px;
+    width: 374px; max-width: 100%; height: 748px;
     background: var(--surface);
     border: 1px solid var(--line-strong);
-    border-radius: 40px;
-    box-shadow: var(--shadow-lg);
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
+    border-radius: 46px;
+    box-shadow: var(--shadow-phone);
+    padding: 9px;
   }
-  .bezel {
-    background: var(--ground);
-    border: 1px solid var(--line);
-    border-radius: 31px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .statusbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 22px 8px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--ink-soft);
-    flex-shrink: 0;
-  }
-  .statusbar .sig {
-    display: inline-flex;
-    gap: 3px;
-    align-items: flex-end;
-  }
-  .statusbar .sig i {
-    width: 3px;
-    background: var(--ink-faint);
-    border-radius: 1px;
-    display: block;
-  }
-  .statusbar .sig i:nth-child(1) { height: 5px; }
-  .statusbar .sig i:nth-child(2) { height: 8px; }
-  .statusbar .sig i:nth-child(3) { height: 11px; }
-  .statusbar .sig i:nth-child(4) { height: 14px; background: var(--ink-faint); }
+  .bezel { background: var(--page); border-radius: 38px; height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+  .statusbar { display: flex; align-items: center; justify-content: space-between; padding: 13px 24px 7px; font-size: 12px; font-weight: 700; color: var(--ink); flex-shrink: 0; }
+  .statusbar .r { display: inline-flex; gap: 5px; align-items: center; color: var(--ink-soft); }
+  .statusbar .bat { width: 20px; height: 10px; border: 1.4px solid currentColor; border-radius: 3px; position: relative; }
+  .statusbar .bat::after { content: ""; position: absolute; left: 1.5px; top: 1.5px; bottom: 1.5px; width: 12px; background: currentColor; border-radius: 1px; }
 
-  .screens {
-    position: relative;
-    flex: 1;
-    overflow: hidden;
-  }
+  .screens { position: relative; flex: 1; overflow: hidden; }
   .screen {
-    position: absolute;
-    inset: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 8px 20px 28px;
-    opacity: 0;
-    transform: translateY(8px);
-    pointer-events: none;
-    transition: opacity 0.22s ease, transform 0.22s ease;
+    position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+    padding: 0 18px 26px;
+    opacity: 0; transform: translateY(6px); pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
     scrollbar-width: thin;
   }
-  .screen::-webkit-scrollbar { width: 5px; }
+  .screen::-webkit-scrollbar { width: 4px; }
   .screen::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
-  .screen.active {
-    opacity: 1;
-    transform: none;
-    pointer-events: auto;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .screen { transition: opacity 0.01s; transform: none; }
-  }
+  .screen.active { opacity: 1; transform: none; pointer-events: auto; }
+  @media (prefers-reduced-motion: reduce) { .screen { transition: opacity .01s; transform: none; } }
 
-  .navbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding: 10px 12px 4px;
-    flex-shrink: 0;
-  }
-  .navbar .stepname {
-    font-size: 12px;
-    color: var(--ink-faint);
-    font-family: "IBM Plex Mono", monospace;
-    letter-spacing: 0.04em;
-  }
-  .navbtn {
-    border: 1px solid var(--line-strong);
-    background: var(--surface);
-    color: var(--ink);
-    border-radius: 999px;
-    padding: 7px 14px;
-    font-size: 12.5px;
-    font-weight: 600;
-    transition: background 0.14s, border-color 0.14s;
-  }
+  .appbar { display: flex; align-items: center; gap: 8px; padding: 8px 0 10px; position: sticky; top: 0; background: var(--page); z-index: 3; }
+  .appbar .title { font-weight: 600; font-size: 15px; flex: 1; }
+  .icon-btn { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 10px; border: 0; background: transparent; color: var(--ink); }
+  .icon-btn:hover { background: var(--surface); }
+  .icon-btn.solid { background: var(--surface); border: 1px solid var(--line); }
+
+  /* bottom tab bar */
+  .tabbar { display: none; flex-shrink: 0; border-top: 1px solid var(--line); background: var(--surface); padding: 8px 6px 10px; justify-content: space-around; }
+  .bezel.has-tabs .tabbar { display: flex; }
+  .tabbar button { border: 0; background: transparent; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--ink-faint); font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 8px; }
+  .tabbar button .ic { width: 22px; height: 22px; }
+  .tabbar button[aria-current="true"] { color: var(--violet); }
+
+  /* ---------- controls + caption ---------- */
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 374px; max-width: 100%; }
+  .navbtn { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 8px 15px; font-size: 12.5px; font-weight: 600; box-shadow: var(--shadow-card); transition: background .14s; }
   .navbtn:hover { background: var(--surface-2); }
-  .navbtn[disabled] { opacity: 0.35; cursor: default; }
+  .navbtn[disabled] { opacity: .38; cursor: default; }
+  .controls .stepname { font-size: 12px; color: var(--ink-faint); font-weight: 600; }
 
-  .caption {
-    max-width: 380px;
-    width: 100%;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 14px 16px;
-    box-shadow: var(--shadow-card);
-  }
-  .caption .eyebrow { display: block; margin-bottom: 4px; }
-  .caption p {
-    margin: 0;
-    font-size: 13.5px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-  }
+  .caption { width: 374px; max-width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 13px 15px; box-shadow: var(--shadow-card); }
+  .caption .lbl { display: block; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--violet); font-weight: 700; margin-bottom: 3px; }
+  .caption p { margin: 0; font-size: 13px; color: var(--ink-soft); line-height: 1.5; }
   .caption b { color: var(--ink); font-weight: 600; }
 
-  /* ---------- in-screen UI kit ---------- */
-  .s-head { margin: 10px 0 14px; }
-  .s-head h2 { font-size: 25px; line-height: 1.15; }
-  .s-head .sub { margin-top: 6px; color: var(--ink-soft); font-size: 13.5px; }
-
-  .fl-card {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    box-shadow: var(--shadow-card);
-  }
+  /* ---------- in-screen kit ---------- */
+  .s-title { font-size: 22px; line-height: 1.18; margin: 6px 0 3px; }
+  .s-sub { color: var(--ink-soft); font-size: 13px; margin: 0 0 14px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; box-shadow: var(--shadow-card); }
   .stack { display: flex; flex-direction: column; gap: 10px; }
-  .row { display: flex; align-items: center; gap: 10px; }
   .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .muted { color: var(--ink-soft); }
   .faint { color: var(--ink-faint); }
   .tiny { font-size: 12px; }
   .num { font-variant-numeric: tabular-nums; }
+  .hr { height: 1px; background: var(--line); margin: 4px 0; }
 
-  .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    border: 0;
-    border-radius: 11px;
-    padding: 11px 16px;
-    font-size: 13.5px;
-    font-weight: 600;
-    background: var(--plum);
-    color: var(--on-plum);
-    width: 100%;
-    transition: transform 0.08s, filter 0.14s;
-  }
+  .btn { display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-radius: 13px; padding: 13px 16px; font-size: 14px; font-weight: 600; background: var(--violet); color: var(--on-violet); width: 100%; transition: background .14s, transform .08s; }
+  .btn:hover { background: var(--violet-press); }
   .btn:active { transform: translateY(1px); }
-  .btn.ghost {
-    background: var(--surface);
-    color: var(--plum-deep);
-    border: 1px solid var(--line-strong);
-  }
-  .btn.sm { width: auto; padding: 8px 13px; font-size: 12.5px; border-radius: 9px; }
+  .btn.ghost { background: var(--surface); color: var(--violet-deep); border: 1px solid var(--line-strong); }
+  .btn.ghost:hover { background: var(--surface-2); }
+  .btn.sm { width: auto; padding: 9px 14px; font-size: 12.5px; border-radius: 11px; }
 
-  .chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 3px 9px;
-    border-radius: 999px;
-    font-size: 11.5px;
-    font-weight: 600;
-    background: var(--surface-2);
-    color: var(--ink-soft);
-    border: 1px solid var(--line);
-  }
-  .chip.plum { background: var(--plum-tint); color: var(--plum-deep); border-color: transparent; }
-  .chip.good { background: var(--good-tint); color: var(--good); border-color: transparent; }
-  .chip.gold { background: var(--gold-tint); color: var(--gold); border-color: transparent; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600; background: var(--surface-2); color: var(--ink-soft); border: 1px solid var(--line); }
+  .pill.v { background: var(--violet-tint); color: var(--violet-deep); border-color: transparent; }
+  .pill.g { background: var(--good-tint); color: var(--good); border-color: transparent; }
+  .pill.a { background: var(--amber-tint); color: var(--amber); border-color: transparent; }
 
-  /* event-type grid */
-  .type-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
-  .type-grid button {
-    border: 1px solid var(--line-strong);
-    background: var(--surface);
-    border-radius: var(--radius-sm);
-    padding: 14px 10px;
-    text-align: left;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    transition: border-color 0.14s, background 0.14s;
-  }
-  .type-grid button .ic { font-size: 20px; }
-  .type-grid button.sel {
-    border-color: var(--plum);
-    background: var(--plum-tint);
-    color: var(--plum-deep);
-    box-shadow: inset 0 0 0 1px var(--plum);
-  }
+  /* occasion grid */
+  .occ { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .occ button { border: 1px solid var(--line-strong); background: var(--surface); border-radius: 14px; padding: 13px 6px 10px; display: flex; flex-direction: column; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 600; color: var(--ink); transition: border-color .14s, background .14s; }
+  .occ button .g { width: 38px; height: 38px; border-radius: 12px; background: var(--violet-tint); display: grid; place-items: center; font-size: 19px; }
+  .occ button.sel { border-color: var(--violet); background: var(--violet-tint-2); box-shadow: inset 0 0 0 1px var(--violet); }
+  .occ button.sel .g { background: var(--violet); }
 
   /* form fields */
   .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
-  .field .val {
-    border: 1px solid var(--line-strong);
-    background: var(--surface);
-    border-radius: 10px;
-    padding: 10px 12px;
-    font-size: 13.5px;
-  }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .field > span { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+  .control { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line-strong); background: var(--surface); border-radius: 11px; padding: 11px 12px; font-size: 13.5px; }
+  .control .ic { width: 17px; height: 17px; color: var(--ink-faint); }
+  .control.between > .ic:last-child { color: var(--ink-faint); }
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* chips (multi-select) */
+  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
+  .chips button { border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink-soft); border-radius: 999px; padding: 7px 13px; font-size: 12.5px; font-weight: 600; transition: all .14s; }
+  .chips button.sel { background: var(--violet); color: var(--on-violet); border-color: var(--violet); }
+
+  /* swatches */
+  .swatch-row { display: flex; gap: 9px; align-items: center; }
+  .swatch { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--line-strong); cursor: pointer; }
+  .swatch.on { box-shadow: 0 0 0 2px var(--violet); }
+  .swatch.add { display: grid; place-items: center; background: var(--surface-2); box-shadow: 0 0 0 1px var(--line-strong); color: var(--ink-faint); }
 
   /* service checklist */
-  .svc {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 11px 6px;
-    border-bottom: 1px solid var(--line);
-  }
+  .svc { display: flex; align-items: center; gap: 11px; padding: 11px 4px; border-bottom: 1px solid var(--line); }
   .svc:last-child { border-bottom: 0; }
-  .svc input { position: absolute; opacity: 0; pointer-events: none; }
-  .svc .box {
-    width: 20px; height: 20px;
-    border-radius: 7px;
-    border: 1.5px solid var(--line-strong);
-    display: grid; place-items: center;
-    flex-shrink: 0;
-    transition: background 0.14s, border-color 0.14s;
-  }
-  .svc .box::after {
-    content: "✓";
-    font-size: 12px;
-    color: var(--on-plum);
-    opacity: 0;
-    transform: scale(0.6);
-    transition: opacity 0.14s, transform 0.14s;
-  }
-  .svc input:checked ~ .box {
-    background: var(--plum);
-    border-color: var(--plum);
-  }
-  .svc input:checked ~ .box::after { opacity: 1; transform: none; }
+  .svc input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .svc .box { width: 21px; height: 21px; border-radius: 7px; border: 1.6px solid var(--line-strong); display: grid; place-items: center; flex-shrink: 0; transition: background .14s, border-color .14s; }
+  .svc .box .ic { width: 13px; height: 13px; color: var(--on-violet); opacity: 0; transform: scale(.6); transition: opacity .14s, transform .14s; }
+  .svc input:checked ~ .box { background: var(--violet); border-color: var(--violet); }
+  .svc input:checked ~ .box .ic { opacity: 1; transform: none; }
+  .svc input:focus-visible ~ .box { outline: 2px solid var(--violet); outline-offset: 2px; }
+  .svc .em { font-size: 15px; width: 22px; text-align: center; }
   .svc .lbl { flex: 1; font-size: 13.5px; font-weight: 500; }
-  .svc .est { font-size: 12px; color: var(--ink-faint); }
-  .svc .ic { font-size: 16px; }
-  .svc input:focus-visible ~ .box { outline: 2px solid var(--plum); outline-offset: 2px; }
 
-  /* portfolio tile (CSS art — no external images) */
-  .tile {
-    aspect-ratio: 4 / 3;
-    border-radius: 10px;
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--line);
-  }
-  .tile span {
-    position: absolute;
-    left: 8px; bottom: 7px;
-    font-size: 10.5px;
-    font-weight: 600;
-    color: rgba(255,255,255,0.95);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-    letter-spacing: 0.02em;
-  }
-  .tile.a { background:
-      radial-gradient(60% 70% at 25% 20%, #f4c9d6, transparent 60%),
-      radial-gradient(50% 60% at 80% 30%, #efd9b0, transparent 60%),
-      radial-gradient(70% 80% at 60% 100%, #b56b93, transparent 65%),
-      #e7b7cb; }
-  .tile.b { background:
-      radial-gradient(55% 60% at 20% 80%, #d9b8d6, transparent 60%),
-      radial-gradient(60% 70% at 85% 15%, #f5dfc0, transparent 60%),
-      linear-gradient(140deg, #8c4f77, #d59bb9); }
-  .tile.c { background:
-      radial-gradient(50% 55% at 70% 25%, #f7d7c2, transparent 60%),
-      radial-gradient(65% 70% at 25% 90%, #7a3e63, transparent 65%),
-      linear-gradient(120deg, #b06f8f, #ecc6a9); }
-  .tile.d { background:
-      radial-gradient(55% 60% at 50% 20%, #f3ccd9, transparent 60%),
-      radial-gradient(60% 65% at 15% 95%, #caa25f, transparent 60%),
-      linear-gradient(160deg, #9c5580, #e7b9cd); }
-  .tile-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
-  .tile-grid.two { grid-template-columns: 1fr 1fr; }
+  .callout { display: flex; gap: 10px; align-items: center; background: var(--pink-tint); border-radius: 12px; padding: 12px; margin-top: 10px; }
+  .callout .em { font-size: 17px; }
+  .callout b { font-size: 12.5px; }
+  .callout p { margin: 1px 0 0; font-size: 11.5px; color: var(--ink-soft); }
 
-  /* match score */
-  .match {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-  }
-  .match b {
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 17px;
-    font-weight: 500;
-    color: var(--good);
-    line-height: 1;
-  }
-  .match.mid b { color: var(--gold); }
-  .match small { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+  /* plan list */
+  .plan-grp { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); font-weight: 700; margin: 12px 0 5px; }
+  .plan-item { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 4px 0; }
+  .plan-item .dot { width: 15px; height: 15px; border-radius: 5px; display: grid; place-items: center; flex-shrink: 0; }
+  .plan-item .dot.e { background: var(--good-tint); color: var(--good); }
+  .plan-item .dot.r { background: var(--violet-tint); color: var(--violet); }
+  .plan-item .dot.o { border: 1.5px solid var(--line-strong); }
+  .plan-item .dot .ic { width: 10px; height: 10px; }
 
-  .vendor {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-  }
-  .vendor .thumb {
-    width: 62px; height: 62px;
-    border-radius: 12px;
-    flex-shrink: 0;
-    border: 1px solid var(--line);
-  }
-  .stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
+  /* imagery — CSS art, no external files */
+  .art { border-radius: 12px; position: relative; overflow: hidden; border: 1px solid var(--line); }
+  .art span { position: absolute; left: 9px; bottom: 8px; font-size: 10px; font-weight: 600; color: #fff; text-shadow: 0 1px 4px rgba(0,0,0,.45); }
+  .art.p1 { background: radial-gradient(60% 65% at 25% 25%, #f6cdde, transparent 60%), radial-gradient(55% 60% at 82% 22%, #f0dcbe, transparent 60%), radial-gradient(75% 80% at 60% 105%, #c07aa1, transparent 65%), #ecbdd3; }
+  .art.p2 { background: radial-gradient(55% 60% at 18% 78%, #ddc0dd, transparent 60%), radial-gradient(60% 65% at 85% 18%, #f6e2c6, transparent 60%), linear-gradient(140deg, #9c5f8b, #e0a9c6); }
+  .art.p3 { background: radial-gradient(52% 55% at 70% 22%, #f8dcc6, transparent 60%), radial-gradient(60% 68% at 22% 92%, #7c5cbd, transparent 65%), linear-gradient(120deg, #bd80a4, #f0cbb1); }
+  .art.p4 { background: radial-gradient(55% 58% at 50% 18%, #f5cfe0, transparent 60%), radial-gradient(58% 62% at 15% 95%, #d6a76a, transparent 60%), linear-gradient(160deg, #a3618c, #ecbcd4); }
+  .thumb-row { display: flex; gap: 7px; }
+  .thumb-row .art { width: 52px; height: 52px; flex-shrink: 0; }
+  .thumb-row .add { width: 52px; height: 52px; border-radius: 12px; border: 1.5px dashed var(--line-strong); display: grid; place-items: center; color: var(--ink-faint); flex-shrink: 0; }
 
-  /* messaging */
-  .bubble {
-    max-width: 82%;
-    padding: 9px 12px;
-    border-radius: 14px;
-    font-size: 13px;
-    line-height: 1.45;
-    white-space: pre-wrap;
-  }
-  .bubble.them { background: var(--surface-2); border: 1px solid var(--line); align-self: flex-start; border-bottom-left-radius: 5px; }
-  .bubble.me { background: var(--plum); color: var(--on-plum); align-self: flex-end; border-bottom-right-radius: 5px; }
-  .thread { display: flex; flex-direction: column; gap: 8px; }
+  /* vendor cards */
+  .vendor { display: flex; gap: 12px; }
+  .vendor .pic { width: 66px; height: 66px; border-radius: 13px; flex-shrink: 0; }
+  .stars { color: #e0a53d; font-size: 11.5px; letter-spacing: .5px; }
+  .match { text-align: right; flex-shrink: 0; }
+  .match b { font-size: 14px; color: var(--good); font-variant-numeric: tabular-nums; }
+  .match.mid b { color: var(--amber); }
+  .match small { display: block; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-faint); }
 
-  /* quote lines */
-  .qline { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .verified { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--violet); color: var(--on-violet); flex-shrink: 0; }
+  .verified .ic { width: 9px; height: 9px; }
+
+  /* messages list */
+  .msg { display: flex; gap: 11px; align-items: center; padding: 11px 2px; border-bottom: 1px solid var(--line); }
+  .msg:last-child { border-bottom: 0; }
+  .msg .av { width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0; }
+  .msg .who { font-size: 13.5px; font-weight: 600; }
+  .msg .prev { font-size: 12px; color: var(--ink-soft); }
+  .msg .meta { text-align: right; flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .msg .time { font-size: 10.5px; color: var(--ink-faint); }
+  .badge-n { min-width: 17px; height: 17px; border-radius: 999px; background: var(--violet); color: var(--on-violet); font-size: 10px; font-weight: 700; display: grid; place-items: center; padding: 0 4px; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 4px; }
+  .tabs button { border: 0; background: var(--surface-2); color: var(--ink-soft); font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 999px; }
+  .tabs button.on { background: var(--violet-tint); color: var(--violet-deep); }
+
+  /* quote */
+  .qline { display: flex; justify-content: space-between; font-size: 13px; padding: 9px 0; border-bottom: 1px solid var(--line); }
   .qline:last-of-type { border-bottom: 0; }
-  .qline:has(+ .qtotal), .qline:has(+ .row) { border-bottom: 0; }
-  .qtotal { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; padding-top: 10px; border-top: 1.5px solid var(--line-strong); margin-top: 4px; }
+  .qline:has(+ .hr) { border-bottom: 0; }
+  .qtotal { display: flex; justify-content: space-between; align-items: baseline; }
+  .qtotal .v { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sched { display: flex; justify-content: space-between; font-size: 12.5px; padding: 7px 0; }
+  .inc { display: flex; align-items: center; gap: 7px; font-size: 12.5px; padding: 4px 0; }
+  .inc .ic { width: 14px; height: 14px; color: var(--good); }
 
-  /* progress ring */
-  .ring-wrap { display: flex; gap: 14px; align-items: center; }
-  .ring { width: 62px; height: 62px; flex-shrink: 0; }
-  .ring circle { fill: none; stroke-width: 8; }
-  .ring .track { stroke: var(--line); }
-  .ring .fill { stroke: var(--plum); stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
-  .ring text { font-family: "IBM Plex Mono", monospace; font-size: 15px; fill: var(--ink); font-weight: 500; }
-
-  .dash-stat { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .dash-stat .fl-card { padding: 11px 12px; }
-  .dash-stat .k { font-size: 11px; color: var(--ink-faint); font-family: "IBM Plex Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase; }
-  .dash-stat .v { font-size: 18px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
-
-  .vrow { display: flex; align-items: center; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  /* dashboard */
+  .bar { height: 8px; border-radius: 999px; background: var(--violet-tint); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 999px; background: var(--violet); transition: width .5s ease; }
+  .vrow { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
   .vrow:last-child { border-bottom: 0; }
-  .vdot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); flex-shrink: 0; }
-  .vdot.ok { background: var(--good); }
-  .vdot.wait { background: var(--gold); }
-
-  .lead {
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--plum);
-    border-radius: 10px;
-    padding: 12px;
-  }
-
-  /* booked-state reveal on the client dashboard */
+  .vrow .ic.chev { width: 16px; height: 16px; color: var(--ink-faint); }
+  .vstatus { font-size: 11.5px; font-weight: 600; }
+  .vstatus.ok { color: var(--good); }
+  .vstatus.mid { color: var(--amber); }
+  .vstatus.todo { color: var(--ink-faint); }
   .when-booked { display: none; }
-  .is-booked .when-booked { display: flex; }
-  .is-booked .when-unbooked { display: none; }
+  .is-booked .when-booked { display: inline; }
+  .is-booked .when-open { display: none; }
 
-  .legal {
-    margin-top: 40px;
-    text-align: center;
-    font-size: 12px;
-    color: var(--ink-faint);
-  }
-  .legal a { color: var(--plum); }
+  .legal { margin-top: 34px; text-align: center; font-size: 12px; color: var(--ink-faint); }
 
-  @media (max-width: 880px) {
-    .workspace { grid-template-columns: 1fr; gap: 18px; }
-    .rail {
-      position: static;
-      flex-direction: row;
-      overflow-x: auto;
-      gap: 6px;
-      padding-bottom: 6px;
-      -webkit-overflow-scrolling: touch;
-    }
+  @media (max-width: 860px) {
+    .workspace { grid-template-columns: 1fr; gap: 16px; }
+    .rail { position: static; flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
     .rail .rail-head { display: none; }
-    .rail button { white-space: nowrap; flex-shrink: 0; border: 1px solid var(--line); }
+    .rail button { white-space: nowrap; flex-shrink: 0; border: 1px solid var(--line); background: var(--surface); }
   }
-  @media (max-width: 460px) {
-    .stage { padding: 22px 14px 48px; }
-    .phone { height: 660px; border-radius: 34px; }
+  @media (max-width: 430px) {
+    .stage { padding: 20px 12px 44px; }
+    .phone { height: 668px; border-radius: 38px; }
   }
 </style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 5 8 12 15 19"/></symbol>
+  <symbol id="i-fwd" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 5 16 12 9 19"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.35-9.5-8.5C1 8.5 2.5 5 6 5c2.2 0 3.5 1.5 4 2.5C10.5 6.5 11.8 5 14 5c3.5 0 5 3.5 3.5 6.5C19 15.65 12 20 12 20z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><polyline points="8 7 12 3 16 7"/><path d="M6 12H5a1 1 0 0 0-1 1v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1h-1"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/><circle cx="9" cy="7" r="2.2" fill="var(--page)"/><circle cx="15" cy="12" r="2.2" fill="var(--page)"/><circle cx="8" cy="17" r="2.2" fill="var(--page)"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6-5.2-6-10a6 6 0 0 1 12 0c0 4.8-6 10-6 10z"/><circle cx="12" cy="11" r="2.2"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"/><line x1="4" y1="10" x2="20" y2="10"/><line x1="9" y1="3" x2="9" y2="7"/><line x1="15" y1="3" x2="15" y2="7"/></symbol>
+  <symbol id="i-compose" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z"/><path d="M13.5 6.5l3 3"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6 8 6"/><path d="M6 10v9a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-9"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="15.5 8.5 11 11 8.5 15.5 13 13"/></symbol>
+  <symbol id="i-events" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2.5"/><line x1="4" y1="10" x2="20" y2="10"/><path d="M12 13.5c1-1.4 3.2-.6 3.2 1 0 1.4-3.2 3.5-3.2 3.5s-3.2-2.1-3.2-3.5c0-1.6 2.2-2.4 3.2-1z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a7 7 0 0 1-7 7H7l-3 3v-9a7 7 0 0 1 7-7h2a7 7 0 0 1 7 7z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></symbol>
+</svg>
 
 <div class="stage">
   <header class="pitch">
     <div>
-      <div class="wordmark"><span class="dot"></span><b>Fleora</b></div>
-      <p>Imagine it, plan it, find it, book it, manage it — one event, one platform. Tap through the flow below.</p>
+      <div class="wordmark"><b>Fleora</b><span class="spark">&#10022;</span></div>
+      <p>Plan beautifully. Celebrate effortlessly. Tap through the flow &mdash; every screen mirrors the working Next.js&nbsp;+&nbsp;Supabase build.</p>
     </div>
     <div class="segmented" role="group" aria-label="Choose a view">
-      <button id="mode-client" aria-pressed="true">Planning an event</button>
+      <button id="mode-client" aria-pressed="true">Client app</button>
       <button id="mode-vendor" aria-pressed="false">Vendor console</button>
     </div>
   </header>
@@ -676,338 +381,444 @@
 
     <div class="device-col">
       <div class="phone">
-        <div class="bezel">
+        <div class="bezel" id="bezel">
           <div class="statusbar">
             <span class="num">9:41</span>
-            <span>Fleora</span>
-            <span class="sig" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="r"><span>&#9679;&#9679;&#9679;</span><span>Wi-Fi</span><span class="bat"></span></span>
           </div>
+
           <div class="screens" id="screens">
 
-            <!-- ============ CLIENT ============ -->
+            <!-- 1 welcome -->
             <section class="screen" data-screen="welcome">
-              <div style="display:flex;flex-direction:column;gap:16px;padding-top:36px;">
-                <div class="tile a" style="aspect-ratio:16/10;"><span>Real Fleora events, Greater Boston</span></div>
-                <div class="s-head">
-                  <div class="eyebrow">Welcome</div>
-                  <h2 style="font-size:30px;">Start with an idea. We&rsquo;ll build the event.</h2>
-                  <p class="sub">Tell Fleora what you&rsquo;re celebrating. Get matched with vetted local vendors, compare quotes, and manage everything in one place.</p>
+              <div style="padding-top:22px;display:flex;flex-direction:column;gap:14px;">
+                <div class="art p1" style="aspect-ratio:5/4;"><span>Real Fleora celebrations</span></div>
+                <div>
+                  <div class="wordmark"><b style="font-size:34px;">Fleora</b><span class="spark" style="font-size:17px;">&#10022;</span></div>
+                  <p style="font-family:'Fraunces',serif;font-weight:300;font-size:19px;color:var(--ink-soft);margin:8px 0 0;line-height:1.4;">Plan beautifully.<br>Celebrate effortlessly.</p>
                 </div>
-                <button class="btn" data-goto="type">Plan an event</button>
-                <button class="btn ghost" data-goto="dashboard">Skip to a finished example</button>
+                <button class="btn" data-goto="occasion">Get started</button>
+                <button class="btn ghost" data-goto="dashboard">I already have an account</button>
               </div>
             </section>
 
-            <section class="screen" data-screen="type">
-              <div class="s-head">
-                <div class="eyebrow">Step 1 · Occasion</div>
-                <h2>What are you planning?</h2>
+            <!-- 2 occasion -->
+            <section class="screen" data-screen="occasion">
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button></div>
+              <h2 class="s-title">What are you celebrating?</h2>
+              <p class="s-sub">Choose the type of event you&rsquo;re planning.</p>
+              <div class="occ" id="occ">
+                <button data-v="birthday" class="sel"><span class="g">&#127874;</span>Birthday</button>
+                <button data-v="baby"><span class="g">&#127868;</span>Baby shower</button>
+                <button data-v="bridal"><span class="g">&#128141;</span>Bridal shower</button>
+                <button data-v="engagement"><span class="g">&#128149;</span>Engagement</button>
+                <button data-v="anniversary"><span class="g">&#127870;</span>Anniversary</button>
+                <button data-v="grad"><span class="g">&#127891;</span>Graduation</button>
+                <button data-v="corporate"><span class="g">&#127970;</span>Corporate</button>
+                <button data-v="other"><span class="g">&#10022;</span>Other</button>
               </div>
-              <div class="type-grid" id="typeGrid">
-                <button data-type="birthday" class="sel"><span class="ic">🎂</span>Birthday</button>
-                <button data-type="wedding"><span class="ic">💍</span>Wedding</button>
-                <button data-type="baby"><span class="ic">👶</span>Baby shower</button>
-                <button data-type="grad"><span class="ic">🎓</span>Graduation</button>
-                <button data-type="anniversary"><span class="ic">🥂</span>Anniversary</button>
-                <button data-type="corporate"><span class="ic">🏢</span>Corporate</button>
-              </div>
-              <div style="margin-top:14px;">
-                <button class="btn" data-goto="details">Continue</button>
-              </div>
+              <div style="margin-top:16px;"><button class="btn" data-goto="details">Continue</button></div>
             </section>
 
+            <!-- 3 details -->
             <section class="screen" data-screen="details">
-              <div class="s-head">
-                <div class="eyebrow">Step 2 · The basics</div>
-                <h2>Tell us about the day</h2>
-                <p class="sub">Fleora uses this to build your plan and score vendor matches.</p>
-              </div>
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button></div>
+              <h2 class="s-title">Tell us about your event</h2>
+              <p class="s-sub">Let&rsquo;s get a few details to get started.</p>
               <div class="stack">
-                <div class="field"><label>Event name</label><div class="val">Jerrica&rsquo;s 36th Birthday</div></div>
-                <div class="grid-2">
-                  <div class="field"><label>Date</label><div class="val num">Oct 17, 2026</div></div>
-                  <div class="field"><label>Location</label><div class="val">Brockton, MA</div></div>
-                </div>
-                <div class="grid-2">
-                  <div class="field"><label>Guests</label><div class="val num">50</div></div>
-                  <div class="field"><label>Budget</label><div class="val num">$6,000</div></div>
-                </div>
-                <div class="grid-2">
-                  <div class="field"><label>Style</label><div class="val">Modern elegant</div></div>
-                  <div class="field"><label>Palette</label><div class="val">Pink · White · Gold</div></div>
-                </div>
-                <button class="btn" data-goto="plan">Build my event &rarr;</button>
+                <label class="field"><span>Event name</span><div class="control">Jerrica&rsquo;s 36th Birthday</div></label>
+                <label class="field"><span>Date</span><div class="control between"><span>October 17, 2026</span><svg class="ic"><use href="#i-cal"/></svg></div></label>
+                <label class="field"><span>Location</span><div class="control between"><span>Brockton, MA</span><svg class="ic"><use href="#i-pin"/></svg></div></label>
+                <label class="field"><span>Guest count</span><div class="control"><svg class="ic"><use href="#i-user"/></svg><span>50</span></div></label>
+                <label class="field"><span>Estimated budget</span><div class="control between"><span>$2,500 &ndash; $5,000</span><svg class="ic"><use href="#i-down"/></svg></div></label>
+                <button class="btn" data-goto="vision">Continue</button>
               </div>
             </section>
 
+            <!-- 4 vision -->
+            <section class="screen" data-screen="vision">
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button></div>
+              <h2 class="s-title">What&rsquo;s your vision?</h2>
+              <p class="s-sub">Add inspiration photos and choose the style you love.</p>
+              <div class="stack">
+                <div>
+                  <div class="field"><span>Inspiration photos</span></div>
+                  <div class="thumb-row" style="margin-top:6px;">
+                    <div class="art p1"></div><div class="art p4"></div><div class="art p2"></div>
+                    <div class="add"><svg class="ic"><use href="#i-plus"/></svg></div>
+                  </div>
+                </div>
+                <div>
+                  <div class="field"><span>Style</span><span class="faint tiny">select all that apply</span></div>
+                  <div class="chips" id="styleChips" style="margin-top:6px;">
+                    <button class="sel">Modern</button><button>Elegant</button><button>Minimal</button>
+                    <button>Luxury</button><button>Glam</button><button>Romantic</button>
+                    <button>Fun</button><button>Boho</button><button>Classic</button>
+                    <button>Garden</button><button>Colorful</button><button>Custom</button>
+                  </div>
+                </div>
+                <div>
+                  <div class="field"><span>Color palette</span></div>
+                  <div class="swatch-row" id="swatches" style="margin-top:6px;">
+                    <span class="swatch on" style="background:#f0a9c8;"></span>
+                    <span class="swatch" style="background:#f4c9a8;"></span>
+                    <span class="swatch on" style="background:#f6ead1;"></span>
+                    <span class="swatch" style="background:#e0b45c;"></span>
+                    <span class="swatch" style="background:#c9a7e6;"></span>
+                    <span class="swatch add"><svg class="ic" style="width:14px;height:14px;"><use href="#i-plus"/></svg></span>
+                  </div>
+                </div>
+                <button class="btn" data-goto="services">Continue</button>
+              </div>
+            </section>
+
+            <!-- 5 services -->
+            <section class="screen" data-screen="services">
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button></div>
+              <h2 class="s-title">What can we help you find?</h2>
+              <p class="s-sub">Select the services you need for your event.</p>
+              <div class="card" style="padding:2px 12px;">
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127963;&#65039;</span><span class="lbl">Venue</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127869;&#65039;</span><span class="lbl">Catering</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127856;</span><span class="lbl">Cake</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127880;</span><span class="lbl">Balloons &amp; decor</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#129681;</span><span class="lbl">Tables &amp; chairs</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#129525;</span><span class="lbl">Linens</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127800;</span><span class="lbl">Florals</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127911;</span><span class="lbl">DJ</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#128247;</span><span class="lbl">Photography</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#129513;</span><span class="lbl">Photo booth</span></label>
+                <label class="svc"><input type="checkbox"><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127864;</span><span class="lbl">Bartending</span></label>
+                <label class="svc"><input type="checkbox"><span class="box"><svg class="ic"><use href="#i-check"/></svg></span><span class="em">&#127917;</span><span class="lbl">Entertainment</span></label>
+              </div>
+              <div class="callout">
+                <span class="em">&#10022;</span>
+                <div><b>Not sure? Build my event for me</b><p>Fleora picks the services a 50-guest birthday needs.</p></div>
+              </div>
+              <div style="margin-top:14px;"><button class="btn" data-goto="plan">Continue</button></div>
+            </section>
+
+            <!-- 6 plan -->
             <section class="screen" data-screen="plan">
-              <div class="s-head">
-                <div class="eyebrow">Step 3 · Your plan</div>
-                <h2>Here&rsquo;s what your event needs</h2>
-                <p class="sub">Pre-selected for a 50-guest birthday. Estimates from your $6,000 budget — adjust anytime.</p>
-              </div>
-              <div class="fl-card" style="padding:4px 12px;">
-                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🎀</span><span class="lbl">Decor &amp; styling</span><span class="est">~$720</span></label>
-                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🎈</span><span class="lbl">Balloons</span><span class="est">~$300</span></label>
-                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🍰</span><span class="lbl">Cake &amp; desserts</span><span class="est">~$300</span></label>
-                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🍽️</span><span class="lbl">Catering</span><span class="est">~$1,800</span></label>
-                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">📸</span><span class="lbl">Photography</span><span class="est">~$550</span></label>
-                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🎧</span><span class="lbl">DJ &amp; entertainment</span><span class="est">~$550</span></label>
-                <label class="svc"><input type="checkbox"><span class="box"></span><span class="ic">🪑</span><span class="lbl">Tables, chairs &amp; linens</span><span class="est">~$480</span></label>
-                <label class="svc"><input type="checkbox"><span class="box"></span><span class="ic">🍸</span><span class="lbl">Bartending</span><span class="est">~$360</span></label>
-              </div>
-              <div style="margin-top:14px;">
-                <button class="btn" data-goto="matches">See my vendor matches</button>
-              </div>
-            </section>
-
-            <section class="screen" data-screen="matches">
-              <div class="s-head">
-                <div class="eyebrow">Step 4 · Decor matches</div>
-                <h2>Ranked for your event</h2>
-                <p class="sub">Scored on availability, distance, budget fit, style and reviews.</p>
-              </div>
-              <div class="stack">
-                <div class="fl-card">
-                  <div class="vendor">
-                    <div class="thumb tile a"></div>
-                    <div style="flex:1;min-width:0;">
-                      <div class="between">
-                        <strong style="font-size:14px;">Luxe Balloons Co.</strong>
-                        <span class="match"><b>94%</b><small>match</small></span>
-                      </div>
-                      <div class="tiny faint">Quincy, MA · 9 mi · <span class="stars">★★★★★</span> 4.7 (23)</div>
-                      <p class="tiny muted" style="margin:6px 0 0;">Luxury organic balloon installs &amp; backdrops. Pink / gold / neutral is our specialty.</p>
-                    </div>
-                  </div>
-                  <div class="row" style="margin-top:10px;gap:6px;">
-                    <span class="chip">from $450</span><span class="chip plum">Verified</span><span class="chip good">Available Oct 17</span>
-                  </div>
-                  <div class="row" style="margin-top:10px;gap:8px;">
-                    <button class="btn ghost sm" data-goto="profile">View profile</button>
-                    <button class="btn sm" data-goto="thread">Request quote</button>
-                  </div>
-                </div>
-
-                <div class="fl-card">
-                  <div class="vendor">
-                    <div class="thumb tile c"></div>
-                    <div style="flex:1;min-width:0;">
-                      <div class="between">
-                        <strong style="font-size:14px;">Field &amp; Vase Florals</strong>
-                        <span class="match mid"><b>86%</b><small>match</small></span>
-                      </div>
-                      <div class="tiny faint">Framingham, MA · 24 mi · <span class="stars">★★★★★</span> 5.0 (7)</div>
-                      <p class="tiny muted" style="margin:6px 0 0;">Garden-style florals, arbors and tablescape styling.</p>
-                    </div>
-                  </div>
-                  <div class="row" style="margin-top:10px;gap:6px;">
-                    <span class="chip">from $380</span><span class="chip plum">Verified</span>
-                  </div>
-                  <div class="row" style="margin-top:10px;gap:8px;">
-                    <button class="btn ghost sm" data-goto="profile">View profile</button>
-                    <button class="btn sm" data-goto="thread">Request quote</button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section class="screen" data-screen="profile">
-              <div class="s-head">
-                <div class="eyebrow">Vendor</div>
-                <h2>Luxe Balloons Co.</h2>
-                <p class="sub">Quincy, MA · <span class="stars">★★★★★</span> 4.7 (23 reviews) · 94% response rate</p>
-              </div>
-              <div class="tile-grid" style="margin-bottom:12px;">
-                <div class="tile a"><span>Blush garland</span></div>
-                <div class="tile b"><span>Shimmer wall</span></div>
-                <div class="tile d"><span>Balloon mosaic</span></div>
-              </div>
-              <div class="fl-card stack">
-                <div>
-                  <div class="eyebrow">Services</div>
-                  <div class="between tiny" style="margin-top:6px;"><span>Organic balloon garland (8ft)</span><span class="muted">from $450</span></div>
-                  <div class="between tiny" style="margin-top:4px;"><span>Backdrop + garland package</span><span class="muted">from $850</span></div>
-                  <div class="between tiny" style="margin-top:4px;"><span>Balloon number / mosaic</span><span class="muted">from $220</span></div>
-                </div>
-                <div>
-                  <div class="eyebrow">Recent review</div>
-                  <p class="tiny muted" style="margin:6px 0 0;">&ldquo;The backdrop was stunning and setup was seamless.&rdquo; — verified booking</p>
-                </div>
-              </div>
-              <div style="margin-top:14px;">
-                <button class="btn" data-goto="thread">Request a quote</button>
-              </div>
-            </section>
-
-            <section class="screen" data-screen="thread">
-              <div class="s-head">
-                <div class="eyebrow">Step 5 · Luxe Balloons Co.</div>
-                <h2>Your conversation</h2>
-                <p class="sub">Your event brief is sent automatically — no re-typing the details.</p>
-              </div>
-              <div class="thread">
-                <div class="bubble me">Hi! I&rsquo;d love a quote for Decor &amp; styling.
-
-Event: Jerrica&rsquo;s 36th Birthday
-Date: Oct 17, 2026
-Location: Brockton, MA
-Guests: 50
-Budget: $6,000
-Style: Modern elegant · Pink · White · Gold</div>
-                <div class="bubble them">Hi Jerrica! Love this palette. I can do an organic garland over a shimmer backdrop with a balloon &ldquo;36&rdquo; and a signage ledge. Sending a quote now. 💗</div>
-                <div class="bubble them">Quote sent — $650 total, $200 deposit to book. Tap to review.</div>
-              </div>
-              <div style="margin-top:14px;">
-                <button class="btn" data-goto="quote">Open quote · $650</button>
-              </div>
-            </section>
-
-            <section class="screen" data-screen="quote">
-              <div class="s-head">
-                <div class="eyebrow">Step 6 · Quote from Luxe Balloons Co.</div>
-                <h2>Decor &amp; styling</h2>
-              </div>
-              <div class="fl-card">
-                <div class="qline"><span>Organic balloon garland</span><span class="num">$450</span></div>
-                <div class="qline"><span>Shimmer backdrop</span><span class="num">$150</span></div>
-                <div class="qline"><span>Delivery, setup &amp; strike</span><span class="num">$50</span></div>
-                <div class="qtotal"><span>Total</span><span class="num">$650</span></div>
-                <div class="between tiny muted" style="margin-top:8px;"><span>Deposit to book</span><span class="num">$200</span></div>
-                <p class="tiny muted" style="margin:10px 0 0;">Includes a balloon &ldquo;36&rdquo; and signage ledge. Arrives 2 hrs before start. Valid until Oct 1.</p>
-              </div>
-              <div class="row" style="margin-top:14px;gap:8px;">
-                <button class="btn ghost sm" data-goto="thread">Ask a question</button>
-                <button class="btn sm" data-action="book">Accept &amp; book</button>
-              </div>
-            </section>
-
-            <section class="screen" data-screen="dashboard">
-              <div class="s-head">
-                <div class="eyebrow">Step 7 · Command center</div>
-                <h2>Jerrica&rsquo;s 36th Birthday</h2>
-                <p class="sub">Oct 17, 2026 · Brockton, MA · 50 guests · Pink · White · Gold</p>
-              </div>
-              <div id="dash" class="stack">
-                <div class="fl-card ring-wrap">
-                  <svg class="ring" viewBox="0 0 80 80" aria-hidden="true">
-                    <circle class="track" cx="40" cy="40" r="34"></circle>
-                    <circle class="fill" id="ringFill" cx="40" cy="40" r="34" transform="rotate(-90 40 40)"></circle>
-                    <text id="ringPct" x="40" y="46" text-anchor="middle">29%</text>
-                  </svg>
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button></div>
+              <h2 class="s-title">Here&rsquo;s your event plan</h2>
+              <p class="s-sub">We&rsquo;ve created a plan based on your details.</p>
+              <div class="card">
+                <div class="between">
                   <div>
-                    <div style="font-weight:700;font-size:14px;">On track for your event 🎉</div>
-                    <div class="tiny muted" id="dashCount">2 of 7 vendors booked</div>
+                    <strong style="font-size:14px;">Jerrica&rsquo;s 36th Birthday</strong>
+                    <div class="tiny faint" style="margin-top:2px;">Oct 17, 2026 &middot; Brockton, MA &middot; 50 guests</div>
+                    <div class="tiny muted" style="margin-top:2px;">Budget: $3,000</div>
+                  </div>
+                  <span class="pill">Edit</span>
+                </div>
+                <div class="hr" style="margin:12px 0 4px;"></div>
+                <div class="plan-grp">Essentials</div>
+                <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Catering</div>
+                <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Cake</div>
+                <div class="plan-item"><span class="dot e"><svg class="ic"><use href="#i-check"/></svg></span>Tables &amp; chairs</div>
+                <div class="plan-grp">Recommended</div>
+                <div class="plan-item"><span class="dot r"><svg class="ic"><use href="#i-check"/></svg></span>Balloons &amp; decor</div>
+                <div class="plan-item"><span class="dot r"><svg class="ic"><use href="#i-check"/></svg></span>Photography</div>
+                <div class="plan-item"><span class="dot r"><svg class="ic"><use href="#i-check"/></svg></span>Photo booth</div>
+                <div class="plan-grp">Optional</div>
+                <div class="plan-item"><span class="dot o"></span><span class="muted">DJ</span></div>
+                <div class="plan-item"><span class="dot o"></span><span class="muted">Bartender</span></div>
+                <div class="plan-item"><span class="dot o"></span><span class="muted">Florals</span></div>
+                <div class="hr" style="margin:10px 0;"></div>
+                <div class="between">
+                  <div><div class="tiny faint">Estimated total</div><div class="tiny" style="color:var(--good);font-weight:600;">You&rsquo;re within budget &#127881;</div></div>
+                  <div class="num" style="font-size:20px;font-weight:700;">$2,950</div>
+                </div>
+              </div>
+              <div style="margin-top:14px;"><button class="btn" data-goto="matches">Find vendors</button></div>
+            </section>
+
+            <!-- 7 matches -->
+            <section class="screen" data-screen="matches">
+              <div class="appbar">
+                <button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button>
+                <span class="title">Top matches for you</span>
+                <button class="icon-btn solid" aria-label="Filter"><svg class="ic"><use href="#i-filter"/></svg></button>
+              </div>
+              <p class="s-sub" style="margin-top:-2px;">Vendors matched to your event.</p>
+              <div class="stack">
+                <div class="card">
+                  <div class="vendor">
+                    <div class="pic art p1"></div>
+                    <div style="flex:1;min-width:0;">
+                      <div class="between"><strong style="font-size:14px;">Luxe Events</strong><span class="match"><b>96%</b><small>match</small></span></div>
+                      <div class="tiny"><span class="stars">&#9733;</span> 4.9 (127) &middot; <span class="faint">8 miles away</span></div>
+                      <div class="tiny muted" style="margin-top:2px;">Starting at $500</div>
+                      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><span class="pill g">Available Oct 17</span><span class="pill v">Within budget</span></div>
+                    </div>
+                  </div>
+                  <button class="btn sm" data-goto="vendor" style="width:100%;margin-top:11px;">View vendor</button>
+                </div>
+                <div class="card">
+                  <div class="vendor">
+                    <div class="pic art p4"></div>
+                    <div style="flex:1;min-width:0;">
+                      <div class="between"><strong style="font-size:14px;">Pretty &amp; Popped</strong><span class="match mid"><b>93%</b><small>match</small></span></div>
+                      <div class="tiny"><span class="stars">&#9733;</span> 4.8 (86) &middot; <span class="faint">6 miles away</span></div>
+                      <div class="tiny muted" style="margin-top:2px;">Starting at $450</div>
+                      <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;"><span class="pill g">Available Oct 17</span><span class="pill v">Within budget</span></div>
+                    </div>
                   </div>
                 </div>
-
-                <div class="dash-stat">
-                  <div class="fl-card"><div class="k">Committed</div><div class="v" id="dashSpend">$1,475</div><div class="tiny faint">of $6,000</div></div>
-                  <div class="fl-card"><div class="k">Guests</div><div class="v num">32 / 50</div><div class="tiny faint">RSVPs in</div></div>
-                </div>
-
-                <div class="fl-card">
-                  <div class="eyebrow" style="margin-bottom:6px;">Your vendors</div>
-                  <div class="when-booked vrow" style="border-top:0;"><span class="vdot ok"></span><span style="flex:1;">Luxe Balloons Co. — Decor</span><span class="chip good">Booked</span></div>
-                  <div class="vrow"><span class="vdot ok"></span><span style="flex:1;">Sugar Plum Bakes — Cake</span><span class="chip good">Booked</span></div>
-                  <div class="vrow"><span class="vdot ok"></span><span style="flex:1;">Lumen Photography — Photo</span><span class="chip good">Booked</span></div>
-                  <div class="vrow"><span class="vdot wait"></span><span style="flex:1;">Harbor Catering — Catering</span><span class="chip gold">2 quotes in</span></div>
-                  <div class="vrow"><span class="vdot"></span><span style="flex:1;">DJ &amp; entertainment</span><span class="chip">Find</span></div>
-                </div>
-
-                <div class="fl-card">
-                  <div class="eyebrow" style="margin-bottom:8px;">Next up</div>
-                  <div class="row tiny"><input type="checkbox" checked style="accent-color:var(--plum);"><span class="muted" style="text-decoration:line-through;">Book decor &amp; photographer</span></div>
-                  <div class="row tiny" style="margin-top:6px;"><input type="checkbox" style="accent-color:var(--plum);"><span>Send invitations — due this week</span></div>
-                  <div class="row tiny" style="margin-top:6px;"><input type="checkbox" style="accent-color:var(--plum);"><span>Confirm final guest count</span></div>
+                <div class="card">
+                  <div class="vendor">
+                    <div class="pic art p2"></div>
+                    <div style="flex:1;min-width:0;">
+                      <div class="between"><strong style="font-size:14px;">Balloon Bar Boston</strong><span class="match mid"><b>88%</b><small>match</small></span></div>
+                      <div class="tiny"><span class="stars">&#9733;</span> 4.7 (54) &middot; <span class="faint">10 miles away</span></div>
+                      <div class="tiny muted" style="margin-top:2px;">Starting at $600</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
 
-            <!-- ============ VENDOR ============ -->
-            <section class="screen" data-screen="v-dash">
-              <div class="s-head">
-                <div class="eyebrow">Vendor console</div>
-                <h2>Good day, Luxe Balloons Co.</h2>
-                <p class="sub">You&rsquo;re live on Fleora across Greater Boston.</p>
+            <!-- 8 vendor profile -->
+            <section class="screen" data-screen="vendor">
+              <div style="margin:0 -18px;position:relative;">
+                <div class="art p1" style="height:180px;border-radius:0;"></div>
+                <div style="position:absolute;top:10px;left:14px;right:14px;display:flex;justify-content:space-between;">
+                  <button class="icon-btn solid" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button>
+                  <div style="display:flex;gap:8px;">
+                    <button class="icon-btn solid" aria-label="Save"><svg class="ic"><use href="#i-heart"/></svg></button>
+                    <button class="icon-btn solid" aria-label="Share"><svg class="ic"><use href="#i-share"/></svg></button>
+                  </div>
+                </div>
               </div>
-              <div class="dash-stat" style="margin-bottom:10px;">
-                <div class="fl-card"><div class="k">New leads</div><div class="v num">4</div></div>
-                <div class="fl-card"><div class="k">Upcoming</div><div class="v num">6</div></div>
-                <div class="fl-card"><div class="k">Booked revenue</div><div class="v num">$8,450</div></div>
-                <div class="fl-card"><div class="k">Rating</div><div class="v">4.7 <span class="stars">★</span></div></div>
+              <div style="padding-top:12px;">
+                <div class="between">
+                  <div style="display:flex;align-items:center;gap:7px;"><h2 style="font-size:19px;">Luxe Events</h2><span class="verified"><svg class="ic"><use href="#i-check"/></svg></span></div>
+                </div>
+                <div class="tiny" style="margin-top:3px;"><span class="stars">&#9733;</span> 4.9 (127 reviews) &middot; <span class="faint">Boston, MA</span></div>
+                <p class="tiny muted" style="margin:8px 0 0;">We create stunning balloon designs and full event styling for unforgettable celebrations.</p>
+                <div class="plan-grp">Services</div>
+                <div class="chips"><span class="pill">Balloon installations</span><span class="pill">Backdrops</span><span class="pill">Tablescapes</span><span class="pill">Event styling</span></div>
+                <div class="plan-grp">Starting prices</div>
+                <div class="between tiny" style="padding:3px 0;"><span>Balloon installations</span><span class="muted">$450+</span></div>
+                <div class="between tiny" style="padding:3px 0;"><span>Backdrops</span><span class="muted">$350+</span></div>
+                <div class="between tiny" style="padding:3px 0;"><span>Full styling</span><span class="muted">$900+</span></div>
+                <div style="display:flex;gap:8px;margin-top:14px;">
+                  <button class="btn ghost sm" data-goto="messages" style="flex:1;">Message</button>
+                  <button class="btn sm" data-goto="request" style="flex:1;">Request quote</button>
+                </div>
               </div>
-              <div class="eyebrow" style="margin:4px 0 8px;">New leads</div>
+            </section>
+
+            <!-- 9 request a quote -->
+            <section class="screen" data-screen="request">
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button><span class="title">Request a quote</span></div>
+              <div class="card" style="padding:12px;margin-bottom:12px;">
+                <strong style="font-size:13px;">Jerrica&rsquo;s 36th Birthday</strong>
+                <div class="tiny faint" style="margin-top:2px;">Oct 17, 2026 &middot; Brockton, MA &middot; 50 guests</div>
+              </div>
               <div class="stack">
-                <div class="lead">
-                  <div class="between"><strong style="font-size:13.5px;">Jerrica&rsquo;s 36th Birthday</strong><span class="match"><b>94%</b><small>match</small></span></div>
-                  <div class="tiny faint" style="margin-top:4px;">🎂 Brockton · Oct 17 · 50 guests · $6,000 · Modern elegant</div>
-                  <div style="margin-top:9px;"><button class="btn sm" data-goto="v-lead">Open lead</button></div>
+                <label class="field"><span>Service requested</span><div class="control between"><span>Balloons &amp; decor</span><svg class="ic"><use href="#i-down"/></svg></div></label>
+                <label class="field"><span>Your budget</span><div class="control between"><span>$500 &ndash; $700</span><svg class="ic"><use href="#i-down"/></svg></div></label>
+                <div class="field"><span>Style</span>
+                  <div class="chips" style="margin-top:4px;"><span class="pill v">Modern</span><span class="pill v">Elegant</span><span class="pill v">Pink</span><span class="pill">+</span></div>
                 </div>
-                <div class="lead" style="border-left-color:var(--line-strong);">
-                  <div class="between"><strong style="font-size:13.5px;">Corporate holiday party</strong><span class="match mid"><b>81%</b><small>match</small></span></div>
-                  <div class="tiny faint" style="margin-top:4px;">🏢 Boston · Dec 12 · 120 guests · $14,000</div>
+                <div class="field"><span>Add inspiration photos</span>
+                  <div class="thumb-row" style="margin-top:4px;"><div class="art p1"></div><div class="art p4"></div><div class="add"><svg class="ic"><use href="#i-plus"/></svg></div></div>
                 </div>
+                <label class="field"><span>Additional notes <span class="faint">(optional)</span></span><div class="control" style="align-items:flex-start;min-height:56px;">I&rsquo;d love a balloon installation around the dessert table.</div></label>
+                <button class="btn" data-goto="messages">Send quote request</button>
+              </div>
+            </section>
+
+            <!-- 10 messages -->
+            <section class="screen" data-screen="messages">
+              <div class="appbar">
+                <span class="title" style="font-size:19px;font-weight:700;">Messages</span>
+                <button class="icon-btn solid" aria-label="New message"><svg class="ic"><use href="#i-compose"/></svg></button>
+              </div>
+              <div class="tabs"><button class="on">All</button><button>Unread</button><button>Favorites</button></div>
+              <div>
+                <div class="msg">
+                  <div class="av art p1"></div>
+                  <div style="flex:1;min-width:0;"><div class="who">Luxe Events</div><div class="prev">New quote received</div></div>
+                  <div class="meta"><span class="time">10:24 AM</span><span class="badge-n">2</span></div>
+                </div>
+                <div class="msg">
+                  <div class="av art p3"></div>
+                  <div style="flex:1;min-width:0;"><div class="who">Sweet Dreams Cakes</div><div class="prev">Awaiting response</div></div>
+                  <div class="meta"><span class="time">Yesterday</span></div>
+                </div>
+                <div class="msg">
+                  <div class="av art p2"></div>
+                  <div style="flex:1;min-width:0;"><div class="who">Boston Photo Booth</div><div class="prev">New message</div></div>
+                  <div class="meta"><span class="time">Yesterday</span><span class="badge-n">1</span></div>
+                </div>
+                <div class="msg">
+                  <div class="av art p4"></div>
+                  <div style="flex:1;min-width:0;"><div class="who">Pretty &amp; Popped</div><div class="prev">Thanks! Let me know&hellip;</div></div>
+                  <div class="meta"><span class="time">Sep 2</span></div>
+                </div>
+                <div class="msg">
+                  <div class="av art p3"></div>
+                  <div style="flex:1;min-width:0;"><div class="who">Elegant Catering Co.</div><div class="prev">We&rsquo;re excited to be part&hellip;</div></div>
+                  <div class="meta"><span class="time">Sep 1</span></div>
+                </div>
+              </div>
+              <div style="margin-top:14px;"><button class="btn" data-goto="quote">Open the Luxe Events quote</button></div>
+            </section>
+
+            <!-- 11 quote -->
+            <section class="screen" data-screen="quote">
+              <div class="appbar">
+                <button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button>
+                <span class="title">Quote from Luxe Events</span>
+                <span class="pill a">Pending</span>
+              </div>
+              <div class="card">
+                <div class="qtotal"><span class="muted tiny" style="font-weight:600;">Total</span><span class="v">$650</span></div>
+                <div class="hr" style="margin:10px 0 2px;"></div>
+                <div class="qline"><span>Balloon installation</span><span class="num">$450</span></div>
+                <div class="qline"><span>Backdrop</span><span class="num">$150</span></div>
+                <div class="qline"><span>Setup</span><span class="num">$50</span></div>
+              </div>
+              <div class="card" style="margin-top:10px;">
+                <div class="plan-grp" style="margin-top:0;">Payment schedule</div>
+                <div class="sched"><span>Deposit <span class="faint">(due now)</span></span><span class="num" style="font-weight:600;">$200</span></div>
+                <div class="sched"><span>Remaining balance<br><span class="faint tiny">Due Oct 10, 2026</span></span><span class="num" style="font-weight:600;">$450</span></div>
+              </div>
+              <div class="card" style="margin-top:10px;">
+                <div class="plan-grp" style="margin-top:0;">Includes</div>
+                <div class="inc"><svg class="ic"><use href="#i-check"/></svg>Delivery</div>
+                <div class="inc"><svg class="ic"><use href="#i-check"/></svg>Setup &amp; breakdown</div>
+                <div class="inc"><svg class="ic"><use href="#i-check"/></svg>Custom sign</div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:14px;">
+                <button class="btn ghost sm" data-goto="messages" style="flex:1;">Decline</button>
+                <button class="btn sm" data-action="book" style="flex:1;">Accept &amp; book</button>
+              </div>
+            </section>
+
+            <!-- 12 dashboard -->
+            <section class="screen" data-screen="dashboard">
+              <div class="appbar">
+                <button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button>
+                <span class="title">Jerrica&rsquo;s 36th Birthday</span>
+                <button class="icon-btn" aria-label="Edit"><svg class="ic"><use href="#i-edit"/></svg></button>
+              </div>
+              <div class="tiny faint" style="margin:-4px 0 12px;">Oct 17, 2026 &middot; Brockton, MA</div>
+              <div id="dash" class="stack">
+                <div class="card">
+                  <div class="between" style="margin-bottom:8px;">
+                    <strong style="font-size:13px;" id="planPctLabel">72% planned</strong>
+                    <span class="tiny faint">On track &#127881;</span>
+                  </div>
+                  <div class="bar"><i id="planBar" style="width:72%"></i></div>
+                </div>
+                <div class="card">
+                  <div class="between">
+                    <div>
+                      <div class="tiny faint">Budget</div>
+                      <div style="font-size:17px;font-weight:700;" class="num"><span id="dashSpend">$2,350</span> <span class="tiny muted" style="font-weight:500;">committed of $3,000</span></div>
+                    </div>
+                    <span class="pill">View budget</span>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="plan-grp" style="margin-top:0;">My vendors</div>
+                  <div class="vrow"><span style="flex:1;">Catering</span><span class="vstatus ok">Booked</span><svg class="ic chev"><use href="#i-fwd"/></svg></div>
+                  <div class="vrow"><span style="flex:1;">Cake</span><span class="vstatus ok">Booked</span><svg class="ic chev"><use href="#i-fwd"/></svg></div>
+                  <div class="vrow">
+                    <span style="flex:1;">Decor</span>
+                    <span class="vstatus mid when-open">Comparing quotes</span>
+                    <span class="vstatus ok when-booked">Booked</span>
+                    <svg class="ic chev"><use href="#i-fwd"/></svg>
+                  </div>
+                  <div class="vrow"><span style="flex:1;">Photo booth</span><span class="vstatus todo">Need to book</span><svg class="ic chev"><use href="#i-fwd"/></svg></div>
+                  <div class="vrow"><span style="flex:1;">Photography</span><span class="vstatus todo">Need to book</span><svg class="ic chev"><use href="#i-fwd"/></svg></div>
+                </div>
+                <button class="btn ghost"><svg class="ic"><use href="#i-plus"/></svg>Add vendor</button>
+              </div>
+            </section>
+
+            <!-- ===== VENDOR ===== -->
+            <section class="screen" data-screen="v-console">
+              <div class="appbar"><span class="title" style="font-size:19px;font-weight:700;">Luxe Events</span><button class="icon-btn" aria-label="Settings"><svg class="ic"><use href="#i-user"/></svg></button></div>
+              <p class="s-sub" style="margin-top:-2px;">Good morning &mdash; here&rsquo;s your day.</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+                <div class="card" style="padding:12px;"><div class="tiny faint">New requests</div><div class="num" style="font-size:19px;font-weight:700;">4</div></div>
+                <div class="card" style="padding:12px;"><div class="tiny faint">Upcoming events</div><div class="num" style="font-size:19px;font-weight:700;">6</div></div>
+                <div class="card" style="padding:12px;"><div class="tiny faint">Upcoming revenue</div><div class="num" style="font-size:19px;font-weight:700;">$8,450</div></div>
+                <div class="card" style="padding:12px;"><div class="tiny faint">Rating</div><div style="font-size:19px;font-weight:700;">4.9 <span class="stars">&#9733;</span></div></div>
+              </div>
+              <div class="plan-grp" style="margin-top:0;">New request</div>
+              <div class="card">
+                <div class="between"><strong style="font-size:13.5px;">Jerrica&rsquo;s 36th Birthday</strong><span class="match"><b>96%</b><small>match</small></span></div>
+                <div class="tiny faint" style="margin-top:4px;">&#127874; Brockton &middot; Oct 17 &middot; 50 guests &middot; $500&ndash;$700</div>
+                <div style="margin-top:9px;"><button class="btn sm" data-goto="v-lead">View request</button></div>
               </div>
             </section>
 
             <section class="screen" data-screen="v-lead">
-              <div class="s-head">
-                <div class="eyebrow">Lead · full brief attached</div>
-                <h2>Jerrica&rsquo;s 36th Birthday</h2>
-              </div>
-              <div class="fl-card stack">
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button><span class="title">Client request</span></div>
+              <h2 class="s-title">Jerrica&rsquo;s 36th Birthday</h2>
+              <p class="s-sub">The full brief is attached &mdash; no back-and-forth to price it.</p>
+              <div class="card stack">
                 <div class="between tiny"><span class="faint">Date</span><span>Oct 17, 2026</span></div>
-                <div class="between tiny"><span class="faint">Location</span><span>Brockton, MA (9 mi)</span></div>
+                <div class="between tiny"><span class="faint">Location</span><span>Brockton, MA &middot; 8 mi</span></div>
                 <div class="between tiny"><span class="faint">Guests</span><span>50</span></div>
-                <div class="between tiny"><span class="faint">Overall budget</span><span>$6,000</span></div>
-                <div class="between tiny"><span class="faint">Service</span><span>Decor &amp; styling</span></div>
-                <div class="between tiny"><span class="faint">Style</span><span>Modern · Pink · White · Gold</span></div>
+                <div class="between tiny"><span class="faint">Service</span><span>Balloons &amp; decor</span></div>
+                <div class="between tiny"><span class="faint">Their budget</span><span>$500 &ndash; $700</span></div>
+                <div class="between tiny"><span class="faint">Style</span><span>Modern &middot; Pink</span></div>
               </div>
-              <div class="tile-grid two" style="margin-top:10px;">
-                <div class="tile a"><span>Client inspiration</span></div>
-                <div class="tile d"><span>Client inspiration</span></div>
-              </div>
-              <p class="tiny muted" style="margin-top:10px;">No back-and-forth to gather the basics — everything you need to price is already here.</p>
+              <div class="thumb-row" style="margin-top:10px;"><div class="art p1" style="width:64px;height:64px;"></div><div class="art p4" style="width:64px;height:64px;"></div></div>
+              <p class="tiny muted" style="margin-top:8px;">&ldquo;I&rsquo;d love a balloon installation around the dessert table.&rdquo;</p>
               <div style="margin-top:14px;"><button class="btn" data-goto="v-quote">Build a quote</button></div>
             </section>
 
             <section class="screen" data-screen="v-quote">
-              <div class="s-head">
-                <div class="eyebrow">New quote · Decor &amp; styling</div>
-                <h2>Price it out</h2>
+              <div class="appbar"><button class="icon-btn" data-back aria-label="Back"><svg class="ic"><use href="#i-back"/></svg></button><span class="title">New quote</span></div>
+              <h2 class="s-title">Price it out</h2>
+              <p class="s-sub">Balloons &amp; decor for Jerrica&rsquo;s 36th Birthday.</p>
+              <div class="card">
+                <div class="qline"><span>Balloon installation</span><span class="num">$450</span></div>
+                <div class="qline"><span>Backdrop</span><span class="num">$150</span></div>
+                <div class="qline"><span>Setup</span><span class="num">$50</span></div>
+                <div class="qline" style="color:var(--violet-deep);font-weight:600;"><span>+ Add line item</span><span></span></div>
+                <div class="hr"></div>
+                <div class="between" style="padding-top:6px;"><span class="muted tiny" style="font-weight:600;">Subtotal</span><span class="num" style="font-size:18px;font-weight:700;">$650</span></div>
+                <div class="between tiny muted" style="margin-top:4px;"><span>Deposit to book (30%)</span><span class="num">$200</span></div>
               </div>
-              <div class="fl-card">
-                <div class="qline"><span>Organic balloon garland</span><span class="num">$450</span></div>
-                <div class="qline"><span>Shimmer backdrop</span><span class="num">$150</span></div>
-                <div class="qline"><span>Delivery, setup &amp; strike</span><span class="num">$50</span></div>
-                <div class="row tiny" style="color:var(--plum-deep);padding:8px 0;">＋ Add line</div>
-                <div class="qtotal"><span>Subtotal</span><span class="num">$650</span></div>
-                <div class="between tiny muted" style="margin-top:8px;"><span>Deposit to book (30%)</span><span class="num">$200</span></div>
-              </div>
-              <div style="margin-top:14px;"><button class="btn" data-goto="v-dash">Send quote to Jerrica</button></div>
-              <p class="tiny faint" style="text-align:center;margin-top:10px;">Fleora fee (7%) is deducted on payout. Client sees $650.</p>
+              <div style="margin-top:14px;"><button class="btn" data-goto="v-console">Send quote to Jerrica</button></div>
+              <p class="tiny faint" style="text-align:center;margin-top:9px;">Fleora fee (7%) comes out of payout. Client sees $650.</p>
             </section>
 
           </div>
-          <div class="navbar">
-            <button class="navbtn" id="prevBtn">&larr; Back</button>
-            <span class="stepname" id="stepName"></span>
-            <button class="navbtn" id="nextBtn">Next &rarr;</button>
-          </div>
+
+          <nav class="tabbar" id="tabbar" aria-label="App sections">
+            <button data-tab="home" data-goto="welcome"><svg class="ic"><use href="#i-home"/></svg>Home</button>
+            <button data-tab="discover" data-goto="matches"><svg class="ic"><use href="#i-compass"/></svg>Discover</button>
+            <button data-tab="events" data-goto="dashboard"><svg class="ic"><use href="#i-events"/></svg>My events</button>
+            <button data-tab="messages" data-goto="messages"><svg class="ic"><use href="#i-chat"/></svg>Messages</button>
+            <button data-tab="profile"><svg class="ic"><use href="#i-user"/></svg>Profile</button>
+          </nav>
         </div>
       </div>
 
+      <div class="controls">
+        <button class="navbtn" id="prevBtn"><svg class="ic" style="width:14px;height:14px;display:inline;vertical-align:-2px;"><use href="#i-back"/></svg> Back</button>
+        <span class="stepname" id="stepName"></span>
+        <button class="navbtn" id="nextBtn">Next <svg class="ic" style="width:14px;height:14px;display:inline;vertical-align:-2px;"><use href="#i-fwd"/></svg></button>
+      </div>
+
       <div class="caption" id="caption" aria-live="polite">
-        <span class="eyebrow" id="capLabel">The pitch</span>
+        <span class="lbl" id="capLabel">The pitch</span>
         <p id="capText"></p>
       </div>
     </div>
   </div>
 
-  <p class="legal">
-    Interactive prototype — mock data, no backend. The working build is a Next.js&nbsp;+&nbsp;Supabase codebase in the same repo.
-  </p>
+  <p class="legal">Interactive prototype &mdash; mock data, no backend. The working build is a Next.js&nbsp;+&nbsp;Supabase codebase in the same repo.</p>
 </div>
 
 <script>
@@ -1016,37 +827,45 @@ Style: Modern elegant · Pink · White · Gold</div>
 
     var FLOWS = {
       client: [
-        { id: "welcome", label: "Welcome", cap: ["The pitch", "Two ways in: describe what you're planning, or (later) upload an inspiration photo and let AI build the shopping list. The <b>event</b> is the object everything hangs off."] },
-        { id: "type", label: "Occasion", cap: ["Step 1", "Ten occasion types on launch. Each one seeds a different default service checklist and planning timeline."] },
-        { id: "details", label: "The basics", cap: ["Step 2", "Date, location, guest count, budget and style. These five fields feed the matching score and the budget tracker — entered once, reused everywhere."] },
-        { id: "plan", label: "Your plan", cap: ["Step 3", "Fleora turns the answers into a plan: which services this event needs, pre-checked, each with a budget estimate. The client never has to know they need a &ldquo;stationer.&rdquo;"] },
-        { id: "matches", label: "Matches", cap: ["Step 4 · matching engine", "A Postgres function scores every approved vendor 0&ndash;100: availability&nbsp;30 / location&nbsp;25 / budget&nbsp;20 / style&nbsp;15 / reviews&nbsp;10. The client sees <b>&ldquo;94% match,&rdquo;</b> not a directory."] },
-        { id: "profile", label: "Vendor", cap: ["Vendor profile", "Structured portfolio, services with real starting prices, verified reviews from past Fleora bookings. No &ldquo;DM for pricing.&rdquo;"] },
-        { id: "thread", label: "Messaging", cap: ["Step 5", "Requesting a quote opens one thread per vendor and auto-sends the brief. Every conversation stays attached to the event instead of scattered across texts and DMs."] },
-        { id: "quote", label: "Quote", cap: ["Step 6", "Standardized line-item quotes. Accept turns the quote into a booking, marks the category done, and declines the competing quotes automatically."] },
-        { id: "dashboard", label: "Dashboard", cap: ["Step 7", "The command center: progress, committed budget vs. plan, guest RSVPs, per-vendor status, and a checklist that reminds you when invitations are due. <b>Try &ldquo;Accept &amp; book&rdquo; on the quote</b> — this updates."] }
+        { id: "welcome", label: "Welcome", cap: ["The pitch", "Two ways in: describe the event, or upload an inspiration photo. The <b>event</b> is the object every quote, message and payment hangs off."] },
+        { id: "occasion", label: "Occasion", cap: ["Step 1", "Ten occasion types. Each seeds a different default service list and a planning timeline with reminders."] },
+        { id: "details", label: "Details", cap: ["Step 2", "Date, location, guest count and budget &mdash; entered once, reused by the matching score, the budget tracker and every quote request."] },
+        { id: "vision", label: "Vision", cap: ["Step 3", "Inspiration photos plus style and palette. This is the hook into <b>Build This Look</b> &mdash; AI turning a picture into a shopping list later."] },
+        { id: "services", label: "Services", cap: ["Step 4", "Pick the services you need, or tap <b>Build my event for me</b> and Fleora chooses. Clients never need to know they need a &ldquo;stationer.&rdquo;"] },
+        { id: "plan", label: "Event plan", cap: ["Step 5", "The answers become a plan: essentials, recommended, optional &mdash; each with an estimate, checked against the budget."] },
+        { id: "matches", label: "Matches", cap: ["Step 6 &middot; matching engine", "A Postgres function scores every approved vendor 0&ndash;100 on availability, distance, budget fit, style and reviews. The client sees <b>&ldquo;96% match,&rdquo;</b> not a directory."] },
+        { id: "vendor", label: "Vendor", cap: ["Vendor profile", "Structured portfolio, services with real starting prices, verified reviews. No &ldquo;DM for pricing.&rdquo;"] },
+        { id: "request", label: "Request quote", cap: ["Quote request", "One tap sends the whole brief &mdash; date, guests, budget, style, inspiration &mdash; and opens a thread attached to the event."] },
+        { id: "messages", label: "Messages", cap: ["Messages", "Every vendor conversation in one place instead of scattered across texts, email and Instagram DMs."] },
+        { id: "quote", label: "Quote", cap: ["Standardized quote", "Line items, a payment schedule, what&rsquo;s included. <b>Accept &amp; book</b> creates the booking and updates your dashboard &mdash; try it."] },
+        { id: "dashboard", label: "Dashboard", cap: ["Command center", "Progress, committed budget vs. plan, and every vendor&rsquo;s status &mdash; booked, comparing quotes, or still to book."] }
       ],
       vendor: [
-        { id: "v-dash", label: "Console", cap: ["Vendor console", "Vendors don't just get leads — they run their business here. Free tier: profile, leads, messaging, quotes, bookings. Pro adds a calendar and off-platform events."] },
-        { id: "v-lead", label: "Lead", cap: ["Qualified lead", "The whole brief arrives with the lead — date, location, guest count, budget, style, inspiration. A far better lead than &ldquo;someone in Boston wants balloons.&rdquo;"] },
-        { id: "v-quote", label: "Quote builder", cap: ["Quote builder", "Line items, auto 30% deposit, expiry. On payout the Fleora fee is deducted; the client always sees the round number."] }
+        { id: "v-console", label: "Console", cap: ["Vendor console", "Vendors run their business here, not just receive leads. Free: profile, requests, messaging, quotes, bookings. Pro adds a calendar and off-platform events."] },
+        { id: "v-lead", label: "Request", cap: ["Qualified request", "The brief arrives complete. A far better lead than &ldquo;someone in Boston wants balloons.&rdquo;"] },
+        { id: "v-quote", label: "Quote builder", cap: ["Quote builder", "Line items, auto 30% deposit. On payout the Fleora fee is deducted; the client always sees the round number."] }
       ]
     };
 
-    var mode = "client";
-    var idx = 0;
-    var booked = false;
+    var APP_SCREENS = { matches: "discover", vendor: "discover", request: "discover", messages: "messages", quote: "events", dashboard: "events" };
 
+    var mode = "client", idx = 0, booked = false;
     var screensEl = document.getElementById("screens");
+    var bezel = document.getElementById("bezel");
     var railEl = document.getElementById("rail");
+    var tabbar = document.getElementById("tabbar");
     var capLabel = document.getElementById("capLabel");
     var capText = document.getElementById("capText");
     var stepName = document.getElementById("stepName");
     var prevBtn = document.getElementById("prevBtn");
     var nextBtn = document.getElementById("nextBtn");
-    var C = 2 * Math.PI * 34;
 
     function flow() { return FLOWS[mode]; }
+    function indexOfId(id) {
+      var f = flow();
+      for (var i = 0; i < f.length; i++) if (f[i].id === id) return i;
+      return -1;
+    }
 
     function renderRail() {
       railEl.innerHTML = "";
@@ -1056,22 +875,18 @@ Style: Modern elegant · Pink · White · Gold</div>
       railEl.appendChild(head);
       flow().forEach(function (step, i) {
         var b = document.createElement("button");
-        b.innerHTML = '<span class="n">' + String(i + 1) + '</span><span>' + step.label + "</span>";
+        b.innerHTML = '<span class="n">' + (i + 1) + '</span><span>' + step.label + "</span>";
         b.addEventListener("click", function () { go(i); });
         railEl.appendChild(b);
       });
     }
 
-    function setRing(pct) {
-      var fill = document.getElementById("ringFill");
-      var txt = document.getElementById("ringPct");
-      if (!fill) return;
-      fill.style.strokeDasharray = C;
-      fill.style.strokeDashoffset = C * (1 - pct / 100);
-      txt.textContent = pct + "%";
-      document.getElementById("dashCount").textContent =
-        (booked ? 3 : 2) + " of 7 vendors booked";
-      document.getElementById("dashSpend").textContent = booked ? "$2,125" : "$1,475";
+    function updateDash() {
+      var bar = document.getElementById("planBar");
+      if (!bar) return;
+      bar.style.width = (booked ? 79 : 72) + "%";
+      document.getElementById("planPctLabel").textContent = (booked ? 79 : 72) + "% planned";
+      document.getElementById("dashSpend").textContent = booked ? "$2,550" : "$2,350";
     }
 
     function go(i) {
@@ -1085,6 +900,12 @@ Style: Modern elegant · Pink · White · Gold</div>
         b.setAttribute("aria-current", bi === idx ? "true" : "false");
       });
 
+      var tab = APP_SCREENS[step.id];
+      bezel.classList.toggle("has-tabs", mode === "client" && !!tab);
+      Array.prototype.forEach.call(tabbar.querySelectorAll("button"), function (b) {
+        b.setAttribute("aria-current", b.getAttribute("data-tab") === tab ? "true" : "false");
+      });
+
       capLabel.innerHTML = step.cap[0];
       capText.innerHTML = step.cap[1];
       stepName.textContent = step.label;
@@ -1093,8 +914,7 @@ Style: Modern elegant · Pink · White · Gold</div>
 
       var active = screensEl.querySelector(".screen.active");
       if (active) active.scrollTop = 0;
-
-      if (step.id === "dashboard") setRing(booked ? 43 : 29);
+      if (step.id === "dashboard") updateDash();
     }
 
     function setMode(m) {
@@ -1110,44 +930,56 @@ Style: Modern elegant · Pink · White · Gold</div>
     prevBtn.addEventListener("click", function () { go(idx - 1); });
     nextBtn.addEventListener("click", function () { go(idx + 1); });
 
-    // event-type selection
-    var typeGrid = document.getElementById("typeGrid");
-    if (typeGrid) {
-      typeGrid.addEventListener("click", function (e) {
-        var btn = e.target.closest("button");
-        if (!btn) return;
-        Array.prototype.forEach.call(typeGrid.children, function (c) { c.classList.remove("sel"); });
-        btn.classList.add("sel");
+    function multiSelect(container) {
+      if (!container) return;
+      container.addEventListener("click", function (e) {
+        var b = e.target.closest("button");
+        if (b) b.classList.toggle("sel");
       });
     }
+    var occ = document.getElementById("occ");
+    if (occ) occ.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (!b) return;
+      Array.prototype.forEach.call(occ.children, function (c) { c.classList.remove("sel"); });
+      b.classList.add("sel");
+    });
+    multiSelect(document.getElementById("styleChips"));
+    var sw = document.getElementById("swatches");
+    if (sw) sw.addEventListener("click", function (e) {
+      var s = e.target.closest(".swatch:not(.add)");
+      if (s) s.classList.toggle("on");
+    });
 
-    // in-screen navigation + actions (event delegation)
+    function jump(id) { var i = indexOfId(id); if (i >= 0) go(i); }
+
     screensEl.addEventListener("click", function (e) {
-      var t = e.target.closest("[data-goto],[data-action]");
+      var t = e.target.closest("[data-goto],[data-action],[data-back]");
       if (!t) return;
-      var goto = t.getAttribute("data-goto");
-      var action = t.getAttribute("data-action");
-      if (action === "book") {
+      if (t.hasAttribute("data-back")) { go(idx - 1); return; }
+      if (t.getAttribute("data-action") === "book") {
         booked = true;
-        document.getElementById("dash").classList.add("is-booked");
-        var di = flow().indexOf(flow().filter(function (s) { return s.id === "dashboard"; })[0]);
-        go(di);
+        var d = document.getElementById("dash");
+        if (d) d.classList.add("is-booked");
+        jump("dashboard");
         return;
       }
-      if (goto) {
-        var target = flow().filter(function (s) { return s.id === goto; })[0];
-        if (target) go(flow().indexOf(target));
-      }
+      var g = t.getAttribute("data-goto");
+      if (g) jump(g);
+    });
+
+    tabbar.addEventListener("click", function (e) {
+      var b = e.target.closest("button");
+      if (b && b.hasAttribute("data-goto")) jump(b.getAttribute("data-goto"));
     });
 
     document.addEventListener("keydown", function (e) {
-      if (e.target.matches("input, textarea")) return;
-      if (e.key === "ArrowRight") { nextBtn.click(); }
-      if (e.key === "ArrowLeft") { prevBtn.click(); }
+      if (e.target.matches("input, textarea, select")) return;
+      if (e.key === "ArrowRight") nextBtn.click();
+      if (e.key === "ArrowLeft") prevBtn.click();
     });
 
     renderRail();
-    // open on the finished dashboard so the first frame shows the product working
     idx = FLOWS.client.length - 1;
     go(idx);
   })();
