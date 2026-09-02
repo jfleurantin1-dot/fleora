@@ -1,0 +1,1154 @@
+<title>Fleora Prototype</title>
+<meta name="description" content="Interactive walkthrough of the Fleora event-planning marketplace — client journey and vendor console." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+/>
+
+<style>
+  /* ============================================================
+     Fleora prototype — design tokens
+     Palette: warm porcelain ground, mulberry accent, dusty blush,
+     antique brass for "match" highlights, garden green for booked.
+     Type: Fraunces (display) / Instrument Sans (UI) / IBM Plex Mono (labels)
+     ============================================================ */
+  :root {
+    color-scheme: light;
+    --ground: #fbf7f4;
+    --backdrop: #f0e7e0;
+    --surface: #ffffff;
+    --surface-2: #f6efe9;
+    --ink: #2a2320;
+    --ink-soft: #6e6259;
+    --ink-faint: #9a8d83;
+    --line: #e7ddd6;
+    --line-strong: #d8ccc2;
+    --plum: #7a3e63;
+    --plum-deep: #5c2c4a;
+    --plum-tint: #f3e6ee;
+    --on-plum: #fdf6fa;
+    --blush: #e0949d;
+    --blush-tint: #fbe9ea;
+    --gold: #a9772f;
+    --gold-tint: #f6ecdb;
+    --good: #3f7d5a;
+    --good-tint: #e4f0e8;
+    --radius: 18px;
+    --radius-sm: 12px;
+    --shadow-lg: 30px 40px 80px -20px rgba(58, 38, 52, 0.28);
+    --shadow-card: 0 1px 2px rgba(42, 35, 32, 0.06), 0 8px 24px -12px rgba(42, 35, 32, 0.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --ground: #17130f;
+      --backdrop: #100d0b;
+      --surface: #221c19;
+      --surface-2: #2b2420;
+      --ink: #f2e9e1;
+      --ink-soft: #b3a79d;
+      --ink-faint: #8a7d73;
+      --line: #362e29;
+      --line-strong: #473c35;
+      --plum: #dd9fc4;
+      --plum-deep: #efc9e0;
+      --plum-tint: #33232e;
+      --on-plum: #2a1622;
+      --blush: #e6a2ab;
+      --blush-tint: #362528;
+      --gold: #dcab63;
+      --gold-tint: #362c1d;
+      --good: #6fb98f;
+      --good-tint: #21322a;
+      --shadow-lg: 30px 40px 90px -20px rgba(0, 0, 0, 0.6);
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --ground: #17130f;
+    --backdrop: #100d0b;
+    --surface: #221c19;
+    --surface-2: #2b2420;
+    --ink: #f2e9e1;
+    --ink-soft: #b3a79d;
+    --ink-faint: #8a7d73;
+    --line: #362e29;
+    --line-strong: #473c35;
+    --plum: #dd9fc4;
+    --plum-deep: #efc9e0;
+    --plum-tint: #33232e;
+    --on-plum: #2a1622;
+    --blush: #e6a2ab;
+    --blush-tint: #362528;
+    --gold: #dcab63;
+    --gold-tint: #362c1d;
+    --good: #6fb98f;
+    --good-tint: #21322a;
+    --shadow-lg: 30px 40px 90px -20px rgba(0, 0, 0, 0.6);
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 28px -14px rgba(0, 0, 0, 0.55);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1200px 700px at 12% -8%, var(--blush-tint), transparent 60%),
+      radial-gradient(900px 600px at 100% 0%, var(--gold-tint), transparent 55%),
+      var(--backdrop);
+    color: var(--ink);
+    font-family: "Instrument Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, h4 {
+    font-family: "Fraunces", Georgia, "Times New Roman", serif;
+    font-weight: 500;
+    text-wrap: balance;
+    margin: 0;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--plum);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  .mono {
+    font-family: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  /* ---------- shell ---------- */
+  .stage {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 34px 22px 64px;
+  }
+  .pitch {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 18px 24px;
+    margin-bottom: 30px;
+  }
+  .wordmark {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .wordmark b {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: -0.01em;
+  }
+  .wordmark .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--blush);
+    align-self: center;
+  }
+  .pitch p {
+    margin: 6px 0 0;
+    max-width: 42ch;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .segmented {
+    display: inline-flex;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px;
+    gap: 2px;
+  }
+  .segmented button {
+    border: 0;
+    background: transparent;
+    color: var(--ink-soft);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    transition: background 0.16s, color 0.16s;
+  }
+  .segmented button[aria-pressed="true"] {
+    background: var(--plum);
+    color: var(--on-plum);
+  }
+
+  /* ---------- workspace ---------- */
+  .workspace {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 34px;
+    align-items: start;
+  }
+  .rail {
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .rail .rail-head {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding: 6px 10px 10px;
+  }
+  .rail button {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    text-align: left;
+    border: 0;
+    background: transparent;
+    color: var(--ink-soft);
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    line-height: 1.35;
+    transition: background 0.14s, color 0.14s;
+  }
+  .rail button .n {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    min-width: 14px;
+  }
+  .rail button:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+  .rail button[aria-current="true"] {
+    background: var(--plum-tint);
+    color: var(--plum-deep);
+    font-weight: 600;
+  }
+  .rail button[aria-current="true"] .n {
+    color: var(--plum);
+  }
+
+  .device-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  /* ---------- phone ---------- */
+  .phone {
+    width: 380px;
+    max-width: 100%;
+    height: 724px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 40px;
+    box-shadow: var(--shadow-lg);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .bezel {
+    background: var(--ground);
+    border: 1px solid var(--line);
+    border-radius: 31px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 22px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    flex-shrink: 0;
+  }
+  .statusbar .sig {
+    display: inline-flex;
+    gap: 3px;
+    align-items: flex-end;
+  }
+  .statusbar .sig i {
+    width: 3px;
+    background: var(--ink-faint);
+    border-radius: 1px;
+    display: block;
+  }
+  .statusbar .sig i:nth-child(1) { height: 5px; }
+  .statusbar .sig i:nth-child(2) { height: 8px; }
+  .statusbar .sig i:nth-child(3) { height: 11px; }
+  .statusbar .sig i:nth-child(4) { height: 14px; background: var(--ink-faint); }
+
+  .screens {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+  }
+  .screen {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px 20px 28px;
+    opacity: 0;
+    transform: translateY(8px);
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    scrollbar-width: thin;
+  }
+  .screen::-webkit-scrollbar { width: 5px; }
+  .screen::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 3px; }
+  .screen.active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .screen { transition: opacity 0.01s; transform: none; }
+  }
+
+  .navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px 4px;
+    flex-shrink: 0;
+  }
+  .navbar .stepname {
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-family: "IBM Plex Mono", monospace;
+    letter-spacing: 0.04em;
+  }
+  .navbtn {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 7px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    transition: background 0.14s, border-color 0.14s;
+  }
+  .navbtn:hover { background: var(--surface-2); }
+  .navbtn[disabled] { opacity: 0.35; cursor: default; }
+
+  .caption {
+    max-width: 380px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px 16px;
+    box-shadow: var(--shadow-card);
+  }
+  .caption .eyebrow { display: block; margin-bottom: 4px; }
+  .caption p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+  }
+  .caption b { color: var(--ink); font-weight: 600; }
+
+  /* ---------- in-screen UI kit ---------- */
+  .s-head { margin: 10px 0 14px; }
+  .s-head h2 { font-size: 25px; line-height: 1.15; }
+  .s-head .sub { margin-top: 6px; color: var(--ink-soft); font-size: 13.5px; }
+
+  .fl-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    box-shadow: var(--shadow-card);
+  }
+  .stack { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .muted { color: var(--ink-soft); }
+  .faint { color: var(--ink-faint); }
+  .tiny { font-size: 12px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 0;
+    border-radius: 11px;
+    padding: 11px 16px;
+    font-size: 13.5px;
+    font-weight: 600;
+    background: var(--plum);
+    color: var(--on-plum);
+    width: 100%;
+    transition: transform 0.08s, filter 0.14s;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost {
+    background: var(--surface);
+    color: var(--plum-deep);
+    border: 1px solid var(--line-strong);
+  }
+  .btn.sm { width: auto; padding: 8px 13px; font-size: 12.5px; border-radius: 9px; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 600;
+    background: var(--surface-2);
+    color: var(--ink-soft);
+    border: 1px solid var(--line);
+  }
+  .chip.plum { background: var(--plum-tint); color: var(--plum-deep); border-color: transparent; }
+  .chip.good { background: var(--good-tint); color: var(--good); border-color: transparent; }
+  .chip.gold { background: var(--gold-tint); color: var(--gold); border-color: transparent; }
+
+  /* event-type grid */
+  .type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .type-grid button {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+    padding: 14px 10px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: border-color 0.14s, background 0.14s;
+  }
+  .type-grid button .ic { font-size: 20px; }
+  .type-grid button.sel {
+    border-color: var(--plum);
+    background: var(--plum-tint);
+    color: var(--plum-deep);
+    box-shadow: inset 0 0 0 1px var(--plum);
+  }
+
+  /* form fields */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
+  .field .val {
+    border: 1px solid var(--line-strong);
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 13.5px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* service checklist */
+  .svc {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 6px;
+    border-bottom: 1px solid var(--line);
+  }
+  .svc:last-child { border-bottom: 0; }
+  .svc input { position: absolute; opacity: 0; pointer-events: none; }
+  .svc .box {
+    width: 20px; height: 20px;
+    border-radius: 7px;
+    border: 1.5px solid var(--line-strong);
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    transition: background 0.14s, border-color 0.14s;
+  }
+  .svc .box::after {
+    content: "✓";
+    font-size: 12px;
+    color: var(--on-plum);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.14s, transform 0.14s;
+  }
+  .svc input:checked ~ .box {
+    background: var(--plum);
+    border-color: var(--plum);
+  }
+  .svc input:checked ~ .box::after { opacity: 1; transform: none; }
+  .svc .lbl { flex: 1; font-size: 13.5px; font-weight: 500; }
+  .svc .est { font-size: 12px; color: var(--ink-faint); }
+  .svc .ic { font-size: 16px; }
+  .svc input:focus-visible ~ .box { outline: 2px solid var(--plum); outline-offset: 2px; }
+
+  /* portfolio tile (CSS art — no external images) */
+  .tile {
+    aspect-ratio: 4 / 3;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .tile span {
+    position: absolute;
+    left: 8px; bottom: 7px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.95);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+    letter-spacing: 0.02em;
+  }
+  .tile.a { background:
+      radial-gradient(60% 70% at 25% 20%, #f4c9d6, transparent 60%),
+      radial-gradient(50% 60% at 80% 30%, #efd9b0, transparent 60%),
+      radial-gradient(70% 80% at 60% 100%, #b56b93, transparent 65%),
+      #e7b7cb; }
+  .tile.b { background:
+      radial-gradient(55% 60% at 20% 80%, #d9b8d6, transparent 60%),
+      radial-gradient(60% 70% at 85% 15%, #f5dfc0, transparent 60%),
+      linear-gradient(140deg, #8c4f77, #d59bb9); }
+  .tile.c { background:
+      radial-gradient(50% 55% at 70% 25%, #f7d7c2, transparent 60%),
+      radial-gradient(65% 70% at 25% 90%, #7a3e63, transparent 65%),
+      linear-gradient(120deg, #b06f8f, #ecc6a9); }
+  .tile.d { background:
+      radial-gradient(55% 60% at 50% 20%, #f3ccd9, transparent 60%),
+      radial-gradient(60% 65% at 15% 95%, #caa25f, transparent 60%),
+      linear-gradient(160deg, #9c5580, #e7b9cd); }
+  .tile-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .tile-grid.two { grid-template-columns: 1fr 1fr; }
+
+  /* match score */
+  .match {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  .match b {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--good);
+    line-height: 1;
+  }
+  .match.mid b { color: var(--gold); }
+  .match small { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); }
+
+  .vendor {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .vendor .thumb {
+    width: 62px; height: 62px;
+    border-radius: 12px;
+    flex-shrink: 0;
+    border: 1px solid var(--line);
+  }
+  .stars { color: var(--gold); font-size: 12px; letter-spacing: 1px; }
+
+  /* messaging */
+  .bubble {
+    max-width: 82%;
+    padding: 9px 12px;
+    border-radius: 14px;
+    font-size: 13px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+  .bubble.them { background: var(--surface-2); border: 1px solid var(--line); align-self: flex-start; border-bottom-left-radius: 5px; }
+  .bubble.me { background: var(--plum); color: var(--on-plum); align-self: flex-end; border-bottom-right-radius: 5px; }
+  .thread { display: flex; flex-direction: column; gap: 8px; }
+
+  /* quote lines */
+  .qline { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .qline:last-of-type { border-bottom: 0; }
+  .qline:has(+ .qtotal), .qline:has(+ .row) { border-bottom: 0; }
+  .qtotal { display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; padding-top: 10px; border-top: 1.5px solid var(--line-strong); margin-top: 4px; }
+
+  /* progress ring */
+  .ring-wrap { display: flex; gap: 14px; align-items: center; }
+  .ring { width: 62px; height: 62px; flex-shrink: 0; }
+  .ring circle { fill: none; stroke-width: 8; }
+  .ring .track { stroke: var(--line); }
+  .ring .fill { stroke: var(--plum); stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
+  .ring text { font-family: "IBM Plex Mono", monospace; font-size: 15px; fill: var(--ink); font-weight: 500; }
+
+  .dash-stat { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dash-stat .fl-card { padding: 11px 12px; }
+  .dash-stat .k { font-size: 11px; color: var(--ink-faint); font-family: "IBM Plex Mono", monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+  .dash-stat .v { font-size: 18px; font-weight: 700; margin-top: 2px; font-variant-numeric: tabular-nums; }
+
+  .vrow { display: flex; align-items: center; gap: 9px; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+  .vrow:last-child { border-bottom: 0; }
+  .vdot { width: 8px; height: 8px; border-radius: 50%; background: var(--line-strong); flex-shrink: 0; }
+  .vdot.ok { background: var(--good); }
+  .vdot.wait { background: var(--gold); }
+
+  .lead {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--plum);
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  /* booked-state reveal on the client dashboard */
+  .when-booked { display: none; }
+  .is-booked .when-booked { display: flex; }
+  .is-booked .when-unbooked { display: none; }
+
+  .legal {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .legal a { color: var(--plum); }
+
+  @media (max-width: 880px) {
+    .workspace { grid-template-columns: 1fr; gap: 18px; }
+    .rail {
+      position: static;
+      flex-direction: row;
+      overflow-x: auto;
+      gap: 6px;
+      padding-bottom: 6px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .rail .rail-head { display: none; }
+    .rail button { white-space: nowrap; flex-shrink: 0; border: 1px solid var(--line); }
+  }
+  @media (max-width: 460px) {
+    .stage { padding: 22px 14px 48px; }
+    .phone { height: 660px; border-radius: 34px; }
+  }
+</style>
+
+<div class="stage">
+  <header class="pitch">
+    <div>
+      <div class="wordmark"><span class="dot"></span><b>Fleora</b></div>
+      <p>Imagine it, plan it, find it, book it, manage it — one event, one platform. Tap through the flow below.</p>
+    </div>
+    <div class="segmented" role="group" aria-label="Choose a view">
+      <button id="mode-client" aria-pressed="true">Planning an event</button>
+      <button id="mode-vendor" aria-pressed="false">Vendor console</button>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <nav class="rail" id="rail" aria-label="Prototype steps"></nav>
+
+    <div class="device-col">
+      <div class="phone">
+        <div class="bezel">
+          <div class="statusbar">
+            <span class="num">9:41</span>
+            <span>Fleora</span>
+            <span class="sig" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          </div>
+          <div class="screens" id="screens">
+
+            <!-- ============ CLIENT ============ -->
+            <section class="screen" data-screen="welcome">
+              <div style="display:flex;flex-direction:column;gap:16px;padding-top:36px;">
+                <div class="tile a" style="aspect-ratio:16/10;"><span>Real Fleora events, Greater Boston</span></div>
+                <div class="s-head">
+                  <div class="eyebrow">Welcome</div>
+                  <h2 style="font-size:30px;">Start with an idea. We&rsquo;ll build the event.</h2>
+                  <p class="sub">Tell Fleora what you&rsquo;re celebrating. Get matched with vetted local vendors, compare quotes, and manage everything in one place.</p>
+                </div>
+                <button class="btn" data-goto="type">Plan an event</button>
+                <button class="btn ghost" data-goto="dashboard">Skip to a finished example</button>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="type">
+              <div class="s-head">
+                <div class="eyebrow">Step 1 · Occasion</div>
+                <h2>What are you planning?</h2>
+              </div>
+              <div class="type-grid" id="typeGrid">
+                <button data-type="birthday" class="sel"><span class="ic">🎂</span>Birthday</button>
+                <button data-type="wedding"><span class="ic">💍</span>Wedding</button>
+                <button data-type="baby"><span class="ic">👶</span>Baby shower</button>
+                <button data-type="grad"><span class="ic">🎓</span>Graduation</button>
+                <button data-type="anniversary"><span class="ic">🥂</span>Anniversary</button>
+                <button data-type="corporate"><span class="ic">🏢</span>Corporate</button>
+              </div>
+              <div style="margin-top:14px;">
+                <button class="btn" data-goto="details">Continue</button>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="details">
+              <div class="s-head">
+                <div class="eyebrow">Step 2 · The basics</div>
+                <h2>Tell us about the day</h2>
+                <p class="sub">Fleora uses this to build your plan and score vendor matches.</p>
+              </div>
+              <div class="stack">
+                <div class="field"><label>Event name</label><div class="val">Jerrica&rsquo;s 36th Birthday</div></div>
+                <div class="grid-2">
+                  <div class="field"><label>Date</label><div class="val num">Oct 17, 2026</div></div>
+                  <div class="field"><label>Location</label><div class="val">Brockton, MA</div></div>
+                </div>
+                <div class="grid-2">
+                  <div class="field"><label>Guests</label><div class="val num">50</div></div>
+                  <div class="field"><label>Budget</label><div class="val num">$6,000</div></div>
+                </div>
+                <div class="grid-2">
+                  <div class="field"><label>Style</label><div class="val">Modern elegant</div></div>
+                  <div class="field"><label>Palette</label><div class="val">Pink · White · Gold</div></div>
+                </div>
+                <button class="btn" data-goto="plan">Build my event &rarr;</button>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="plan">
+              <div class="s-head">
+                <div class="eyebrow">Step 3 · Your plan</div>
+                <h2>Here&rsquo;s what your event needs</h2>
+                <p class="sub">Pre-selected for a 50-guest birthday. Estimates from your $6,000 budget — adjust anytime.</p>
+              </div>
+              <div class="fl-card" style="padding:4px 12px;">
+                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🎀</span><span class="lbl">Decor &amp; styling</span><span class="est">~$720</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🎈</span><span class="lbl">Balloons</span><span class="est">~$300</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🍰</span><span class="lbl">Cake &amp; desserts</span><span class="est">~$300</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🍽️</span><span class="lbl">Catering</span><span class="est">~$1,800</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">📸</span><span class="lbl">Photography</span><span class="est">~$550</span></label>
+                <label class="svc"><input type="checkbox" checked><span class="box"></span><span class="ic">🎧</span><span class="lbl">DJ &amp; entertainment</span><span class="est">~$550</span></label>
+                <label class="svc"><input type="checkbox"><span class="box"></span><span class="ic">🪑</span><span class="lbl">Tables, chairs &amp; linens</span><span class="est">~$480</span></label>
+                <label class="svc"><input type="checkbox"><span class="box"></span><span class="ic">🍸</span><span class="lbl">Bartending</span><span class="est">~$360</span></label>
+              </div>
+              <div style="margin-top:14px;">
+                <button class="btn" data-goto="matches">See my vendor matches</button>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="matches">
+              <div class="s-head">
+                <div class="eyebrow">Step 4 · Decor matches</div>
+                <h2>Ranked for your event</h2>
+                <p class="sub">Scored on availability, distance, budget fit, style and reviews.</p>
+              </div>
+              <div class="stack">
+                <div class="fl-card">
+                  <div class="vendor">
+                    <div class="thumb tile a"></div>
+                    <div style="flex:1;min-width:0;">
+                      <div class="between">
+                        <strong style="font-size:14px;">Luxe Balloons Co.</strong>
+                        <span class="match"><b>94%</b><small>match</small></span>
+                      </div>
+                      <div class="tiny faint">Quincy, MA · 9 mi · <span class="stars">★★★★★</span> 4.7 (23)</div>
+                      <p class="tiny muted" style="margin:6px 0 0;">Luxury organic balloon installs &amp; backdrops. Pink / gold / neutral is our specialty.</p>
+                    </div>
+                  </div>
+                  <div class="row" style="margin-top:10px;gap:6px;">
+                    <span class="chip">from $450</span><span class="chip plum">Verified</span><span class="chip good">Available Oct 17</span>
+                  </div>
+                  <div class="row" style="margin-top:10px;gap:8px;">
+                    <button class="btn ghost sm" data-goto="profile">View profile</button>
+                    <button class="btn sm" data-goto="thread">Request quote</button>
+                  </div>
+                </div>
+
+                <div class="fl-card">
+                  <div class="vendor">
+                    <div class="thumb tile c"></div>
+                    <div style="flex:1;min-width:0;">
+                      <div class="between">
+                        <strong style="font-size:14px;">Field &amp; Vase Florals</strong>
+                        <span class="match mid"><b>86%</b><small>match</small></span>
+                      </div>
+                      <div class="tiny faint">Framingham, MA · 24 mi · <span class="stars">★★★★★</span> 5.0 (7)</div>
+                      <p class="tiny muted" style="margin:6px 0 0;">Garden-style florals, arbors and tablescape styling.</p>
+                    </div>
+                  </div>
+                  <div class="row" style="margin-top:10px;gap:6px;">
+                    <span class="chip">from $380</span><span class="chip plum">Verified</span>
+                  </div>
+                  <div class="row" style="margin-top:10px;gap:8px;">
+                    <button class="btn ghost sm" data-goto="profile">View profile</button>
+                    <button class="btn sm" data-goto="thread">Request quote</button>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="profile">
+              <div class="s-head">
+                <div class="eyebrow">Vendor</div>
+                <h2>Luxe Balloons Co.</h2>
+                <p class="sub">Quincy, MA · <span class="stars">★★★★★</span> 4.7 (23 reviews) · 94% response rate</p>
+              </div>
+              <div class="tile-grid" style="margin-bottom:12px;">
+                <div class="tile a"><span>Blush garland</span></div>
+                <div class="tile b"><span>Shimmer wall</span></div>
+                <div class="tile d"><span>Balloon mosaic</span></div>
+              </div>
+              <div class="fl-card stack">
+                <div>
+                  <div class="eyebrow">Services</div>
+                  <div class="between tiny" style="margin-top:6px;"><span>Organic balloon garland (8ft)</span><span class="muted">from $450</span></div>
+                  <div class="between tiny" style="margin-top:4px;"><span>Backdrop + garland package</span><span class="muted">from $850</span></div>
+                  <div class="between tiny" style="margin-top:4px;"><span>Balloon number / mosaic</span><span class="muted">from $220</span></div>
+                </div>
+                <div>
+                  <div class="eyebrow">Recent review</div>
+                  <p class="tiny muted" style="margin:6px 0 0;">&ldquo;The backdrop was stunning and setup was seamless.&rdquo; — verified booking</p>
+                </div>
+              </div>
+              <div style="margin-top:14px;">
+                <button class="btn" data-goto="thread">Request a quote</button>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="thread">
+              <div class="s-head">
+                <div class="eyebrow">Step 5 · Luxe Balloons Co.</div>
+                <h2>Your conversation</h2>
+                <p class="sub">Your event brief is sent automatically — no re-typing the details.</p>
+              </div>
+              <div class="thread">
+                <div class="bubble me">Hi! I&rsquo;d love a quote for Decor &amp; styling.
+
+Event: Jerrica&rsquo;s 36th Birthday
+Date: Oct 17, 2026
+Location: Brockton, MA
+Guests: 50
+Budget: $6,000
+Style: Modern elegant · Pink · White · Gold</div>
+                <div class="bubble them">Hi Jerrica! Love this palette. I can do an organic garland over a shimmer backdrop with a balloon &ldquo;36&rdquo; and a signage ledge. Sending a quote now. 💗</div>
+                <div class="bubble them">Quote sent — $650 total, $200 deposit to book. Tap to review.</div>
+              </div>
+              <div style="margin-top:14px;">
+                <button class="btn" data-goto="quote">Open quote · $650</button>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="quote">
+              <div class="s-head">
+                <div class="eyebrow">Step 6 · Quote from Luxe Balloons Co.</div>
+                <h2>Decor &amp; styling</h2>
+              </div>
+              <div class="fl-card">
+                <div class="qline"><span>Organic balloon garland</span><span class="num">$450</span></div>
+                <div class="qline"><span>Shimmer backdrop</span><span class="num">$150</span></div>
+                <div class="qline"><span>Delivery, setup &amp; strike</span><span class="num">$50</span></div>
+                <div class="qtotal"><span>Total</span><span class="num">$650</span></div>
+                <div class="between tiny muted" style="margin-top:8px;"><span>Deposit to book</span><span class="num">$200</span></div>
+                <p class="tiny muted" style="margin:10px 0 0;">Includes a balloon &ldquo;36&rdquo; and signage ledge. Arrives 2 hrs before start. Valid until Oct 1.</p>
+              </div>
+              <div class="row" style="margin-top:14px;gap:8px;">
+                <button class="btn ghost sm" data-goto="thread">Ask a question</button>
+                <button class="btn sm" data-action="book">Accept &amp; book</button>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="dashboard">
+              <div class="s-head">
+                <div class="eyebrow">Step 7 · Command center</div>
+                <h2>Jerrica&rsquo;s 36th Birthday</h2>
+                <p class="sub">Oct 17, 2026 · Brockton, MA · 50 guests · Pink · White · Gold</p>
+              </div>
+              <div id="dash" class="stack">
+                <div class="fl-card ring-wrap">
+                  <svg class="ring" viewBox="0 0 80 80" aria-hidden="true">
+                    <circle class="track" cx="40" cy="40" r="34"></circle>
+                    <circle class="fill" id="ringFill" cx="40" cy="40" r="34" transform="rotate(-90 40 40)"></circle>
+                    <text id="ringPct" x="40" y="46" text-anchor="middle">29%</text>
+                  </svg>
+                  <div>
+                    <div style="font-weight:700;font-size:14px;">On track for your event 🎉</div>
+                    <div class="tiny muted" id="dashCount">2 of 7 vendors booked</div>
+                  </div>
+                </div>
+
+                <div class="dash-stat">
+                  <div class="fl-card"><div class="k">Committed</div><div class="v" id="dashSpend">$1,475</div><div class="tiny faint">of $6,000</div></div>
+                  <div class="fl-card"><div class="k">Guests</div><div class="v num">32 / 50</div><div class="tiny faint">RSVPs in</div></div>
+                </div>
+
+                <div class="fl-card">
+                  <div class="eyebrow" style="margin-bottom:6px;">Your vendors</div>
+                  <div class="when-booked vrow" style="border-top:0;"><span class="vdot ok"></span><span style="flex:1;">Luxe Balloons Co. — Decor</span><span class="chip good">Booked</span></div>
+                  <div class="vrow"><span class="vdot ok"></span><span style="flex:1;">Sugar Plum Bakes — Cake</span><span class="chip good">Booked</span></div>
+                  <div class="vrow"><span class="vdot ok"></span><span style="flex:1;">Lumen Photography — Photo</span><span class="chip good">Booked</span></div>
+                  <div class="vrow"><span class="vdot wait"></span><span style="flex:1;">Harbor Catering — Catering</span><span class="chip gold">2 quotes in</span></div>
+                  <div class="vrow"><span class="vdot"></span><span style="flex:1;">DJ &amp; entertainment</span><span class="chip">Find</span></div>
+                </div>
+
+                <div class="fl-card">
+                  <div class="eyebrow" style="margin-bottom:8px;">Next up</div>
+                  <div class="row tiny"><input type="checkbox" checked style="accent-color:var(--plum);"><span class="muted" style="text-decoration:line-through;">Book decor &amp; photographer</span></div>
+                  <div class="row tiny" style="margin-top:6px;"><input type="checkbox" style="accent-color:var(--plum);"><span>Send invitations — due this week</span></div>
+                  <div class="row tiny" style="margin-top:6px;"><input type="checkbox" style="accent-color:var(--plum);"><span>Confirm final guest count</span></div>
+                </div>
+              </div>
+            </section>
+
+            <!-- ============ VENDOR ============ -->
+            <section class="screen" data-screen="v-dash">
+              <div class="s-head">
+                <div class="eyebrow">Vendor console</div>
+                <h2>Good day, Luxe Balloons Co.</h2>
+                <p class="sub">You&rsquo;re live on Fleora across Greater Boston.</p>
+              </div>
+              <div class="dash-stat" style="margin-bottom:10px;">
+                <div class="fl-card"><div class="k">New leads</div><div class="v num">4</div></div>
+                <div class="fl-card"><div class="k">Upcoming</div><div class="v num">6</div></div>
+                <div class="fl-card"><div class="k">Booked revenue</div><div class="v num">$8,450</div></div>
+                <div class="fl-card"><div class="k">Rating</div><div class="v">4.7 <span class="stars">★</span></div></div>
+              </div>
+              <div class="eyebrow" style="margin:4px 0 8px;">New leads</div>
+              <div class="stack">
+                <div class="lead">
+                  <div class="between"><strong style="font-size:13.5px;">Jerrica&rsquo;s 36th Birthday</strong><span class="match"><b>94%</b><small>match</small></span></div>
+                  <div class="tiny faint" style="margin-top:4px;">🎂 Brockton · Oct 17 · 50 guests · $6,000 · Modern elegant</div>
+                  <div style="margin-top:9px;"><button class="btn sm" data-goto="v-lead">Open lead</button></div>
+                </div>
+                <div class="lead" style="border-left-color:var(--line-strong);">
+                  <div class="between"><strong style="font-size:13.5px;">Corporate holiday party</strong><span class="match mid"><b>81%</b><small>match</small></span></div>
+                  <div class="tiny faint" style="margin-top:4px;">🏢 Boston · Dec 12 · 120 guests · $14,000</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="screen" data-screen="v-lead">
+              <div class="s-head">
+                <div class="eyebrow">Lead · full brief attached</div>
+                <h2>Jerrica&rsquo;s 36th Birthday</h2>
+              </div>
+              <div class="fl-card stack">
+                <div class="between tiny"><span class="faint">Date</span><span>Oct 17, 2026</span></div>
+                <div class="between tiny"><span class="faint">Location</span><span>Brockton, MA (9 mi)</span></div>
+                <div class="between tiny"><span class="faint">Guests</span><span>50</span></div>
+                <div class="between tiny"><span class="faint">Overall budget</span><span>$6,000</span></div>
+                <div class="between tiny"><span class="faint">Service</span><span>Decor &amp; styling</span></div>
+                <div class="between tiny"><span class="faint">Style</span><span>Modern · Pink · White · Gold</span></div>
+              </div>
+              <div class="tile-grid two" style="margin-top:10px;">
+                <div class="tile a"><span>Client inspiration</span></div>
+                <div class="tile d"><span>Client inspiration</span></div>
+              </div>
+              <p class="tiny muted" style="margin-top:10px;">No back-and-forth to gather the basics — everything you need to price is already here.</p>
+              <div style="margin-top:14px;"><button class="btn" data-goto="v-quote">Build a quote</button></div>
+            </section>
+
+            <section class="screen" data-screen="v-quote">
+              <div class="s-head">
+                <div class="eyebrow">New quote · Decor &amp; styling</div>
+                <h2>Price it out</h2>
+              </div>
+              <div class="fl-card">
+                <div class="qline"><span>Organic balloon garland</span><span class="num">$450</span></div>
+                <div class="qline"><span>Shimmer backdrop</span><span class="num">$150</span></div>
+                <div class="qline"><span>Delivery, setup &amp; strike</span><span class="num">$50</span></div>
+                <div class="row tiny" style="color:var(--plum-deep);padding:8px 0;">＋ Add line</div>
+                <div class="qtotal"><span>Subtotal</span><span class="num">$650</span></div>
+                <div class="between tiny muted" style="margin-top:8px;"><span>Deposit to book (30%)</span><span class="num">$200</span></div>
+              </div>
+              <div style="margin-top:14px;"><button class="btn" data-goto="v-dash">Send quote to Jerrica</button></div>
+              <p class="tiny faint" style="text-align:center;margin-top:10px;">Fleora fee (7%) is deducted on payout. Client sees $650.</p>
+            </section>
+
+          </div>
+          <div class="navbar">
+            <button class="navbtn" id="prevBtn">&larr; Back</button>
+            <span class="stepname" id="stepName"></span>
+            <button class="navbtn" id="nextBtn">Next &rarr;</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="caption" id="caption" aria-live="polite">
+        <span class="eyebrow" id="capLabel">The pitch</span>
+        <p id="capText"></p>
+      </div>
+    </div>
+  </div>
+
+  <p class="legal">
+    Interactive prototype — mock data, no backend. The working build is a Next.js&nbsp;+&nbsp;Supabase codebase in the same repo.
+  </p>
+</div>
+
+<script>
+  (function () {
+    "use strict";
+
+    var FLOWS = {
+      client: [
+        { id: "welcome", label: "Welcome", cap: ["The pitch", "Two ways in: describe what you're planning, or (later) upload an inspiration photo and let AI build the shopping list. The <b>event</b> is the object everything hangs off."] },
+        { id: "type", label: "Occasion", cap: ["Step 1", "Ten occasion types on launch. Each one seeds a different default service checklist and planning timeline."] },
+        { id: "details", label: "The basics", cap: ["Step 2", "Date, location, guest count, budget and style. These five fields feed the matching score and the budget tracker — entered once, reused everywhere."] },
+        { id: "plan", label: "Your plan", cap: ["Step 3", "Fleora turns the answers into a plan: which services this event needs, pre-checked, each with a budget estimate. The client never has to know they need a &ldquo;stationer.&rdquo;"] },
+        { id: "matches", label: "Matches", cap: ["Step 4 · matching engine", "A Postgres function scores every approved vendor 0&ndash;100: availability&nbsp;30 / location&nbsp;25 / budget&nbsp;20 / style&nbsp;15 / reviews&nbsp;10. The client sees <b>&ldquo;94% match,&rdquo;</b> not a directory."] },
+        { id: "profile", label: "Vendor", cap: ["Vendor profile", "Structured portfolio, services with real starting prices, verified reviews from past Fleora bookings. No &ldquo;DM for pricing.&rdquo;"] },
+        { id: "thread", label: "Messaging", cap: ["Step 5", "Requesting a quote opens one thread per vendor and auto-sends the brief. Every conversation stays attached to the event instead of scattered across texts and DMs."] },
+        { id: "quote", label: "Quote", cap: ["Step 6", "Standardized line-item quotes. Accept turns the quote into a booking, marks the category done, and declines the competing quotes automatically."] },
+        { id: "dashboard", label: "Dashboard", cap: ["Step 7", "The command center: progress, committed budget vs. plan, guest RSVPs, per-vendor status, and a checklist that reminds you when invitations are due. <b>Try &ldquo;Accept &amp; book&rdquo; on the quote</b> — this updates."] }
+      ],
+      vendor: [
+        { id: "v-dash", label: "Console", cap: ["Vendor console", "Vendors don't just get leads — they run their business here. Free tier: profile, leads, messaging, quotes, bookings. Pro adds a calendar and off-platform events."] },
+        { id: "v-lead", label: "Lead", cap: ["Qualified lead", "The whole brief arrives with the lead — date, location, guest count, budget, style, inspiration. A far better lead than &ldquo;someone in Boston wants balloons.&rdquo;"] },
+        { id: "v-quote", label: "Quote builder", cap: ["Quote builder", "Line items, auto 30% deposit, expiry. On payout the Fleora fee is deducted; the client always sees the round number."] }
+      ]
+    };
+
+    var mode = "client";
+    var idx = 0;
+    var booked = false;
+
+    var screensEl = document.getElementById("screens");
+    var railEl = document.getElementById("rail");
+    var capLabel = document.getElementById("capLabel");
+    var capText = document.getElementById("capText");
+    var stepName = document.getElementById("stepName");
+    var prevBtn = document.getElementById("prevBtn");
+    var nextBtn = document.getElementById("nextBtn");
+    var C = 2 * Math.PI * 34;
+
+    function flow() { return FLOWS[mode]; }
+
+    function renderRail() {
+      railEl.innerHTML = "";
+      var head = document.createElement("div");
+      head.className = "rail-head";
+      head.textContent = mode === "client" ? "Client journey" : "Vendor journey";
+      railEl.appendChild(head);
+      flow().forEach(function (step, i) {
+        var b = document.createElement("button");
+        b.innerHTML = '<span class="n">' + String(i + 1) + '</span><span>' + step.label + "</span>";
+        b.addEventListener("click", function () { go(i); });
+        railEl.appendChild(b);
+      });
+    }
+
+    function setRing(pct) {
+      var fill = document.getElementById("ringFill");
+      var txt = document.getElementById("ringPct");
+      if (!fill) return;
+      fill.style.strokeDasharray = C;
+      fill.style.strokeDashoffset = C * (1 - pct / 100);
+      txt.textContent = pct + "%";
+      document.getElementById("dashCount").textContent =
+        (booked ? 3 : 2) + " of 7 vendors booked";
+      document.getElementById("dashSpend").textContent = booked ? "$2,125" : "$1,475";
+    }
+
+    function go(i) {
+      idx = Math.max(0, Math.min(flow().length - 1, i));
+      var step = flow()[idx];
+
+      Array.prototype.forEach.call(screensEl.children, function (sc) {
+        sc.classList.toggle("active", sc.getAttribute("data-screen") === step.id);
+      });
+      Array.prototype.forEach.call(railEl.querySelectorAll("button"), function (b, bi) {
+        b.setAttribute("aria-current", bi === idx ? "true" : "false");
+      });
+
+      capLabel.innerHTML = step.cap[0];
+      capText.innerHTML = step.cap[1];
+      stepName.textContent = step.label;
+      prevBtn.disabled = idx === 0;
+      nextBtn.disabled = idx === flow().length - 1;
+
+      var active = screensEl.querySelector(".screen.active");
+      if (active) active.scrollTop = 0;
+
+      if (step.id === "dashboard") setRing(booked ? 43 : 29);
+    }
+
+    function setMode(m) {
+      mode = m;
+      document.getElementById("mode-client").setAttribute("aria-pressed", String(m === "client"));
+      document.getElementById("mode-vendor").setAttribute("aria-pressed", String(m === "vendor"));
+      renderRail();
+      go(0);
+    }
+
+    document.getElementById("mode-client").addEventListener("click", function () { setMode("client"); });
+    document.getElementById("mode-vendor").addEventListener("click", function () { setMode("vendor"); });
+    prevBtn.addEventListener("click", function () { go(idx - 1); });
+    nextBtn.addEventListener("click", function () { go(idx + 1); });
+
+    // event-type selection
+    var typeGrid = document.getElementById("typeGrid");
+    if (typeGrid) {
+      typeGrid.addEventListener("click", function (e) {
+        var btn = e.target.closest("button");
+        if (!btn) return;
+        Array.prototype.forEach.call(typeGrid.children, function (c) { c.classList.remove("sel"); });
+        btn.classList.add("sel");
+      });
+    }
+
+    // in-screen navigation + actions (event delegation)
+    screensEl.addEventListener("click", function (e) {
+      var t = e.target.closest("[data-goto],[data-action]");
+      if (!t) return;
+      var goto = t.getAttribute("data-goto");
+      var action = t.getAttribute("data-action");
+      if (action === "book") {
+        booked = true;
+        document.getElementById("dash").classList.add("is-booked");
+        var di = flow().indexOf(flow().filter(function (s) { return s.id === "dashboard"; })[0]);
+        go(di);
+        return;
+      }
+      if (goto) {
+        var target = flow().filter(function (s) { return s.id === goto; })[0];
+        if (target) go(flow().indexOf(target));
+      }
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.target.matches("input, textarea")) return;
+      if (e.key === "ArrowRight") { nextBtn.click(); }
+      if (e.key === "ArrowLeft") { prevBtn.click(); }
+    });
+
+    renderRail();
+    // open on the finished dashboard so the first frame shows the product working
+    idx = FLOWS.client.length - 1;
+    go(idx);
+  })();
+</script>
