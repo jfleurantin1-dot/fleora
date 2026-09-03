@@ -94,6 +94,7 @@ export default async function EventPage({
           ["#vendors", "Vendors"],
           ["#guests", "Guests"],
           ["#checklist", "Checklist"],
+          ["#inspiration", "Inspiration"],
           ["#messages", "Messages"],
         ].map(([href, label], index) => (
           <a key={href} href={href} className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${index === 0 ? "bg-plum-500 text-white" : "bg-white text-ink-600 shadow-sm hover:bg-plum-50 hover:text-plum-700"}`}>{label}</a>
@@ -195,6 +196,12 @@ export default async function EventPage({
           <Card id="guests" className="scroll-mt-28">
             <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">People</p><h3 className="mt-1 font-display text-xl text-ink-900">Guest list</h3></div><UsersIcon size={18} className="text-plum-600" /></div>
             <GuestList eventId={event.id} guests={guests ?? []} />
+          </Card>
+
+          <Card id="inspiration" variant="soft" className="scroll-mt-28 overflow-hidden bg-gradient-to-br from-blush-50 via-white to-plum-50">
+            <div className="mb-3 flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-plum-600 shadow-sm">✦</span><h3 className="font-display text-xl text-ink-900">Inspiration Board</h3></div>
+            <p className="text-sm leading-relaxed text-ink-600">Save the looks you love and turn them into a vendor-ready plan with Build This Look.</p>
+            <Link href={`/events/${event.id}/inspiration`} className="mt-4 inline-flex text-sm font-bold text-plum-700 hover:underline">Open inspiration board →</Link>
           </Card>
 
           <Card id="messages" variant="soft" className="scroll-mt-28">

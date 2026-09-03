@@ -139,9 +139,10 @@ export default async function DashboardPage() {
                 <div className="max-w-xl">
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-plum-600 shadow-sm"><SparkleIcon /></div>
                   <h2 className="font-display text-2xl text-ink-900">Have an inspiration photo?</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-600">Soon, Fleora will turn a photo you love into a vendor-ready event plan — decor, florals, cake, tablescape and more.</p>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-600">Save inspiration photos, choose the details you want to recreate, and turn the look into a vendor-ready plan.</p>
+                  <ButtonLink href={`/events/${hero.id}/inspiration`} variant="magic" className="mt-5">✦ Build This Look</ButtonLink>
                 </div>
-                <div className="shrink-0"><Badge tone="champagne">Build This Look · coming soon</Badge></div>
+                <div className="shrink-0"><Badge tone="champagne">Phase 2 · live preview</Badge></div>
               </div>
             </Card>
 

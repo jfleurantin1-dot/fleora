@@ -24,7 +24,7 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
           <Link href="/" className="inline-flex items-start font-display text-4xl leading-none text-plum-600">Fleora<span className="ml-1 mt-1 text-sm text-champagne-500">✦</span></Link>
           <p className="mt-10 fleora-kicker">Create your space</p>
           <h1 className="mt-3 max-w-xl font-display text-6xl leading-[.98] text-ink-900">Plan beautifully. Grow beautifully.</h1>
-          <p className="mt-5 max-w-lg text-lg leading-relaxed text-ink-600">Whether you’re planning a celebration or running an event business, Fleora keeps the experience thoughtful and organized. organized.</p>
+          <p className="mt-5 max-w-lg text-lg leading-relaxed text-ink-600">Whether you’re planning a celebration or running an event business, Fleora keeps the experience thoughtful and organized.</p>
         </section>
         <div className="mx-auto w-full max-w-lg">
           <Link href="/" className="mb-7 inline-flex items-start font-display text-3xl leading-none text-plum-600 lg:hidden">Fleora<span className="ml-1 mt-1 text-xs text-champagne-500">✦</span></Link>
