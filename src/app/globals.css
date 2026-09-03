@@ -2,20 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: light;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
-    Arial, "Noto Sans", sans-serif;
+:root { color-scheme: light; }
+html { background: #FCF9F5; scroll-behavior: smooth; }
+body { @apply bg-ivory-50 text-ink-900 antialiased font-sans; }
+::selection { @apply bg-plum-100 text-plum-900; }
+
+@layer components {
+  .fleora-surface { @apply rounded-[18px] border border-[#E9E3E7] bg-white shadow-fleora; }
+  .fleora-kicker { @apply text-[11px] font-bold uppercase tracking-[0.16em] text-plum-500; }
+  .fleora-divider { @apply border-[#EEE8EC]; }
+  .fleora-chip { @apply inline-flex min-h-9 items-center justify-center rounded-full border border-[#E9E3E7] bg-white px-3 text-sm font-medium text-ink-600 transition hover:border-plum-200 hover:bg-plum-50 hover:text-plum-700; }
+  .fleora-chip-active { @apply border-plum-500 bg-plum-500 text-white hover:bg-plum-600 hover:text-white; }
 }
 
-body {
-  @apply bg-plum-50 text-slate-800 antialiased;
-}
+.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+.scroll-thin::-webkit-scrollbar-thumb { @apply rounded-full bg-plum-200; }
 
-/* thin brand scrollbar for the message pane */
-.scroll-thin::-webkit-scrollbar {
-  width: 6px;
-}
-.scroll-thin::-webkit-scrollbar-thumb {
-  @apply rounded-full bg-plum-200;
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
 }
