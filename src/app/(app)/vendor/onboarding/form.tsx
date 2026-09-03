@@ -4,6 +4,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { saveVendorProfile, type VendorOnboardingState } from "./actions";
 import { Button, Card, Field, Input, Textarea, Select, FormError } from "@/components/ui";
 import { CATEGORY_GROUPS, categoriesInGroup } from "@/lib/constants";
+import { PhotoUploader } from "@/components/vendor/photo-uploader";
 import type { Service, Vendor } from "@/lib/types";
 
 function Submit() {
@@ -16,11 +17,13 @@ function Submit() {
 }
 
 export function VendorForm({
+  userId,
   vendor,
   categories,
   services,
   photos,
 }: {
+  userId: string;
   vendor: Vendor | null;
   categories: string[];
   services: Service[];
@@ -126,9 +129,10 @@ export function VendorForm({
 
       <Card className="space-y-3">
         <h2 className="font-semibold text-slate-900">Portfolio photos</h2>
-        <Field label="Image URLs" hint="One per line. Hosted images for now; file upload comes later.">
-          <Textarea name="photos" rows={4} defaultValue={photos.join("\n")} />
-        </Field>
+        <p className="text-sm text-slate-500">
+          Show your best work — clients see these on your profile and in match results.
+        </p>
+        <PhotoUploader userId={userId} initial={photos} />
       </Card>
 
       <FormError message={state.error} />

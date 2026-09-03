@@ -5,7 +5,7 @@ import { VendorForm } from "./form";
 import type { Service } from "@/lib/types";
 
 export default async function VendorOnboardingPage() {
-  const { vendor } = await requireVendor();
+  const { profile, vendor } = await requireVendor();
   const supabase = createClient();
 
   let categories: string[] = [];
@@ -34,7 +34,13 @@ export default async function VendorOnboardingPage() {
           )
         }
       />
-      <VendorForm vendor={vendor} categories={categories} services={services} photos={photos} />
+      <VendorForm
+        userId={profile.id}
+        vendor={vendor}
+        categories={categories}
+        services={services}
+        photos={photos}
+      />
     </div>
   );
 }

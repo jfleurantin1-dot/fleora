@@ -9,7 +9,7 @@ const nextConfig = {
   images: {
     remotePatterns: [
       // Supabase Storage public bucket
-      { protocol: "https", hostname: "*.supabase.co" },
+      { protocol: "https", hostname: "**.supabase.co" },
       // Placeholder / stock imagery used by the seed data
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
