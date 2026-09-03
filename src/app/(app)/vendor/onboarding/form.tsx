@@ -34,8 +34,8 @@ export function VendorForm({
 
   return (
     <form action={formAction} className="space-y-6">
-      <Card className="space-y-4">
-        <h2 className="font-semibold text-slate-900">Business</h2>
+      <Card variant="feature" className="space-y-4">
+        <div><p className="fleora-kicker">Step 1</p><h2 className="mt-1 font-display text-2xl text-ink-900">Your business</h2><p className="mt-1 text-sm text-ink-600">Tell clients what makes your work special.</p></div>
         <Field label="Business name">
           <Input name="business_name" defaultValue={vendor?.business_name ?? ""} required />
         </Field>
@@ -59,8 +59,7 @@ export function VendorForm({
       </Card>
 
       <Card className="space-y-4">
-        <h2 className="font-semibold text-slate-900">Service categories</h2>
-        <p className="text-sm text-slate-500">Check every service you offer.</p>
+        <div><p className="fleora-kicker">Step 2</p><h2 className="mt-1 font-display text-2xl text-ink-900">Services you offer</h2><p className="mt-1 text-sm text-ink-600">Choose every category you want to be matched for.</p></div>
         {CATEGORY_GROUPS.map((group) => (
           <div key={group.key}>
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-plum-500">
@@ -70,7 +69,7 @@ export function VendorForm({
               {categoriesInGroup(group.key).map((c) => (
                 <label
                   key={c.key}
-                  className="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm ring-1 ring-plum-200 hover:bg-plum-50"
+                  className="flex cursor-pointer items-center gap-2 rounded-xl border border-[#E9E3E7] bg-white px-3 py-2.5 text-sm text-ink-700 transition hover:border-plum-200 hover:bg-plum-50"
                 >
                   <input
                     type="checkbox"
@@ -90,8 +89,7 @@ export function VendorForm({
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="font-semibold text-slate-900">Starting prices</h2>
-        <p className="text-sm text-slate-500">Add up to four so clients can filter by budget.</p>
+        <div><p className="fleora-kicker">Pricing</p><h2 className="mt-1 font-display text-2xl text-ink-900">Starting prices</h2><p className="mt-1 text-sm text-ink-600">Give clients a useful starting point before they request a custom quote.</p></div>
         {[0, 1, 2, 3].map((i) => {
           const s = services[i];
           return (
@@ -128,10 +126,9 @@ export function VendorForm({
       </Card>
 
       <Card className="space-y-3">
-        <h2 className="font-semibold text-slate-900">Portfolio photos</h2>
-        <p className="text-sm text-slate-500">
+        <div><p className="fleora-kicker">Portfolio</p><h2 className="mt-1 font-display text-2xl text-ink-900">Show your best work</h2><p className="mt-1 text-sm text-ink-600">
           Show your best work — clients see these on your profile and in match results.
-        </p>
+        </p></div>
         <PhotoUploader userId={userId} initial={photos} />
       </Card>
 
@@ -141,7 +138,7 @@ export function VendorForm({
           Saved. {vendor?.status !== "approved" && "An admin will review your profile before it goes live."}
         </p>
       )}
-      <Submit />
+      <div className="flex justify-end"><Submit /></div>
     </form>
   );
 }
