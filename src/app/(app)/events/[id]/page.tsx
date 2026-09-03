@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { ButtonLink, Card, Badge, Progress, PageHeader, Empty } from "@/components/ui";
 import { money, shortDate, relativeDay } from "@/lib/format";
-import { categoryEmoji, categoryLabel } from "@/lib/constants";
+import { categoryEmoji, categoryLabel, CATEGORIES } from "@/lib/constants";
 import { Checklist } from "@/components/event/checklist";
 import { GuestList } from "@/components/event/guest-list";
 import type { Vendor } from "@/lib/types";
@@ -35,7 +35,10 @@ export default async function EventPage({
   type VName = Pick<Vendor, "id" | "business_name" | "location">;
   const vName = new Map<string, VName>();
   for (const v of (vendors ?? []) as VName[]) vName.set(v.id, v);
-  const reqs = requests ?? [];
+  const catOrder = new Map(CATEGORIES.map((c, i) => [c.key, i] as [string, number]));
+  const reqs = (requests ?? [])
+    .slice()
+    .sort((a, b) => (catOrder.get(a.category) ?? 99) - (catOrder.get(b.category) ?? 99));
   const openQuotes = (quotes ?? []).filter((q) => q.status === "sent");
   const bk = bookings ?? [];
 

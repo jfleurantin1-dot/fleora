@@ -3,7 +3,7 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { saveVendorProfile, type VendorOnboardingState } from "./actions";
 import { Button, Card, Field, Input, Textarea, Select, FormError } from "@/components/ui";
-import { CATEGORIES } from "@/lib/constants";
+import { CATEGORY_GROUPS, categoriesInGroup } from "@/lib/constants";
 import type { Service, Vendor } from "@/lib/types";
 
 function Submit() {
@@ -55,27 +55,35 @@ export function VendorForm({
         </div>
       </Card>
 
-      <Card className="space-y-3">
+      <Card className="space-y-4">
         <h2 className="font-semibold text-slate-900">Service categories</h2>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {CATEGORIES.map((c) => (
-            <label
-              key={c.key}
-              className="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm ring-1 ring-plum-200 hover:bg-plum-50"
-            >
-              <input
-                type="checkbox"
-                name="category"
-                value={c.key}
-                defaultChecked={catSet.has(c.key)}
-                className="h-4 w-4 rounded border-plum-300 text-plum-600"
-              />
-              <span>
-                {c.emoji} {c.label}
-              </span>
-            </label>
-          ))}
-        </div>
+        <p className="text-sm text-slate-500">Check every service you offer.</p>
+        {CATEGORY_GROUPS.map((group) => (
+          <div key={group.key}>
+            <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-plum-500">
+              {group.label}
+            </p>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {categoriesInGroup(group.key).map((c) => (
+                <label
+                  key={c.key}
+                  className="flex cursor-pointer items-center gap-2 rounded-xl px-3 py-2 text-sm ring-1 ring-plum-200 hover:bg-plum-50"
+                >
+                  <input
+                    type="checkbox"
+                    name="category"
+                    value={c.key}
+                    defaultChecked={catSet.has(c.key)}
+                    className="h-4 w-4 rounded border-plum-300 text-plum-600"
+                  />
+                  <span>
+                    {c.emoji} {c.label}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
       </Card>
 
       <Card className="space-y-3">
@@ -93,10 +101,14 @@ export function VendorForm({
               />
               <Select name={`svc_cat_${i}`} defaultValue={s?.category ?? ""} className="col-span-4">
                 <option value="">Category…</option>
-                {CATEGORIES.map((c) => (
-                  <option key={c.key} value={c.key}>
-                    {c.label}
-                  </option>
+                {CATEGORY_GROUPS.map((group) => (
+                  <optgroup key={group.key} label={group.label}>
+                    {categoriesInGroup(group.key).map((c) => (
+                      <option key={c.key} value={c.key}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </optgroup>
                 ))}
               </Select>
               <Input

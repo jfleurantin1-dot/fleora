@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { CATEGORIES, EVENT_TYPE_MAP } from "@/lib/constants";
+import { CATEGORY_GROUPS, categoriesInGroup, EVENT_TYPE_MAP } from "@/lib/constants";
 import { Button, Card, PageHeader } from "@/components/ui";
 import { money } from "@/lib/format";
 import { saveServices } from "./actions";
@@ -34,30 +34,41 @@ export default async function ServicesPage({ params }: { params: { id: string } 
       />
 
       <form action={saveWithId}>
-        <Card className="space-y-2">
-          {CATEGORIES.map((c) => {
-            const checked = chosen.size ? chosen.has(c.key) : suggested.has(c.key);
-            const est = budget ? money(Math.round((budget * c.budgetShare) / 25) * 25) : null;
-            return (
-              <label
-                key={c.key}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 hover:bg-plum-50"
-              >
-                <input
-                  type="checkbox"
-                  name="category"
-                  value={c.key}
-                  defaultChecked={checked}
-                  className="h-4 w-4 rounded border-plum-300 text-plum-600 focus:ring-plum-400"
-                />
-                <span className="text-lg">{c.emoji}</span>
-                <span className="flex-1 text-sm font-medium text-slate-700">{c.label}</span>
-                {est && <span className="text-xs text-slate-400">~{est}</span>}
-              </label>
-            );
-          })}
+        <Card className="space-y-4">
+          {CATEGORY_GROUPS.map((group) => (
+            <div key={group.key}>
+              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-plum-500">
+                {group.label}
+              </p>
+              <div className="space-y-1">
+                {categoriesInGroup(group.key).map((c) => {
+                  const checked = chosen.size ? chosen.has(c.key) : suggested.has(c.key);
+                  const est = budget
+                    ? money(Math.round((budget * c.budgetShare) / 25) * 25)
+                    : null;
+                  return (
+                    <label
+                      key={c.key}
+                      className="flex cursor-pointer items-center gap-3 rounded-xl px-2 py-2 hover:bg-plum-50"
+                    >
+                      <input
+                        type="checkbox"
+                        name="category"
+                        value={c.key}
+                        defaultChecked={checked}
+                        className="h-4 w-4 rounded border-plum-300 text-plum-600 focus:ring-plum-400"
+                      />
+                      <span className="text-lg">{c.emoji}</span>
+                      <span className="flex-1 text-sm font-medium text-slate-700">{c.label}</span>
+                      {est && <span className="text-xs text-slate-400">~{est}</span>}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
 
-          <div className="pt-3">
+          <div className="pt-2">
             <Button type="submit" size="lg" className="w-full">
               Save & see my plan →
             </Button>

@@ -2,25 +2,26 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { Card, Badge, Stars, PageHeader, Empty } from "@/components/ui";
-import { CATEGORIES } from "@/lib/constants";
+import { CATEGORY_GROUPS, categoriesInGroup, GROUP_MAP } from "@/lib/constants";
 
 export default async function BrowseVendors({
   searchParams,
 }: {
-  searchParams: { category?: string };
+  searchParams: { group?: string };
 }) {
   await requireProfile();
   const supabase = createClient();
 
-  const category = searchParams.category;
+  const group = searchParams.group && GROUP_MAP[searchParams.group] ? searchParams.group : undefined;
 
   let vendorIds: string[] | null = null;
-  if (category) {
+  if (group) {
+    const leafKeys = categoriesInGroup(group).map((c) => c.key);
     const { data } = await supabase
       .from("vendor_categories")
       .select("vendor_id")
-      .eq("category", category);
-    vendorIds = (data ?? []).map((r) => r.vendor_id);
+      .in("category", leafKeys);
+    vendorIds = [...new Set((data ?? []).map((r) => r.vendor_id))];
   }
 
   let query = supabase
@@ -28,7 +29,9 @@ export default async function BrowseVendors({
     .select("*")
     .eq("status", "approved")
     .order("rating", { ascending: false });
-  if (vendorIds) query = query.in("id", vendorIds.length ? vendorIds : ["00000000-0000-0000-0000-000000000000"]);
+  if (vendorIds) {
+    query = query.in("id", vendorIds.length ? vendorIds : ["00000000-0000-0000-0000-000000000000"]);
+  }
 
   const { data: vendors } = await query;
 
@@ -40,22 +43,22 @@ export default async function BrowseVendors({
         <Link
           href="/vendors/browse"
           className={`rounded-full px-3 py-1 text-sm ${
-            !category ? "bg-plum-600 text-white" : "bg-white text-slate-600 ring-1 ring-plum-200"
+            !group ? "bg-plum-600 text-white" : "bg-white text-slate-600 ring-1 ring-plum-200"
           }`}
         >
           All
         </Link>
-        {CATEGORIES.map((c) => (
+        {CATEGORY_GROUPS.map((g) => (
           <Link
-            key={c.key}
-            href={`/vendors/browse?category=${c.key}`}
+            key={g.key}
+            href={`/vendors/browse?group=${g.key}`}
             className={`rounded-full px-3 py-1 text-sm ${
-              category === c.key
+              group === g.key
                 ? "bg-plum-600 text-white"
                 : "bg-white text-slate-600 ring-1 ring-plum-200"
             }`}
           >
-            {c.emoji} {c.label}
+            {g.label}
           </Link>
         ))}
       </div>
