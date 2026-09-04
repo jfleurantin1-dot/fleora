@@ -15,6 +15,7 @@ const clientLinks = [
 const vendorLinks = [
   { href: "/vendor/dashboard", label: "Home", Icon: HomeIcon },
   { href: "/vendor/leads", label: "Leads", Icon: SearchIcon },
+  { href: "/vendor/claim", label: "Claim", Icon: SearchIcon },
   { href: "/messages", label: "Messages", Icon: MessageIcon },
   { href: "/vendor/onboarding", label: "Profile", Icon: UserIcon },
 ];

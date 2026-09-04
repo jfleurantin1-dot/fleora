@@ -131,6 +131,8 @@ export const GROUP_MAP: Record<string, CategoryGroupDef> = Object.fromEntries(
   CATEGORY_GROUPS.map((g) => [g.key, g] as [string, CategoryGroupDef]),
 );
 
+
+
 export interface EventTypeDef {
   key: string;
   label: string;
@@ -173,11 +175,9 @@ export function categoriesInGroup(group: string): CategoryDef[] {
 export function categoryLabel(key: string): string {
   return CATEGORY_MAP[key]?.label ?? key;
 }
-
 export function categoryEmoji(key: string): string {
   return CATEGORY_MAP[key]?.emoji ?? "•";
 }
-
 export function groupLabelForCategory(key: string): string {
   const g = CATEGORY_MAP[key]?.group;
   return g ? (GROUP_MAP[g]?.label ?? g) : "";
