@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { requireVendor } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Button, ButtonLink, Card, Field, Input } from "@/components/ui";
-import { blockDate, removeBlockedDate } from "./actions";
+import { blockDateRange, removeBlockedDate } from "./actions";
 
 function prettyDate(value: string) {
   return new Intl.DateTimeFormat("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`));
@@ -34,17 +34,21 @@ export default async function VendorAvailabilityPage() {
 
       <Card variant="feature" className="space-y-4">
         <div>
-          <p className="fleora-kicker">Block a date</p>
+          <p className="fleora-kicker">Block dates</p>
           <h2 className="mt-1 font-display text-2xl text-ink-900">When are you unavailable?</h2>
+          <p className="mt-1 text-sm text-ink-500">Choose one day or an entire date range.</p>
         </div>
-        <form action={blockDate} className="grid gap-3 sm:grid-cols-[1fr_1.5fr_auto] sm:items-end">
-          <Field label="Date">
-            <Input type="date" name="date" min={today} required />
+        <form action={blockDateRange} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1.4fr_auto] lg:items-end">
+          <Field label="Start date">
+            <Input type="date" name="start_date" min={today} required />
+          </Field>
+          <Field label="End date" hint="Leave blank for one day.">
+            <Input type="date" name="end_date" min={today} />
           </Field>
           <Field label="Note" hint="Optional — only you see this here.">
             <Input name="note" placeholder="Already booked, vacation, personal day…" />
           </Field>
-          <Button type="submit" className="sm:mb-[1px]">Block date</Button>
+          <Button type="submit" className="lg:mb-[1px]">Block dates</Button>
         </form>
       </Card>
 
