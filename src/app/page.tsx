@@ -32,7 +32,7 @@ export default async function Landing() {
                 Log in
               </ButtonLink>
               <ButtonLink href="/signup" variant="primary" size="sm">
-                Get started
+                Sign up
               </ButtonLink>
             </>
           )}

@@ -15,6 +15,7 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
   const [state, formAction] = useFormState<SignupState, FormData>(signup, {});
   const [accountType, setAccountType] = useState(searchParams.as === "vendor" ? "vendor" : "client");
   const isVendor = accountType === "vendor";
+  const [password, setPassword] = useState("");
   return (
     <main className="relative min-h-screen overflow-hidden bg-ivory-50">
       <div className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-blush-100/60 blur-3xl" />
@@ -37,7 +38,9 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
               <input type="hidden" name="account_type" value={accountType} />
               <div className="grid grid-cols-2 gap-3"><Field label="First name"><Input name="first_name" required /></Field><Field label="Last name"><Input name="last_name" /></Field></div>
               <Field label="Email"><Input name="email" type="email" autoComplete="email" required /></Field>
-              <Field label="Password" hint="At least 6 characters"><Input name="password" type="password" autoComplete="new-password" required minLength={6} /></Field>
+              <Field label="Phone number"><Input name="phone" type="tel" autoComplete="tel" placeholder="(617) 555-0123" required /></Field>
+              <Field label="Password" hint="At least 6 characters"><Input name="password" type="password" autoComplete="new-password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} /></Field>
+              <Field label="Confirm password"><Input name="confirm_password" type="password" autoComplete="new-password" required minLength={6} /></Field>
               <FormError message={state.error} />
               <Submit isVendor={isVendor} />
             </form>

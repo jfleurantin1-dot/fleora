@@ -1,18 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { createEvent, type NewEventState } from "./actions";
 import { Button, Card, FormError, Input } from "@/components/ui";
 import { ArrowLeftIcon, SparkleIcon } from "@/components/icons";
 import { EVENT_TYPES, STYLE_OPTIONS } from "@/lib/constants";
 
-const paletteOptions = [
-  { label: "Blush & Champagne", value: "Blush · Ivory · Champagne", dots: ["#F6DDE3", "#FCF9F5", "#D8B982"] },
-  { label: "Plum & Lavender", value: "Plum · Lavender · Ivory", dots: ["#6F4A8E", "#E9DDF1", "#FCF9F5"] },
-  { label: "Garden Romance", value: "Rose · Sage · Cream", dots: ["#E9BAC6", "#A9B8A0", "#F8F2EC"] },
-  { label: "Modern Neutral", value: "Taupe · Ivory · Black", dots: ["#B89BA3", "#FCF9F5", "#29242B"] },
-];
+
 
 function Submit() {
   const { pending } = useFormStatus();
@@ -33,11 +28,16 @@ export default function NewEventPage() {
   const [guestCount, setGuestCount] = useState("");
   const [budget, setBudget] = useState("");
   const [style, setStyle] = useState(STYLE_OPTIONS[0]);
-  const [palette, setPalette] = useState(paletteOptions[0].value);
   const [customPalette, setCustomPalette] = useState("");
+  const [inspoPreviews, setInspoPreviews] = useState<string[]>([]);
 
   const canContinueDetails = name.trim().length > 0;
-  const finalPalette = customPalette.trim() || palette;
+  const finalPalette = customPalette.trim();
+
+  function previewInspo(e: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).slice(0, 6);
+    setInspoPreviews(files.map((file) => URL.createObjectURL(file)));
+  }
 
   return (
     <div className="mx-auto max-w-3xl">
@@ -125,7 +125,7 @@ export default function NewEventPage() {
                 </label>
                 <label className="block space-y-1.5">
                   <span className="text-sm font-semibold text-ink-900">Location</span>
-                  <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Brockton, MA" />
+                  <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, State" />
                 </label>
               </div>
 
@@ -172,38 +172,19 @@ export default function NewEventPage() {
               </div>
 
               <div>
-                <h2 className="mb-3 text-sm font-bold text-ink-900">Color palette</h2>
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {paletteOptions.map((option) => {
-                    const active = palette === option.value && !customPalette;
-                    return (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => { setPalette(option.value); setCustomPalette(""); }}
-                        className={`flex items-center justify-between rounded-2xl border p-3 text-left transition ${active ? "border-plum-400 bg-plum-50 ring-2 ring-plum-100" : "border-[#E9E3E7] bg-white hover:border-plum-200"}`}
-                      >
-                        <span className="text-sm font-semibold text-ink-900">{option.label}</span>
-                        <span className="flex -space-x-1.5">
-                          {option.dots.map((dot) => <span key={dot} className="h-7 w-7 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: dot }} />)}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="mt-3">
-                  <Input value={customPalette} onChange={(e) => setCustomPalette(e.target.value)} placeholder="Or describe your colors: butter yellow, blush, nude…" />
-                </div>
+                <h2 className="mb-3 text-sm font-bold text-ink-900">Describe your color palette</h2>
+                <Input value={customPalette} onChange={(e) => setCustomPalette(e.target.value)} placeholder="Butter yellow, blush pink, ivory and gold…" />
               </div>
 
-              <div className="rounded-2xl border border-dashed border-blush-300 bg-blush-50/70 p-4">
-                <div className="flex gap-3">
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-plum-600 shadow-sm"><SparkleIcon size={18} /></span>
-                  <div>
-                    <p className="text-sm font-bold text-ink-900">Inspiration photos are coming next</p>
-                    <p className="mt-1 text-xs leading-relaxed text-ink-600">We&apos;re laying the design foundation now. The future Build This Look tool will live right here.</p>
-                  </div>
-                </div>
+              <div>
+                <h2 className="mb-1 text-sm font-bold text-ink-900">Add inspiration photos <span className="font-normal text-ink-400">(optional)</span></h2>
+                <p className="mb-3 text-xs text-ink-500">Upload up to 6 photos. They&apos;ll be waiting for you on this event&apos;s Inspiration Board.</p>
+                <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-plum-200 bg-plum-50/50 p-5 text-center transition hover:border-plum-300 hover:bg-plum-50">
+                  <span className="text-xl">＋</span><span className="ml-2 text-sm font-bold text-plum-700">Choose inspiration photos</span>
+                  <input name="inspiration_photos" onChange={previewInspo} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="sr-only" />
+                </label>
+                {inspoPreviews.length > 0 && <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">{inspoPreviews.map((src, i) => <img key={src} src={src} alt={`Inspiration ${i + 1}`} className="aspect-square w-full rounded-xl object-cover" />)}</div>}
+                <p className="mt-2 text-xs text-ink-400">JPG, PNG, WEBP or GIF · max 10 MB each</p>
               </div>
 
               <FormError message={state.error} />

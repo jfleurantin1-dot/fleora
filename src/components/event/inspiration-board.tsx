@@ -19,7 +19,7 @@ function storageKey(eventId: string) {
   return `fleora:inspiration:${eventId}`;
 }
 
-export function InspirationBoard({ eventId, eventName, eventStyle, colorPalette }: { eventId: string; eventName: string; eventStyle?: string | null; colorPalette?: string | null }) {
+export function InspirationBoard({ eventId, eventName, eventStyle, colorPalette, initialPhotos = [] }: { eventId: string; eventName: string; eventStyle?: string | null; colorPalette?: string | null; initialPhotos?: { id: string; url: string; sort: number; created_at: string }[] }) {
   const [items, setItems] = useState<Inspiration[]>([]);
   const [active, setActive] = useState<Inspiration | null>(null);
   const [title, setTitle] = useState("");
@@ -31,11 +31,14 @@ export function InspirationBoard({ eventId, eventName, eventStyle, colorPalette 
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(storageKey(eventId));
-      if (raw) setItems(JSON.parse(raw));
+      const local: Inspiration[] = raw ? JSON.parse(raw) : [];
+      const uploaded: Inspiration[] = initialPhotos.map((photo, i) => ({ id: `db-${photo.id}`, image: photo.url, title: `Inspiration ${i + 1}`, note: "Added when this event was created", tags: [], createdAt: new Date(photo.created_at).getTime() }));
+      const localIds = new Set(local.map((item) => item.id));
+      setItems([...uploaded.filter((item) => !localIds.has(item.id)), ...local]);
     } catch {
       // Keep the board usable even if browser storage is unavailable.
     }
-  }, [eventId]);
+  }, [eventId, initialPhotos]);
 
   function persist(next: Inspiration[]) {
     setItems(next);

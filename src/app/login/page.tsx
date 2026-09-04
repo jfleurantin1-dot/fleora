@@ -10,7 +10,7 @@ function Submit() {
   return <Button type="submit" size="lg" className="w-full" disabled={pending}>{pending ? "Signing in…" : "Welcome back"}</Button>;
 }
 
-export default function LoginPage({ searchParams }: { searchParams: { next?: string } }) {
+export default function LoginPage({ searchParams }: { searchParams: { next?: string; check?: string } }) {
   const [state, formAction] = useFormState<AuthState, FormData>(login, {});
   return (
     <main className="relative min-h-screen overflow-hidden bg-ivory-50">
@@ -27,6 +27,7 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
           <Link href="/" className="mb-7 inline-flex items-start font-display text-3xl leading-none text-plum-600 lg:hidden">Fleora<span className="ml-1 mt-1 text-xs text-champagne-500">✦</span></Link>
           <Card variant="feature" padding="lg" className="space-y-6">
             <div><p className="fleora-kicker">Sign in</p><h2 className="mt-2 font-display text-4xl text-ink-900">Welcome back.</h2><p className="mt-2 text-sm text-ink-600">Your plans, conversations and bookings are waiting.</p></div>
+            {searchParams.check === "1" && <div className="rounded-2xl border border-plum-200 bg-plum-50 px-4 py-3 text-sm font-medium text-plum-800">Check your email to confirm your Fleora account, then come back here to log in.</div>}
             <form action={formAction} className="space-y-4">
               <input type="hidden" name="next" value={searchParams.next ?? "/dashboard"} />
               <Field label="Email"><Input name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></Field>

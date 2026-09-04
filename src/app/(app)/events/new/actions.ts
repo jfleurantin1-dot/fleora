@@ -49,6 +49,18 @@ export async function createEvent(_prev: NewEventState, formData: FormData): Pro
 
   await supabase.rpc("seed_event_checklist", { p_event_id: event.id });
 
+  const photos = formData.getAll("inspiration_photos").filter((value): value is File => value instanceof File && value.size > 0).slice(0, 6);
+  for (let i = 0; i < photos.length; i++) {
+    const file = photos[i];
+    if (!file.type.startsWith("image/") || file.size > 10_000_000) continue;
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const path = `${user.id}/${event.id}/${crypto.randomUUID()}.${ext}`;
+    const { error: uploadError } = await supabase.storage.from("event-inspiration").upload(path, file, { contentType: file.type, upsert: false });
+    if (uploadError) continue;
+    const { data: publicUrl } = supabase.storage.from("event-inspiration").getPublicUrl(path);
+    await supabase.from("event_inspiration_photos").insert({ event_id: event.id, url: publicUrl.publicUrl, sort: i });
+  }
+
   revalidatePath("/dashboard");
   redirect(`/events/${event.id}/services`);
 }

@@ -43,6 +43,14 @@ export type EventRow = {
   created_at: string;
 };
 
+export type EventInspirationPhoto = {
+  id: string;
+  event_id: string;
+  url: string;
+  sort: number;
+  created_at: string;
+};
+
 export type Vendor = {
   id: string;
   user_id: string | null;
@@ -246,6 +254,7 @@ export type Database = {
     Tables: {
       profiles: TableDef<Profile>;
       events: TableDef<EventRow>;
+      event_inspiration_photos: TableDef<EventInspirationPhoto>;
       vendors: TableDef<Vendor>;
       vendor_claims: TableDef<VendorClaim>;
       vendor_categories: TableDef<VendorCategory>;
