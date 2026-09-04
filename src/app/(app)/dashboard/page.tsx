@@ -56,7 +56,7 @@ export default async function DashboardPage() {
         <div>
           <p className="fleora-kicker mb-2">Your planning space</p>
           <h1 className="font-display text-4xl leading-none text-ink-900 sm:text-5xl">
-            Good morning, {profile.first_name ?? "there"}<span className="ml-2 text-2xl text-champagne-500">✦</span>
+            Good morning, {profile.first_name ?? "there"}
           </h1>
           <p className="mt-3 text-sm text-ink-600 sm:text-base">Let&apos;s make something beautiful.</p>
         </div>
@@ -147,7 +147,7 @@ export default async function DashboardPage() {
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-plum-600 shadow-sm"><SparkleIcon /></div>
                   <h2 className="font-display text-2xl text-ink-900">Have an inspiration photo?</h2>
                   <p className="mt-2 text-sm leading-relaxed text-ink-600">Save inspiration photos, choose the details you want to recreate, and turn the look into a vendor-ready plan.</p>
-                  <ButtonLink href={`/events/${hero.id}/inspiration`} variant="magic" className="mt-5">✦ Build This Look</ButtonLink>
+                  <ButtonLink href={`/events/${hero.id}/inspiration`} variant="magic" className="mt-5">Build This Look</ButtonLink>
                 </div>
                 <div className="shrink-0"><Badge tone="champagne">Phase 2 · live preview</Badge></div>
               </div>

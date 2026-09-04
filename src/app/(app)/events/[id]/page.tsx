@@ -56,7 +56,7 @@ export default async function EventPage({
     <div className="space-y-7">
       {searchParams.booked && (
         <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-          ✦ Your {categoryLabel(searchParams.booked)} vendor is booked and now part of this event.
+          Your {categoryLabel(searchParams.booked)} vendor is booked and now part of this event.
         </div>
       )}
 

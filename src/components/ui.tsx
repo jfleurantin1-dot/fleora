@@ -5,7 +5,7 @@ import type { ComponentProps, ReactNode } from "react";
 type Variant = "primary" | "secondary" | "ghost" | "magic" | "danger";
 const variants: Record<Variant, string> = {
   primary:
-    "bg-plum-500 text-white shadow-sm hover:-translate-y-0.5 hover:bg-plum-600 hover:shadow-fleora disabled:translate-y-0 disabled:opacity-60",
+    "bg-gradient-to-r from-plum-500 to-plum-600 text-white shadow-sm hover:-translate-y-0.5 hover:bg-plum-600 hover:shadow-fleora disabled:translate-y-0 disabled:opacity-60",
   secondary:
     "border border-plum-200 bg-white text-plum-700 shadow-sm hover:-translate-y-0.5 hover:border-plum-300 hover:bg-plum-50",
   ghost: "text-plum-700 hover:bg-plum-50",
@@ -19,7 +19,7 @@ const sizes = {
   lg: "min-h-[52px] px-6 py-3 text-base",
 };
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-plum-300 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 rounded-[10px] font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-plum-300 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
 
 export function Button({
   variant = "primary",
@@ -41,11 +41,11 @@ export function ButtonLink({
 
 type CardVariant = "standard" | "feature" | "interactive" | "soft";
 const cardVariants: Record<CardVariant, string> = {
-  standard: "border-[#E9E3E7] bg-white shadow-fleora",
-  feature: "border-plum-100 bg-gradient-to-br from-white via-white to-plum-50 shadow-lift",
+  standard: "border-[#E8E1ED] bg-white shadow-fleora",
+  feature: "border-[#E8E1ED] bg-white shadow-fleora",
   interactive:
-    "border-[#E9E3E7] bg-white shadow-fleora transition duration-200 hover:-translate-y-0.5 hover:border-plum-200 hover:shadow-lift",
-  soft: "border-transparent bg-ivory-100/80 shadow-none",
+    "border-[#E8E1ED] bg-white shadow-fleora transition duration-200 hover:-translate-y-0.5 hover:border-plum-200 hover:shadow-lift",
+  soft: "border-transparent bg-plum-50/55 shadow-none",
 };
 
 export function Card({
@@ -68,14 +68,14 @@ export function Card({
     as,
     {
       id,
-      className: `rounded-[18px] border ${cardVariants[variant]} ${paddingClass} ${className}`,
+      className: `rounded-[14px] border ${cardVariants[variant]} ${paddingClass} ${className}`,
     },
     children,
   );
 }
 
 const inputCls =
-  "min-h-12 w-full rounded-xl border border-[#E9E3E7] bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm placeholder:text-ink-400 transition focus:border-plum-300 focus:outline-none focus:ring-4 focus:ring-plum-50";
+  "min-h-12 w-full rounded-[10px] border border-[#E8E1ED] bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm placeholder:text-ink-400 transition focus:border-plum-300 focus:outline-none focus:ring-4 focus:ring-plum-50";
 
 export function Field({
   label,
@@ -157,8 +157,8 @@ export function Stars({
 
 export function Empty({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="rounded-[22px] border border-dashed border-plum-200 bg-white/70 p-10 text-center shadow-fleora">
-      <div className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-full bg-plum-50 text-xl text-plum-600">✦</div>
+    <div className="rounded-[14px] border border-dashed border-plum-200 bg-white/70 p-10 text-center shadow-fleora">
+      <div className="mx-auto mb-3 grid h-11 w-11 place-items-center rounded-full bg-plum-50 text-xl text-plum-600"><span className="h-2 w-2 rounded-full bg-plum-400" /></div>
       <p className="font-display text-xl text-ink-900">{title}</p>
       {children && <div className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-600">{children}</div>}
     </div>

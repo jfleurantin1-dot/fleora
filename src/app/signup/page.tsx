@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { signup, type SignupState } from "./actions";
 import { Button, Card, Field, Input, FormError } from "@/components/ui";
+import { BrandLogo } from "@/components/brand-logo";
 
 function Submit({ isVendor }: { isVendor: boolean }) {
   const { pending } = useFormStatus();
@@ -22,13 +23,13 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
       <div className="absolute -right-16 top-0 h-80 w-80 rounded-full bg-plum-100/60 blur-3xl" />
       <div className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-6 py-12 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
         <section className="hidden lg:block">
-          <Link href="/" className="inline-flex items-start font-display text-4xl leading-none text-plum-600">Fleora<span className="ml-1 mt-1 text-sm text-champagne-500">✦</span></Link>
+          <BrandLogo />
           <p className="mt-10 fleora-kicker">Create your space</p>
           <h1 className="mt-3 max-w-xl font-display text-6xl leading-[.98] text-ink-900">Plan beautifully. Grow beautifully.</h1>
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-ink-600">Whether you’re planning a celebration or running an event business, Fleora keeps the experience thoughtful and organized.</p>
         </section>
         <div className="mx-auto w-full max-w-lg">
-          <Link href="/" className="mb-7 inline-flex items-start font-display text-3xl leading-none text-plum-600 lg:hidden">Fleora<span className="ml-1 mt-1 text-xs text-champagne-500">✦</span></Link>
+          <div className="mb-7 lg:hidden"><BrandLogo /></div>
           <Card variant="feature" padding="lg" className="space-y-6">
             <div><p className="fleora-kicker">Join Fleora</p><h2 className="mt-2 font-display text-4xl text-ink-900">{isVendor ? "Grow your event business." : "Let’s plan something beautiful."}</h2></div>
             <div className="grid grid-cols-2 gap-2 rounded-2xl bg-ivory-100 p-1.5">

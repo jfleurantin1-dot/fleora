@@ -5,6 +5,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { createEvent, type NewEventState } from "./actions";
 import { Button, Card, FormError, Input } from "@/components/ui";
 import { ArrowLeftIcon, SparkleIcon } from "@/components/icons";
+import { FlowerMark } from "@/components/brand-logo";
 import { EVENT_TYPES, STYLE_OPTIONS } from "@/lib/constants";
 
 
@@ -13,7 +14,7 @@ function Submit() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={pending}>
-      {pending ? "Creating your plan…" : "Create my event plan ✦"}
+      {pending ? "Creating your plan…" : "Create my event plan"}
     </Button>
   );
 }
@@ -99,7 +100,7 @@ export default function NewEventPage() {
                           : "border-[#E9E3E7] bg-white hover:-translate-y-0.5 hover:border-plum-200 hover:shadow-fleora"
                       }`}
                     >
-                      <span className={`grid h-10 w-10 place-items-center rounded-xl text-xl ${active ? "bg-white" : "bg-ivory-100"}`}>{t.emoji}</span>
+                      <span className={`grid h-10 w-10 place-items-center rounded-full ${active ? "bg-white text-plum-500" : "bg-plum-50 text-plum-400"}`}><FlowerMark className="h-5 w-5" /></span>
                       <span className={`mt-3 block text-sm font-bold ${active ? "text-plum-700" : "text-ink-900"}`}>{t.label}</span>
                     </button>
                   );
