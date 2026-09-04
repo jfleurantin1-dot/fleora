@@ -80,6 +80,14 @@ export type VendorCategory = {
   category: string;
 };
 
+
+export type VendorUnavailableDate = {
+  id: string;
+  vendor_id: string;
+  unavailable_date: string;
+  note: string | null;
+  created_at: string;
+};
 export type VendorPhoto = {
   id: string;
   vendor_id: string;
@@ -242,6 +250,7 @@ export type Database = {
       vendor_claims: TableDef<VendorClaim>;
       vendor_categories: TableDef<VendorCategory>;
       vendor_photos: TableDef<VendorPhoto>;
+      vendor_unavailable_dates: TableDef<VendorUnavailableDate>;
       services: TableDef<Service>;
       packages: TableDef<Package>;
       event_requests: TableDef<EventRequest>;
