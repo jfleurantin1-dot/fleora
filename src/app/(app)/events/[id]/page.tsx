@@ -9,6 +9,7 @@ import { categoryEmoji, categoryLabel, CATEGORIES } from "@/lib/constants";
 import { Checklist } from "@/components/event/checklist";
 import { GuestList } from "@/components/event/guest-list";
 import type { Vendor } from "@/lib/types";
+import { EventMoodCover } from "@/components/event/event-mood-cover";
 
 export default async function EventPage({
   params,
@@ -23,7 +24,7 @@ export default async function EventPage({
   const { data: event } = await supabase.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();
 
-  const [{ data: requests }, { data: quotes }, { data: bookings }, { data: checklist }, { data: guests }, { data: vendors }] =
+  const [{ data: requests }, { data: quotes }, { data: bookings }, { data: checklist }, { data: guests }, { data: vendors }, { data: inspirationPhotos }] =
     await Promise.all([
       supabase.from("event_requests").select("*").eq("event_id", params.id).order("created_at"),
       supabase.from("quotes").select("*").eq("event_id", params.id).order("created_at", { ascending: false }),
@@ -31,6 +32,7 @@ export default async function EventPage({
       supabase.from("checklist_items").select("*").eq("event_id", params.id),
       supabase.from("guests").select("*").eq("event_id", params.id).order("created_at"),
       supabase.from("vendors").select("id,business_name,location").order("business_name"),
+      supabase.from("event_inspiration_photos").select("id,url,sort").eq("event_id", params.id).order("sort"),
     ]);
 
   type VName = Pick<Vendor, "id" | "business_name" | "location">;
@@ -58,9 +60,12 @@ export default async function EventPage({
         </div>
       )}
 
-      <Card variant="feature" padding="lg" className="relative overflow-hidden">
-        <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blush-100/80 blur-3xl" />
-        <div className="relative">
+      <Card variant="feature" padding="none" className="relative overflow-hidden">
+        <div className="grid lg:grid-cols-[.9fr_1.1fr]">
+          <EventMoodCover photos={inspirationPhotos ?? []} href={`/events/${event.id}/inspiration`} className="h-64 w-full lg:h-full lg:min-h-[340px]" emptyLabel="Build your event mood board" />
+          <div className="relative p-6 sm:p-8">
+            <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blush-100/80 blur-3xl" />
+            <div className="relative">
           <div className="flex flex-wrap items-start justify-between gap-5">
             <div>
               <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -84,6 +89,8 @@ export default async function EventPage({
               <span className="text-ink-500">{relativeDay(event.event_date)}</span>
             </div>
             <Progress value={pct} />
+              </div>
+            </div>
           </div>
         </div>
       </Card>
@@ -215,10 +222,13 @@ export default async function EventPage({
             <GuestList eventId={event.id} guests={guests ?? []} />
           </Card>
 
-          <Card id="inspiration" variant="soft" className="scroll-mt-28 overflow-hidden bg-gradient-to-br from-blush-50 via-white to-plum-50">
-            <div className="mb-3 flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-plum-600 shadow-sm">✦</span><h3 className="font-display text-xl text-ink-900">Inspiration Board</h3></div>
-            <p className="text-sm leading-relaxed text-ink-600">Save the looks you love and turn them into a vendor-ready plan with Build This Look.</p>
-            <Link href={`/events/${event.id}/inspiration`} className="mt-4 inline-flex text-sm font-bold text-plum-700 hover:underline">Open inspiration board →</Link>
+          <Card id="inspiration" variant="soft" padding="none" className="scroll-mt-28 overflow-hidden bg-gradient-to-br from-blush-50 via-white to-plum-50">
+            <EventMoodCover photos={inspirationPhotos ?? []} href={`/events/${event.id}/inspiration`} className="h-36 w-full" emptyLabel="Add inspiration photos" />
+            <div className="p-5">
+              <div className="mb-2 flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-plum-600 shadow-sm">✦</span><h3 className="font-display text-xl text-ink-900">Inspiration Board</h3></div>
+              <p className="text-sm leading-relaxed text-ink-600">{(inspirationPhotos ?? []).length ? `${(inspirationPhotos ?? []).length} inspiration photo${(inspirationPhotos ?? []).length === 1 ? "" : "s"} shaping this event.` : "Save the looks you love and turn them into a vendor-ready plan."}</p>
+              <Link href={`/events/${event.id}/inspiration`} className="mt-4 inline-flex text-sm font-bold text-plum-700 hover:underline">Open mood board →</Link>
+            </div>
           </Card>
 
           <Card id="messages" variant="soft" className="scroll-mt-28">

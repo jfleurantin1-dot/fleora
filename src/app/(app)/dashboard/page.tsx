@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Badge, ButtonLink, Card, Empty, Progress, SectionHeader, StatCard } from "@/components/ui";
 import { CalendarIcon, CheckIcon, ChevronRightIcon, SparkleIcon, StoreIcon, UsersIcon, WalletIcon } from "@/components/icons";
 import { money, relativeDay, shortDate } from "@/lib/format";
+import { EventMoodCover } from "@/components/event/event-mood-cover";
 
 export default async function DashboardPage() {
   const profile = await requireProfile();
@@ -22,11 +23,12 @@ export default async function DashboardPage() {
   const eventIds = rows.map((e) => e.id);
   const safeIds = eventIds.length ? eventIds : ["00000000-0000-0000-0000-000000000000"];
 
-  const [{ data: requests }, { data: bookings }, { data: guests }, { data: checklist }] = await Promise.all([
+  const [{ data: requests }, { data: bookings }, { data: guests }, { data: checklist }, { data: inspirationPhotos }] = await Promise.all([
     supabase.from("event_requests").select("event_id,category").in("event_id", safeIds),
     supabase.from("bookings").select("event_id,total,status,category").in("event_id", safeIds),
     supabase.from("guests").select("event_id,party_size,rsvp").in("event_id", safeIds),
     supabase.from("checklist_items").select("event_id,done").in("event_id", safeIds),
+    supabase.from("event_inspiration_photos").select("event_id,url,sort").in("event_id", safeIds).order("sort"),
   ]);
 
   const today = new Date();
@@ -70,10 +72,13 @@ export default async function DashboardPage() {
         <>
           <section>
             <SectionHeader title="Your upcoming event" eyebrow="Continue planning" />
-            <Card variant="feature" padding="lg" className="relative overflow-hidden">
-              <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blush-100/70 blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-plum-100/70 blur-3xl" />
-              <div className="relative grid gap-7 lg:grid-cols-[1.4fr_.8fr] lg:items-center">
+            <Card variant="feature" padding="none" className="relative overflow-hidden">
+              <div className="grid lg:grid-cols-[.82fr_1.18fr]">
+                <EventMoodCover photos={(inspirationPhotos ?? []).filter((p) => p.event_id === hero.id)} href={`/events/${hero.id}/inspiration`} className="h-60 w-full lg:h-full lg:min-h-[330px]" />
+                <div className="relative p-6 sm:p-8">
+                  <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blush-100/70 blur-3xl" />
+                  <div className="pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-plum-100/70 blur-3xl" />
+                  <div className="relative grid gap-7 lg:grid-cols-[1.25fr_.8fr] lg:items-center">
                 <div>
                   <div className="mb-4 flex flex-wrap items-center gap-2">
                     <Badge tone="plum">{hero.status}</Badge>
@@ -118,7 +123,9 @@ export default async function DashboardPage() {
                       <strong className="text-ink-900">{heroStats.done} / {heroStats.taskTotal} complete</strong>
                     </div>
                   </div>
+                  </div>
                 </div>
+              </div>
               </div>
             </Card>
           </section>

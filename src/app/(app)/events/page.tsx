@@ -4,6 +4,7 @@ import { requireProfile } from "@/lib/auth";
 import { Badge, ButtonLink, Card, Empty, PageHeader, Progress } from "@/components/ui";
 import { CalendarIcon, ChevronRightIcon } from "@/components/icons";
 import { money, relativeDay, shortDate } from "@/lib/format";
+import { EventMoodCover } from "@/components/event/event-mood-cover";
 
 export default async function EventsPage() {
   const profile = await requireProfile();
@@ -12,9 +13,10 @@ export default async function EventsPage() {
   const rows = events ?? [];
   const ids = rows.map((e) => e.id);
   const safeIds = ids.length ? ids : ["00000000-0000-0000-0000-000000000000"];
-  const [{ data: requests }, { data: bookings }] = await Promise.all([
+  const [{ data: requests }, { data: bookings }, { data: inspirationPhotos }] = await Promise.all([
     supabase.from("event_requests").select("event_id").in("event_id", safeIds),
     supabase.from("bookings").select("event_id,total,status").in("event_id", safeIds),
+    supabase.from("event_inspiration_photos").select("event_id,url,sort").in("event_id", safeIds).order("sort"),
   ]);
 
   return (
@@ -31,6 +33,7 @@ export default async function EventsPage() {
             const pct = reqCount ? Math.round((eventBookings.length / reqCount) * 100) : 0;
             return (
               <Card key={e.id} variant="interactive" padding="none" className="overflow-hidden">
+                <EventMoodCover photos={(inspirationPhotos ?? []).filter((p) => p.event_id === e.id)} href={`/events/${e.id}`} className="h-44 w-full" />
                 <Link href={`/events/${e.id}`} className="block">
                   <div className="bg-gradient-to-br from-blush-50 via-ivory-50 to-plum-50 p-5">
                     <div className="flex items-start justify-between gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-plum-600 shadow-sm"><CalendarIcon size={18} /></span><Badge tone={e.status === "planning" ? "plum" : "green"}>{e.status}</Badge></div>
