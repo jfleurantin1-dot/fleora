@@ -45,7 +45,7 @@ export type EventRow = {
 
 export type Vendor = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   business_name: string;
   description: string | null;
   location: string | null;
@@ -57,7 +57,22 @@ export type Vendor = {
   verified: boolean;
   response_rate: number;
   status: VendorStatus;
+  website: string | null;
+  instagram: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  source: string;
   created_at: string;
+};
+
+export type VendorClaim = {
+  id: string;
+  vendor_id: string;
+  claimant_id: string;
+  note: string | null;
+  status: "pending" | "approved" | "rejected";
+  created_at: string;
+  reviewed_at: string | null;
 };
 
 export type VendorCategory = {
@@ -224,6 +239,7 @@ export type Database = {
       profiles: TableDef<Profile>;
       events: TableDef<EventRow>;
       vendors: TableDef<Vendor>;
+      vendor_claims: TableDef<VendorClaim>;
       vendor_categories: TableDef<VendorCategory>;
       vendor_photos: TableDef<VendorPhoto>;
       services: TableDef<Service>;

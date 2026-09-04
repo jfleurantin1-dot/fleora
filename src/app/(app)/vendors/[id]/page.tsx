@@ -7,6 +7,7 @@ import { Badge, ButtonLink, Card, Stars } from "@/components/ui";
 import { ArrowLeftIcon, MapPinIcon } from "@/components/icons";
 import { money, shortDate } from "@/lib/format";
 import { categoryLabel } from "@/lib/constants";
+import { ClaimForm } from "./claim-form";
 
 export default async function VendorProfile({ params }: { params: { id: string } }) {
   await requireProfile();
@@ -42,7 +43,7 @@ export default async function VendorProfile({ params }: { params: { id: string }
         <main>
           <div className="flex flex-wrap items-start justify-between gap-4 border-b fleora-divider pb-6">
             <div>
-              <div className="mb-2 flex flex-wrap items-center gap-2">{vendor.verified && <Badge tone="plum">Verified</Badge>}<Badge tone="green">{vendor.status}</Badge></div>
+              <div className="mb-2 flex flex-wrap items-center gap-2">{vendor.verified && <Badge tone="plum">Verified</Badge>}<Badge tone="green">{vendor.status}</Badge>{!vendor.user_id && <Badge tone="champagne">Unclaimed</Badge>}</div>
               <h1 className="font-display text-4xl leading-tight text-ink-900 sm:text-5xl">{vendor.business_name}</h1>
               <div className="mt-3 flex flex-wrap items-center gap-4"><Stars rating={vendor.rating} count={vendor.review_count} /><span className="flex items-center gap-1 text-sm text-ink-500"><MapPinIcon size={14} />{vendor.location ?? "Greater Boston"}</span></div>
             </div>
@@ -72,6 +73,13 @@ export default async function VendorProfile({ params }: { params: { id: string }
             <ButtonLink href="/events" className="mt-5 w-full">Choose an event</ButtonLink>
             <ButtonLink href="/messages" variant="secondary" className="mt-2 w-full">Open messages</ButtonLink>
             <p className="mt-4 text-center text-xs text-ink-400">{vendor.response_rate}% response rate</p>
+            {!vendor.user_id && (
+              <div className="mt-5 border-t fleora-divider pt-5">
+                <p className="text-sm font-semibold text-ink-900">Is this your business?</p>
+                <p className="mt-1 mb-3 text-xs leading-relaxed text-ink-500">Claim the complimentary Fleora listing to manage your photos, pricing, availability, inquiries and quotes.</p>
+                <ClaimForm vendorId={vendor.id} />
+              </div>
+            )}
           </Card>
         </aside>
       </div>
