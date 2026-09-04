@@ -2,10 +2,10 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import { saveVendorProfile, type VendorOnboardingState } from "./actions";
-import { Button, Card, Field, Input, Textarea, Select, FormError } from "@/components/ui";
+import { Button, ButtonLink, Card, Field, Input, Textarea, Select, FormError } from "@/components/ui";
 import { CATEGORY_GROUPS, categoriesInGroup } from "@/lib/constants";
 import { PhotoUploader } from "@/components/vendor/photo-uploader";
-import type { Service, Vendor } from "@/lib/types";
+import type { Package, Service, Vendor } from "@/lib/types";
 
 function Submit() {
   const { pending } = useFormStatus();
@@ -21,12 +21,14 @@ export function VendorForm({
   vendor,
   categories,
   services,
+  packages,
   photos,
 }: {
   userId: string;
   vendor: Vendor | null;
   categories: string[];
   services: Service[];
+  packages: Package[];
   photos: string[];
 }) {
   const [state, formAction] = useFormState<VendorOnboardingState, FormData>(saveVendorProfile, {});
@@ -54,6 +56,24 @@ export function VendorForm({
               max={150}
               defaultValue={vendor?.service_radius_miles ?? 25}
             />
+          </Field>
+        </div>
+      </Card>
+
+      <Card className="space-y-4">
+        <div><p className="fleora-kicker">Storefront details</p><h2 className="mt-1 font-display text-2xl text-ink-900">Help clients find you everywhere</h2><p className="mt-1 text-sm text-ink-600">You can type a website like <strong>mybusiness.com</strong> or an Instagram handle like <strong>@mybusiness</strong>. Fleora will format the links for you.</p></div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Website">
+            <Input name="website" defaultValue={vendor?.website ?? ""} placeholder="mybusiness.com" inputMode="url" />
+          </Field>
+          <Field label="Instagram">
+            <Input name="instagram" defaultValue={vendor?.instagram ?? ""} placeholder="@mybusiness" />
+          </Field>
+          <Field label="Public email">
+            <Input name="contact_email" type="email" defaultValue={vendor?.contact_email ?? ""} placeholder="hello@mybusiness.com" />
+          </Field>
+          <Field label="Public phone">
+            <Input name="contact_phone" type="tel" defaultValue={vendor?.contact_phone ?? ""} placeholder="(617) 555-0123" />
           </Field>
         </div>
       </Card>
@@ -126,6 +146,20 @@ export function VendorForm({
       </Card>
 
       <Card className="space-y-3">
+        <div><p className="fleora-kicker">Packages</p><h2 className="mt-1 font-display text-2xl text-ink-900">Create easy-to-shop packages</h2><p className="mt-1 text-sm text-ink-600">Packages help clients understand what they can book before requesting a custom quote.</p></div>
+        {[0, 1, 2].map((i) => {
+          const pkg = packages[i];
+          return (
+            <div key={i} className="grid gap-2 rounded-2xl border border-[#E9E3E7] bg-white p-3 sm:grid-cols-12">
+              <Input name={`pkg_name_${i}`} placeholder="Package name" defaultValue={pkg?.name ?? ""} className="sm:col-span-4" />
+              <Input name={`pkg_desc_${i}`} placeholder="What’s included" defaultValue={pkg?.description ?? ""} className="sm:col-span-5" />
+              <Input name={`pkg_price_${i}`} type="number" min={0} placeholder="$ Price" defaultValue={pkg?.price ?? ""} className="sm:col-span-3" />
+            </div>
+          );
+        })}
+      </Card>
+
+      <Card className="space-y-3">
         <div><p className="fleora-kicker">Portfolio</p><h2 className="mt-1 font-display text-2xl text-ink-900">Show your best work</h2><p className="mt-1 text-sm text-ink-600">
           Show your best work — clients see these on your profile and in match results.
         </p></div>
@@ -138,7 +172,7 @@ export function VendorForm({
           Saved. {vendor?.status !== "approved" && "An admin will review your profile before it goes live."}
         </p>
       )}
-      <div className="flex justify-end"><Submit /></div>
+      <div className="flex flex-wrap justify-end gap-3">{vendor?.id && <ButtonLink href={`/vendors/${vendor.id}`} variant="secondary" size="lg">Preview storefront</ButtonLink>}<Submit /></div>
     </form>
   );
 }

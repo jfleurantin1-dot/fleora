@@ -88,9 +88,26 @@ export default async function EventPage({
         </div>
       </Card>
 
+      {openQuotes.length > 0 && (
+        <Card variant="feature" padding="lg" className="border-plum-200 bg-gradient-to-r from-plum-50 via-white to-blush-50">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-plum-100 text-xl">💌</span>
+              <div>
+                <p className="fleora-kicker">Quote ready</p>
+                <h2 className="mt-1 font-display text-2xl text-ink-900">You have {openQuotes.length} quote{openQuotes.length === 1 ? "" : "s"} waiting for review.</h2>
+                <p className="mt-1 text-sm text-ink-600">Review pricing, deposit details and vendor notes before you book.</p>
+              </div>
+            </div>
+            <ButtonLink href={openQuotes.length === 1 ? `/quotes/${openQuotes[0].id}` : "#quotes"} size="lg">{openQuotes.length === 1 ? "View quote" : "Review quotes"}</ButtonLink>
+          </div>
+        </Card>
+      )}
+
       <nav className="scroll-thin -mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
         {[
           ["#overview", "Overview"],
+          ["#quotes", `Quotes${openQuotes.length ? ` (${openQuotes.length})` : ""}`],
           ["#vendors", "Vendors"],
           ["#guests", "Guests"],
           ["#checklist", "Checklist"],
@@ -146,8 +163,8 @@ export default async function EventPage({
           </section>
 
           {openQuotes.length > 0 && (
-            <section>
-              <SectionHeader title="Quotes to review" eyebrow="Needs your attention" />
+            <section id="quotes" className="scroll-mt-28">
+              <SectionHeader title="Quotes to review" eyebrow="Needs your attention" description="Compare your vendor quotes and book when you’re ready." />
               <div className="space-y-3">
                 {openQuotes.map((q) => (
                   <Card key={q.id} variant="interactive" className="flex flex-wrap items-center justify-between gap-4">

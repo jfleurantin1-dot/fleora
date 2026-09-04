@@ -52,6 +52,8 @@ export default async function VendorProfile({ params }: { params: { id: string }
 
           {vendor.description && <section className="py-7"><p className="fleora-kicker mb-2">About</p><p className="max-w-3xl text-sm leading-7 text-ink-600">{vendor.description}</p><div className="mt-4 flex flex-wrap gap-2">{(cats ?? []).map((c) => <Badge key={c.category} tone="slate">{categoryLabel(c.category)}</Badge>)}</div></section>}
 
+          {(vendor.website || vendor.instagram || vendor.contact_email || vendor.contact_phone) && <section className="border-t fleora-divider py-6"><p className="fleora-kicker mb-3">Connect</p><div className="flex flex-wrap gap-2">{vendor.website && <a href={vendor.website} target="_blank" rel="noreferrer" className="rounded-full border border-[#E9E3E7] bg-white px-4 py-2 text-sm font-semibold text-plum-700 transition hover:bg-plum-50">Website ↗</a>}{vendor.instagram && <a href={vendor.instagram} target="_blank" rel="noreferrer" className="rounded-full border border-[#E9E3E7] bg-white px-4 py-2 text-sm font-semibold text-plum-700 transition hover:bg-plum-50">Instagram ↗</a>}{vendor.contact_email && <a href={`mailto:${vendor.contact_email}`} className="rounded-full border border-[#E9E3E7] bg-white px-4 py-2 text-sm font-semibold text-ink-700 transition hover:bg-ivory-100">Email</a>}{vendor.contact_phone && <a href={`tel:${vendor.contact_phone}`} className="rounded-full border border-[#E9E3E7] bg-white px-4 py-2 text-sm font-semibold text-ink-700 transition hover:bg-ivory-100">Call</a>}</div></section>}
+
           <section className="border-t fleora-divider py-7">
             <h2 className="font-display text-2xl text-ink-900">Services & starting prices</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
