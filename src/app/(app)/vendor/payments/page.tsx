@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { requireVendor } from "@/lib/auth";
-import { createAdminClient, createClient } from "@/lib/supabase/server";
-import { accountState, retrieveConnectedAccount, stripeConfigured } from "@/lib/stripe-rest";
+import { createClient } from "@/lib/supabase/server";
+import { stripeConfigured } from "@/lib/stripe-rest";
 import { Badge, Button, Card, Empty, PageHeader, Progress, StatCard } from "@/components/ui";
 import { money } from "@/lib/format";
 import { startStripeOnboarding, refreshStripeStatus } from "./actions";
@@ -20,22 +20,9 @@ export default async function VendorPaymentsPage({ searchParams }: { searchParam
     transfersStatus: vendor.stripe_transfers_status ?? null,
   };
 
-  if (stripeConfigured() && vendor.stripe_account_id && searchParams?.stripe === "return") {
-    try {
-      const account = await retrieveConnectedAccount(vendor.stripe_account_id);
-      const state = accountState(account);
-      live = state;
-      const admin = createAdminClient();
-      await admin.from("vendors").update({
-        stripe_onboarding_status: state.onboardingStatus,
-        stripe_details_submitted: state.detailsSubmitted,
-        stripe_charges_enabled: state.chargesEnabled,
-        stripe_payouts_enabled: state.payoutsEnabled,
-        stripe_transfers_status: state.transfersStatus,
-        stripe_last_synced_at: new Date().toISOString(),
-      }).eq("id", vendor.id);
-    } catch { /* keep last known state and show reconnect option */ }
-  }
+  // Stripe return only brings the vendor back to Fleora.
+  // Status is refreshed explicitly with the Refresh status action.
+
 
   const [{ data: settings }, { data: payments }] = await Promise.all([
     supabase.from("payment_settings").select("*").eq("id", 1).maybeSingle(),

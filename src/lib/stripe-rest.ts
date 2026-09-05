@@ -94,20 +94,20 @@ export async function createFleoraConnectedAccount(input: { vendorId: string; bu
         },
       },
       metadata: { fleora_vendor_id: input.vendorId },
-      include: ["configuration.recipient", "identity", "requirements"],
     },
   });
 }
 
 export async function retrieveConnectedAccount(accountId: string) {
-  // Stripe Accounts v2 requires explicitly indexed include parameters on GET.
-  // Build the query string literally to avoid frameworks/URL helpers rewriting
-  // the array syntax into the unsupported include[] form.
-  const query = [
-    "include[0]=configuration.recipient",
-    "include[1]=requirements",
-  ].join("&");
-  return stripeV2Request<StripeAccount>(`/accounts/${encodeURIComponent(accountId)}?${query}`);
+  // Accounts v2 only accepts indexed include keys. Build them with
+  // URLSearchParams so the square brackets are percent-encoded on the wire
+  // exactly like Stripe's documented curl -G -d "include[0]=..." request.
+  const params = new URLSearchParams();
+  params.set("include[0]", "configuration.recipient");
+  params.set("include[1]", "requirements");
+  return stripeV2Request<StripeAccount>(
+    `/accounts/${encodeURIComponent(accountId)}?${params.toString()}`,
+  );
 }
 
 export async function createOnboardingLink(accountId: string, baseUrl: string) {
