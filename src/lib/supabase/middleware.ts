@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/types";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth"];
+const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth", "/forgot-password", "/reset-password", "/rsvp"];
 
 /** Refreshes the Supabase session and gates the /app area behind auth. */
 export async function updateSession(request: NextRequest) {

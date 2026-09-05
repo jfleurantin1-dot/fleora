@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { Badge, ButtonLink, Card, Empty, Progress, SectionHeader, StatCard } from "@/components/ui";
-import { CalendarIcon, CheckIcon, MessageIcon, StoreIcon, UsersIcon, WalletIcon } from "@/components/icons";
+import { Badge, ButtonLink, Card, Empty, Progress, SectionHeader } from "@/components/ui";
+import { CalendarIcon, CheckIcon, MapPinIcon, MessageIcon, StoreIcon, UsersIcon, WalletIcon } from "@/components/icons";
 import { money, relativeDay, shortDate } from "@/lib/format";
 import { categoryLabel, CATEGORIES } from "@/lib/constants";
 import { CategoryIcon } from "@/components/category-icon";
@@ -51,46 +51,48 @@ export default async function EventPage({
   const pct = reqs.length ? Math.round((bookedCats.size / reqs.length) * 100) : 0;
   const attending = (guests ?? []).filter((g) => g.rsvp === "yes").reduce((s, g) => s + Number(g.party_size ?? 1), 0);
   const invited = (guests ?? []).reduce((s, g) => s + Number(g.party_size ?? 1), 0);
+  const awaiting = (guests ?? []).filter((g) => g.rsvp === "pending").length;
   const doneTasks = (checklist ?? []).filter((i) => i.done).length;
   const budgetRemaining = Math.max(0, budget - committed);
+  const stillNeeded = Math.max(0, reqs.length - bookedCats.size);
 
   return (
     <div className="space-y-7">
       {searchParams.booked && (
-        <div className="rounded-2xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
+        <div className="rounded-2xl border border-sage-100 bg-sage-50 px-4 py-3 text-sm font-medium text-sage-700">
           Your {categoryLabel(searchParams.booked)} vendor is booked and now part of this event.
         </div>
       )}
 
       <Card variant="feature" padding="none" className="relative overflow-hidden">
         <div className="grid lg:grid-cols-[.9fr_1.1fr]">
-          <EventMoodCover photos={inspirationPhotos ?? []}  className="h-64 w-full lg:h-full lg:min-h-[340px]" emptyLabel="Add mood board photos" />
+          <EventMoodCover photos={inspirationPhotos ?? []} className="h-64 w-full lg:h-full lg:min-h-[340px]" emptyLabel="Add mood board photos" />
           <div className="relative p-6 sm:p-8">
             <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blush-100/80 blur-3xl" />
             <div className="relative">
-          <div className="flex flex-wrap items-start justify-between gap-5">
-            <div>
-              <div className="mb-3 flex flex-wrap items-center gap-2">
-                <Badge tone="plum">{event.status}</Badge>
-                {event.style && <Badge tone="blush">{event.style}</Badge>}
+              <div className="flex flex-wrap items-start justify-between gap-5">
+                <div>
+                  <div className="mb-3 flex flex-wrap items-center gap-2">
+                    <Badge tone={event.status === "completed" ? "green" : event.status === "cancelled" ? "rose" : "plum"}>{event.status}</Badge>
+                    {event.style && <Badge tone="blush">{event.style}</Badge>}
+                  </div>
+                  <h1 className="font-display text-4xl leading-tight text-ink-900 sm:text-5xl">{event.name}</h1>
+                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-600">
+                    <span className="inline-flex items-center gap-1.5"><CalendarIcon size={16} />{shortDate(event.event_date)}</span>
+                    <span className="inline-flex items-center gap-1.5"><MapPinIcon size={16} />{event.location ?? "Location TBD"}</span>
+                    <span>{event.guest_count ?? "?"} guests</span>
+                    {event.color_palette && <span>{event.color_palette}</span>}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2"><ButtonLink href={`/events/${event.id}/edit`} variant="secondary" size="sm">Edit event</ButtonLink><ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink></div>
               </div>
-              <h1 className="font-display text-4xl leading-tight text-ink-900 sm:text-5xl">{event.name}</h1>
-              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-600">
-                <span className="inline-flex items-center gap-1.5"><CalendarIcon size={16} />{shortDate(event.event_date)}</span>
-                <span>{event.location ?? "Location TBD"}</span>
-                <span>{event.guest_count ?? "?"} guests</span>
-                {event.color_palette && <span>{event.color_palette}</span>}
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2"><ButtonLink href={`/events/${event.id}/edit`} variant="secondary" size="sm">Edit event</ButtonLink><ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink></div>
-          </div>
 
-          <div className="mt-7 max-w-2xl">
-            <div className="mb-2 flex items-center justify-between text-sm">
-              <span className="font-bold text-ink-900">{pct}% planned</span>
-              <span className="text-ink-500">{relativeDay(event.event_date)}</span>
-            </div>
-            <Progress value={pct} />
+              <div className="mt-7 max-w-2xl">
+                <div className="mb-2 flex items-center justify-between text-sm">
+                  <span className="font-bold text-ink-900">{pct}% planned</span>
+                  <span className="text-ink-500">{relativeDay(event.event_date)}</span>
+                </div>
+                <Progress value={pct} />
               </div>
             </div>
           </div>
@@ -103,7 +105,7 @@ export default async function EventPage({
         <Card variant="feature" padding="lg" className="border-plum-200 bg-gradient-to-r from-plum-50 via-white to-blush-50">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-plum-100 text-plum-700"><MessageIcon size={25} /></span>
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-blush-100 text-plum-700"><MessageIcon size={25} /></span>
               <div>
                 <p className="fleora-kicker">Quote ready</p>
                 <h2 className="mt-1 font-display text-2xl text-ink-900">You have {openQuotes.length} quote{openQuotes.length === 1 ? "" : "s"} waiting for review.</h2>
@@ -117,9 +119,8 @@ export default async function EventPage({
 
       <nav className="scroll-thin -mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
         {[
-          ["#overview", "Overview"],
+          ["#vendors", "Event team"],
           ["#quotes", `Quotes${openQuotes.length ? ` (${openQuotes.length})` : ""}`],
-          ["#vendors", "Vendors"],
           ["#guests", "Guests"],
           ["#checklist", "Checklist"],
           ["#messages", "Messages"],
@@ -128,19 +129,15 @@ export default async function EventPage({
         ))}
       </nav>
 
-      <section id="overview" className="scroll-mt-28">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Budget" value={money(committed)} meta={`${money(budgetRemaining)} remaining of ${money(budget)}`} icon={<WalletIcon size={24} />} />
-          <StatCard label="Guests" value={`${attending} / ${(event.guest_count ?? invited) || "—"}`} meta={`${invited} currently invited`} icon={<UsersIcon size={24} />} />
-          <StatCard label="Vendors" value={`${bk.length} booked`} meta={`${Math.max(0, reqs.length - bookedCats.size)} still to find`} icon={<StoreIcon size={24} />} />
-          <StatCard label="Checklist" value={`${doneTasks} / ${(checklist ?? []).length}`} meta="tasks complete" icon={<CheckIcon size={24} />} />
-        </div>
-      </section>
-
-      <div className="grid gap-7 lg:grid-cols-[1.55fr_.75fr]">
-        <div className="space-y-8">
-          <section id="vendors" className="scroll-mt-28">
-            <SectionHeader title="Your vendors" eyebrow="Marketplace" description="Everything you need, organized by service." action={<ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink>} />
+      <section id="vendors" className="scroll-mt-28">
+        <div className="grid gap-6 lg:grid-cols-[1.55fr_.75fr] lg:items-start">
+          <div>
+            <SectionHeader
+              title="Your Event Team"
+              eyebrow="Marketplace"
+              description={`${reqs.length} services selected · ${bk.length} booked · ${stillNeeded} still to find`}
+              action={<ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink>}
+            />
             {reqs.length === 0 ? (
               <Empty title="No services selected yet"><ButtonLink href={`/events/${event.id}/services`} size="sm" className="mt-3">Choose services</ButtonLink></Empty>
             ) : (
@@ -149,39 +146,59 @@ export default async function EventPage({
                   const isBooked = bookedCats.has(r.category);
                   const isQuoted = quotedCats.has(r.category);
                   const booking = bk.find((b) => b.category === r.category);
+                  const quoteCount = openQuotes.filter((q) => q.category === r.category).length;
                   return (
-                    <Card key={r.id} variant="interactive" className="flex min-h-[116px] items-center justify-between gap-3">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={r.category} size={27}/></span>
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-bold text-ink-900">{categoryLabel(r.category)}</p>
-                          {isBooked && booking ? (
-                            <p className="mt-1 truncate text-xs font-medium text-emerald-600">Booked · {vName.get(booking.vendor_id)?.business_name}</p>
-                          ) : isQuoted ? (
-                            <p className="mt-1 text-xs font-medium text-plum-600">{openQuotes.filter((q) => q.category === r.category).length} quote(s) ready</p>
-                          ) : (
-                            <p className="mt-1 text-xs text-ink-400">Ready to find your match</p>
-                          )}
-                        </div>
+                    <Card key={r.id} variant="interactive" className={`group relative flex min-h-[126px] items-center gap-4 overflow-hidden ${isBooked ? "border-sage-100 bg-sage-50/35" : isQuoted ? "border-blush-100 bg-blush-50/35" : "bg-white"}`}>
+                      <span className={`grid h-16 w-16 shrink-0 place-items-center rounded-[20px] ${isBooked ? "bg-sage-100 text-sage-700" : isQuoted ? "bg-blush-100 text-[#9B5065]" : "bg-plum-50 text-plum-700"}`}><CategoryIcon category={r.category} size={30}/></span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-bold text-ink-900">{categoryLabel(r.category)}</p>
+                        {isBooked && booking ? (
+                          <><p className="mt-1 truncate text-xs font-semibold text-sage-700">Booked · {vName.get(booking.vendor_id)?.business_name}</p><Link href={`/events/${event.id}/matches/${r.category}`} className="mt-3 inline-flex text-xs font-bold text-sage-700 hover:underline">View category →</Link></>
+                        ) : isQuoted ? (
+                          <><p className="mt-1 text-xs font-semibold text-[#9B5065]">{quoteCount} quote{quoteCount === 1 ? "" : "s"} ready to review</p><Link href="#quotes" className="mt-3 inline-flex text-xs font-bold text-plum-700 hover:underline">Review quote →</Link></>
+                        ) : (
+                          <><p className="mt-1 text-xs text-ink-500">Find a vendor that fits your event.</p><Link href={`/events/${event.id}/matches/${r.category}`} className="mt-3 inline-flex text-xs font-bold text-plum-700 hover:underline">Explore vendors →</Link></>
+                        )}
                       </div>
-                      {isBooked ? <Badge tone="green">Booked</Badge> : <ButtonLink href={`/events/${event.id}/matches/${r.category}`} size="sm" variant={isQuoted ? "secondary" : "primary"}>{isQuoted ? "Review" : "Find"}</ButtonLink>}
                     </Card>
                   );
                 })}
               </div>
             )}
-          </section>
+          </div>
 
+          <Card variant="feature" padding="lg" className="lg:sticky lg:top-24">
+            <div className="flex items-start justify-between gap-4">
+              <div><p className="fleora-kicker">Event overview</p><h2 className="mt-1 font-display text-2xl text-ink-900">Your plan at a glance</h2></div>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-plum-600 shadow-sm"><CalendarIcon size={20} /></span>
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <OverviewRow icon={<CalendarIcon size={17} />} label="Date" value={shortDate(event.event_date)} />
+              <OverviewRow icon={<MapPinIcon size={17} />} label="Location" value={event.location ?? "TBD"} />
+              <OverviewRow icon={<UsersIcon size={17} />} label="Guest list" value={`${attending} attending · ${awaiting} awaiting`} accent="blush" />
+              <OverviewRow icon={<StoreIcon size={17} />} label="Vendors" value={`${bk.length} booked · ${stillNeeded} to find`} accent="sage" />
+              <OverviewRow icon={<WalletIcon size={17} />} label="Budget" value={`${money(committed)} of ${money(budget)}`} />
+              <OverviewRow icon={<CheckIcon size={17} />} label="Checklist" value={`${doneTasks} of ${(checklist ?? []).length} complete`} accent="sage" />
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
+              <div className="mb-2 flex items-center justify-between text-xs font-semibold"><span className="text-ink-600">Planning progress</span><span className="text-plum-700">{pct}%</span></div>
+              <Progress value={pct} />
+            </div>
+          </Card>
+        </div>
+      </section>
+
+      <div className="grid gap-7 lg:grid-cols-[1.55fr_.75fr]">
+        <div className="space-y-8">
           {openQuotes.length > 0 && (
             <section id="quotes" className="scroll-mt-28">
               <SectionHeader title="Quotes to review" eyebrow="Needs your attention" description="Compare your vendor quotes and book when you’re ready." />
               <div className="space-y-3">
                 {openQuotes.map((q) => (
                   <Card key={q.id} variant="interactive" className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <p className="font-bold text-ink-900">{vName.get(q.vendor_id)?.business_name}</p>
-                      <p className="mt-1 text-sm text-ink-600">{categoryLabel(q.category)} · {money(q.deposit)} deposit</p>
-                    </div>
+                    <div><p className="font-bold text-ink-900">{vName.get(q.vendor_id)?.business_name}</p><p className="mt-1 text-sm text-ink-600">{categoryLabel(q.category)} · {money(q.deposit)} deposit</p></div>
                     <div className="flex items-center gap-4"><span className="font-display text-xl text-ink-900">{money(q.total)}</span><ButtonLink href={`/quotes/${q.id}`} size="sm">View quote</ButtonLink></div>
                   </Card>
                 ))}
@@ -194,11 +211,8 @@ export default async function EventPage({
               <SectionHeader title="Booked team" eyebrow="Confirmed" />
               <div className="space-y-3">
                 {bk.map((b) => (
-                  <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={b.category} size={24}/></span>
-                      <div><p className="text-sm font-bold text-ink-900">{vName.get(b.vendor_id)?.business_name}</p><p className="mt-0.5 text-xs text-ink-600">{categoryLabel(b.category)} · {Number(b.balance) > 0 ? `${money(b.balance)} balance` : "paid in full"}</p></div>
-                    </div>
+                  <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3 border-sage-100 bg-sage-50/30">
+                    <div className="flex items-center gap-3"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-sage-100 text-sage-700"><CategoryIcon category={b.category} size={24}/></span><div><p className="text-sm font-bold text-ink-900">{vName.get(b.vendor_id)?.business_name}</p><p className="mt-0.5 text-xs text-ink-600">{categoryLabel(b.category)} · {Number(b.balance) > 0 ? `${money(b.balance)} balance` : "paid in full"}</p></div></div>
                     <div className="flex items-center gap-3"><span className="text-sm font-semibold text-ink-900">{money(b.total)}</span><Badge tone={b.status === "confirmed" || b.status === "completed" ? "green" : "amber"}>{b.status.replace("_", " ")}</Badge></div>
                   </Card>
                 ))}
@@ -208,20 +222,13 @@ export default async function EventPage({
         </div>
 
         <aside className="space-y-5">
-          <Card id="budget" variant="feature" className="overflow-hidden">
-            <div className="flex items-center justify-between gap-3"><div><p className="fleora-kicker">Budget</p><p className="mt-1 font-display text-3xl text-ink-900">{money(committed)}</p></div><span className="grid h-10 w-10 place-items-center rounded-xl bg-white text-plum-600 shadow-sm"><WalletIcon size={19} /></span></div>
-            <p className="mt-1 text-sm text-ink-600">committed of {money(budget)}</p>
-            <div className="mt-4"><Progress value={budget > 0 ? Math.min(100, (committed / budget) * 100) : 0} /></div>
-            <p className="mt-2 text-xs font-semibold text-emerald-600">{money(budgetRemaining)} remaining</p>
-          </Card>
-
           <Card id="checklist" className="scroll-mt-28">
-            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">Planning</p><h3 className="mt-1 font-display text-xl text-ink-900">Checklist</h3></div><CheckIcon size={24} className="text-plum-600" /></div>
+            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">Planning</p><h3 className="mt-1 font-display text-xl text-ink-900">Checklist</h3></div><CheckIcon size={24} className="text-sage-700" /></div>
             <Checklist eventId={event.id} items={checklist ?? []} />
           </Card>
 
           <Card id="guests" className="scroll-mt-28">
-            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">People</p><h3 className="mt-1 font-display text-xl text-ink-900">Guest list</h3></div><UsersIcon size={24} className="text-plum-600" /></div>
+            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">People</p><h3 className="mt-1 font-display text-xl text-ink-900">Guest list</h3></div><UsersIcon size={24} className="text-[#9B5065]" /></div>
             <GuestList eventId={event.id} guests={guests ?? []} />
           </Card>
 
@@ -232,6 +239,16 @@ export default async function EventPage({
           </Card>
         </aside>
       </div>
+    </div>
+  );
+}
+
+function OverviewRow({ icon, label, value, accent = "plum" }: { icon: React.ReactNode; label: string; value: string; accent?: "plum" | "sage" | "blush" }) {
+  const iconClass = accent === "sage" ? "bg-sage-50 text-sage-700" : accent === "blush" ? "bg-blush-50 text-[#9B5065]" : "bg-plum-50 text-plum-700";
+  return (
+    <div className="flex items-center gap-3">
+      <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl ${iconClass}`}>{icon}</span>
+      <div className="min-w-0"><p className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">{label}</p><p className="truncate text-sm font-semibold text-ink-800">{value}</p></div>
     </div>
   );
 }

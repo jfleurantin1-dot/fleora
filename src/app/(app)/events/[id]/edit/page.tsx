@@ -1,2 +1,47 @@
-import{notFound}from"next/navigation";import{createClient}from"@/lib/supabase/server";import{requireProfile}from"@/lib/auth";import{Button,Card,Input,Select}from"@/components/ui";import{EVENT_TYPES,STYLE_OPTIONS}from"@/lib/constants";import{updateEvent,removeMoodPhoto}from"./actions";
-export default async function EditEvent({params}:{params:{id:string}}){await requireProfile();const s=createClient();const[{data:e},{data:photos}]=await Promise.all([s.from("events").select("*").eq("id",params.id).single(),s.from("event_inspiration_photos").select("id,url,sort").eq("event_id",params.id).order("sort")]);if(!e)notFound();return <div className="mx-auto max-w-3xl space-y-6"><div><p className="fleora-kicker">Event settings</p><h1 className="mt-1 font-display text-4xl text-ink-900">Edit your event</h1><p className="mt-2 text-sm text-ink-600">Update details and keep your mood board in one place.</p></div><form action={updateEvent.bind(null,e.id)}><Card padding="lg" className="space-y-5"><label className="block text-sm font-semibold">Event name<Input name="name" defaultValue={e.name} className="mt-1" required/></label><div className="grid gap-4 sm:grid-cols-2"><label className="block text-sm font-semibold">Event type<Select name="event_type" defaultValue={e.event_type} className="mt-1">{EVENT_TYPES.map(t=><option key={t.key} value={t.key}>{t.label}</option>)}</Select></label><label className="block text-sm font-semibold">Date<Input name="event_date" type="date" defaultValue={e.event_date??""} className="mt-1"/></label><label className="block text-sm font-semibold">Location<Input name="location" defaultValue={e.location??""} placeholder="City, State" className="mt-1"/></label><label className="block text-sm font-semibold">Guest count<Input name="guest_count" type="number" min={1} defaultValue={e.guest_count??""} className="mt-1"/></label><label className="block text-sm font-semibold">Budget<Input name="budget" type="number" min={0} defaultValue={e.budget??""} className="mt-1"/></label><label className="block text-sm font-semibold">Style<Select name="style" defaultValue={e.style??STYLE_OPTIONS[0]} className="mt-1">{STYLE_OPTIONS.map(x=><option key={x}>{x}</option>)}</Select></label></div><label className="block text-sm font-semibold">Color palette<Input name="color_palette" defaultValue={e.color_palette??""} className="mt-1"/></label><div><h2 className="text-sm font-bold text-ink-900">Event mood board</h2><p className="mt-1 text-xs text-ink-500">Add photos that capture your vision. These photos become the face of your event.</p>{photos?.length?<div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">{photos.map(p=><div key={p.id} className="group relative"><img src={p.url} alt="Mood board" className="aspect-square w-full rounded-xl object-cover"/><button formAction={removeMoodPhoto.bind(null,e.id,p.id)} className="absolute right-1 top-1 rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold text-rose-600 shadow">Remove</button></div>)}</div>:null}<label className="mt-3 block cursor-pointer rounded-xl border-2 border-dashed border-plum-200 bg-plum-50/50 p-4 text-center text-sm font-bold text-plum-700">＋ Add mood board photos<input name="mood_photos" type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only"/></label></div><Button type="submit" size="lg">Save event</Button></Card></form></div>}
+import { notFound } from "next/navigation";
+import { requireProfile } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
+import { Button, Card, Input, Select } from "@/components/ui";
+import { EVENT_TYPES, STYLE_OPTIONS } from "@/lib/constants";
+import { MoodPhotoManager } from "@/components/event/mood-photo-manager";
+import { updateEvent } from "./actions";
+
+export default async function EditEvent({ params }: { params: { id: string } }) {
+  await requireProfile();
+  const s = createClient();
+  const [{ data: e }, { data: photos }] = await Promise.all([
+    s.from("events").select("*").eq("id", params.id).single(),
+    s.from("event_inspiration_photos").select("id,url,sort").eq("event_id", params.id).order("sort"),
+  ]);
+  if (!e) notFound();
+
+  return (
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div>
+        <p className="fleora-kicker">Event settings</p>
+        <h1 className="mt-1 font-display text-4xl text-ink-900">Edit your event</h1>
+        <p className="mt-2 text-sm text-ink-600">Update details and keep your mood board in one place.</p>
+      </div>
+
+      <Card padding="lg" className="space-y-6">
+        <MoodPhotoManager eventId={e.id} photos={photos ?? []} />
+
+        <div className="h-px bg-plum-50" />
+
+        <form action={updateEvent.bind(null, e.id)} className="space-y-5">
+          <label className="block text-sm font-semibold">Event name<Input name="name" defaultValue={e.name} className="mt-1" required /></label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block text-sm font-semibold">Event type<Select name="event_type" defaultValue={e.event_type} className="mt-1">{EVENT_TYPES.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}</Select></label>
+            <label className="block text-sm font-semibold">Date<Input name="event_date" type="date" defaultValue={e.event_date ?? ""} className="mt-1" /></label>
+            <label className="block text-sm font-semibold">Location<Input name="location" defaultValue={e.location ?? ""} placeholder="City, State" className="mt-1" /></label>
+            <label className="block text-sm font-semibold">Guest count<Input name="guest_count" type="number" min={1} defaultValue={e.guest_count ?? ""} className="mt-1" /></label>
+            <label className="block text-sm font-semibold">Budget<Input name="budget" type="number" min={0} defaultValue={e.budget ?? ""} className="mt-1" /></label>
+            <label className="block text-sm font-semibold">Style<Select name="style" defaultValue={e.style ?? STYLE_OPTIONS[0]} className="mt-1">{STYLE_OPTIONS.map((x) => <option key={x}>{x}</option>)}</Select></label>
+          </div>
+          <label className="block text-sm font-semibold">Color palette<Input name="color_palette" defaultValue={e.color_palette ?? ""} className="mt-1" /></label>
+          <Button type="submit" size="lg">Save event details</Button>
+        </form>
+      </Card>
+    </div>
+  );
+}

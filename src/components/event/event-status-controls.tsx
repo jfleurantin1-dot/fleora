@@ -1,3 +1,40 @@
-"use client";import{useState,useTransition}from"react";import{Button}from"@/components/ui";import{cancelEvent,completeEvent,deleteEvent}from"@/lib/actions/event";
-export function EventStatusControls({eventId,status}:{eventId:string;status:string}){const[mode,setMode]=useState<"cancel"|"delete"|"complete"|null>(null);const[pending,start]=useTransition();if(status==="cancelled"||status==="completed")return <div className="rounded-xl bg-slate-50 p-3 text-sm text-ink-500">This event is <b>{status}</b>. You can keep it for your records or permanently delete it. <button onClick={()=>setMode("delete")} className="ml-1 font-semibold text-rose-600">Delete event</button>{mode==="delete"&&<Confirm title="Delete this event?" body="This permanently removes the event and its planning data. This cannot be undone." pending={pending} onClose={()=>setMode(null)} onConfirm={()=>start(()=>deleteEvent(eventId))}/>}</div>;return <div className="flex flex-wrap gap-2"><Button variant="secondary" size="sm" onClick={()=>setMode("complete")}>Complete event</Button><Button variant="ghost" size="sm" onClick={()=>setMode("cancel")}>Cancel event</Button>{mode==="complete"&&<Confirm title="Mark event complete?" body="The event will move to Completed Events and stay available as a record." pending={pending} onClose={()=>setMode(null)} onConfirm={()=>start(()=>completeEvent(eventId))}/>} {mode==="cancel"&&<Confirm title="Cancel this event?" body="Are you sure you want to cancel this event? Any pending quotes will be declined, open leads will be closed, and connected vendors will be notified." pending={pending} onClose={()=>setMode(null)} onConfirm={()=>start(()=>cancelEvent(eventId))}/>}</div>}
-function Confirm({title,body,pending,onClose,onConfirm}:{title:string;body:string;pending:boolean;onClose:()=>void;onConfirm:()=>void}){return <div className="fixed inset-0 z-[100] grid place-items-center bg-black/30 p-4"><div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"><h2 className="font-display text-2xl text-ink-900">{title}</h2><p className="mt-2 text-sm leading-relaxed text-ink-600">{body}</p><div className="mt-6 flex justify-end gap-2"><Button variant="secondary" onClick={onClose} disabled={pending}>Keep event</Button><Button variant="danger" onClick={onConfirm} disabled={pending}>{pending?"Updating…":"Confirm"}</Button></div></div></div>}
+"use client";
+
+import { useState, useTransition } from "react";
+import { Button } from "@/components/ui";
+import { cancelEvent, completeEvent, deleteEvent } from "@/lib/actions/event";
+
+export function EventStatusControls({ eventId, status }: { eventId: string; status: string }) {
+  const [mode, setMode] = useState<"cancel" | "delete" | "complete" | null>(null);
+  const [pending, start] = useTransition();
+
+  if (status === "cancelled" || status === "completed") {
+    return (
+      <div className={`rounded-xl p-3 text-sm ${status === "completed" ? "bg-sage-50 text-sage-700" : "bg-blush-50 text-[#9B5065]"}`}>
+        This event is <b>{status}</b>. It stays available in your event archive. <button onClick={() => setMode("delete")} className="ml-1 font-semibold text-rose-600">Delete event</button>
+        {mode === "delete" && <Confirm title="Delete this event?" body="This permanently removes the event and its planning data. This cannot be undone." pending={pending} onClose={() => setMode(null)} onConfirm={() => start(() => deleteEvent(eventId))} confirmLabel="Delete event" />}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button variant="secondary" size="sm" onClick={() => setMode("complete")}>Complete event</Button>
+      <Button variant="ghost" size="sm" onClick={() => setMode("cancel")}>Cancel event</Button>
+      {mode === "complete" && <Confirm title="Mark event complete?" body="This event will move to Completed. Any pending quotes will expire, open leads will close, and affected vendors will be notified. Booked vendors and your event history will stay saved." pending={pending} onClose={() => setMode(null)} onConfirm={() => start(() => completeEvent(eventId))} confirmLabel="Complete event" />}
+      {mode === "cancel" && <Confirm title="Cancel this event?" body="Are you sure you want to cancel this event? Any pending quotes will be declined, open leads will be closed, and affected vendors will be notified." pending={pending} onClose={() => setMode(null)} onConfirm={() => start(() => cancelEvent(eventId))} confirmLabel="Cancel event" />}
+    </div>
+  );
+}
+
+function Confirm({ title, body, pending, onClose, onConfirm, confirmLabel }: { title: string; body: string; pending: boolean; onClose: () => void; onConfirm: () => void; confirmLabel: string }) {
+  return (
+    <div className="fixed inset-0 z-[100] grid place-items-center bg-black/30 p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+        <h2 className="font-display text-2xl text-ink-900">{title}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-ink-600">{body}</p>
+        <div className="mt-6 flex justify-end gap-2"><Button variant="secondary" onClick={onClose} disabled={pending}>Keep event</Button><Button variant="danger" onClick={onConfirm} disabled={pending}>{pending ? "Updating…" : confirmLabel}</Button></div>
+      </div>
+    </div>
+  );
+}
