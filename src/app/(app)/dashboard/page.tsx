@@ -131,27 +131,6 @@ export default async function DashboardPage() {
             </Card>
           </section>
 
-          <section className="grid gap-4 lg:grid-cols-[1.3fr_.7fr]">
-            <Card variant="interactive" padding="lg" className="overflow-hidden bg-gradient-to-br from-blush-50 via-white to-plum-50">
-              <div className="flex h-full flex-col justify-between gap-8 sm:flex-row sm:items-center">
-                <div className="max-w-xl">
-                  <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-plum-600 shadow-sm"><SparkleIcon /></div>
-                  <h2 className="font-display text-2xl text-ink-900">Shape your event vision</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-600">Your photos set the visual direction for your event and will help Fleora personalize vendor recommendations as matching gets smarter.</p>
-                  <ButtonLink href={`/events/${hero.id}`} variant="magic" className="mt-5">Edit mood board</ButtonLink>
-                </div>
-                
-              </div>
-            </Card>
-
-            <Card variant="soft" padding="lg">
-              <p className="fleora-kicker">Quick action</p>
-              <h2 className="mt-2 font-display text-2xl text-ink-900">Still need a vendor?</h2>
-              <p className="mt-2 text-sm text-ink-600">Browse approved Fleora businesses or jump into your event matches.</p>
-              <ButtonLink href="/vendors/browse" variant="secondary" className="mt-5 w-full">Discover vendors</ButtonLink>
-            </Card>
-          </section>
-
           {rows.length > 1 && (
             <section>
               <SectionHeader title="All your events" action={<Link href="/events" className="text-sm font-semibold text-plum-700">View all →</Link>} />

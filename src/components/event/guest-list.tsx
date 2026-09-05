@@ -1,37 +1,3 @@
 "use client";
-
-import { useTransition } from "react";
-import type { Guest } from "@/lib/types";
-import { Input, Button } from "@/components/ui";
-import { addGuest, setGuestRsvp, removeGuest } from "@/lib/actions/event";
-
-const rsvpTone: Record<string, string> = { yes: "text-emerald-600", no: "text-rose-500", pending: "text-ink-400" };
-
-export function GuestList({ eventId, guests }: { eventId: string; guests: Guest[] }) {
-  const [pending, start] = useTransition();
-  const attending = guests.filter((g) => g.rsvp === "yes").reduce((s, g) => s + g.party_size, 0);
-  const invited = guests.reduce((s, g) => s + g.party_size, 0);
-
-  return (
-    <div className="space-y-3">
-      <p className="text-sm text-ink-500"><span className="font-bold text-ink-900">{attending}</span> attending · {invited} invited{pending && <span className="ml-2 text-xs text-ink-400">saving…</span>}</p>
-      <ul className="divide-y divide-plum-50">
-        {guests.map((g) => (
-          <li key={g.id} className="flex items-center gap-1.5 py-2 text-sm">
-            <span className="min-w-0 flex-1 truncate font-medium text-ink-700">{g.name}{g.party_size > 1 && <span className="text-ink-400"> +{g.party_size - 1}</span>}</span>
-            {(["yes", "pending", "no"] as const).map((r) => (
-              <button key={r} onClick={() => start(() => setGuestRsvp(eventId, g.id, r))} className={`rounded-lg px-1.5 py-1 text-[10px] font-bold ${g.rsvp === r ? "bg-plum-100 " + rsvpTone[r] : "text-ink-300 hover:text-ink-500"}`}>{r === "yes" ? "Yes" : r === "no" ? "No" : "?"}</button>
-            ))}
-            <button onClick={() => start(() => removeGuest(eventId, g.id))} className="ml-1 text-ink-300 hover:text-rose-500" aria-label="Remove guest">✕</button>
-          </li>
-        ))}
-        {guests.length === 0 && <li className="py-2 text-sm text-ink-400">No guests added yet.</li>}
-      </ul>
-      <form action={(fd) => start(() => addGuest(eventId, fd))} className="flex flex-wrap items-end gap-2">
-        <Input name="name" placeholder="Guest name" required className="min-w-36 flex-1" />
-        <Input name="party_size" type="number" min={1} defaultValue={1} className="w-16 px-2" />
-        <Button type="submit" variant="secondary" size="sm">Add</Button>
-      </form>
-    </div>
-  );
-}
+import{useTransition}from"react";import type{Guest}from"@/lib/types";import{Input,Button,Badge}from"@/components/ui";import{addGuest,setGuestRsvp,removeGuest}from"@/lib/actions/event";
+export function GuestList({eventId,guests}:{eventId:string;guests:Guest[]}){const[pending,start]=useTransition();const attending=guests.filter(g=>g.rsvp==="yes").reduce((s,g)=>s+g.party_size,0);const declined=guests.filter(g=>g.rsvp==="no").length;const awaiting=guests.filter(g=>g.rsvp==="pending").length;const invited=guests.reduce((s,g)=>s+g.party_size,0);return <div className="space-y-4"><div className="grid grid-cols-4 gap-1.5 text-center"><div className="rounded-xl bg-plum-50 p-2"><b className="block text-plum-700">{invited}</b><span className="text-[10px] text-ink-500">Invited</span></div><div className="rounded-xl bg-sage-50 p-2"><b className="block text-sage-700">{attending}</b><span className="text-[10px] text-ink-500">Going</span></div><div className="rounded-xl bg-blush-50 p-2"><b className="block text-[#9B5065]">{declined}</b><span className="text-[10px] text-ink-500">Declined</span></div><div className="rounded-xl bg-slate-50 p-2"><b className="block text-ink-600">{awaiting}</b><span className="text-[10px] text-ink-500">Awaiting</span></div></div>{pending&&<p className="text-xs text-ink-400">saving…</p>}<ul className="divide-y divide-plum-50">{guests.map(g=><li key={g.id} className="py-3"><div className="flex items-start justify-between gap-2"><div className="min-w-0"><p className="truncate text-sm font-semibold text-ink-800">{g.name}{g.party_size>1&&<span className="font-normal text-ink-400"> · party of {g.party_size}</span>}</p><p className="truncate text-xs text-ink-400">{g.email||g.phone||"No contact added"}</p></div><Badge tone={g.rsvp==="yes"?"green":g.rsvp==="no"?"rose":"slate"}>{g.rsvp==="yes"?"Attending":g.rsvp==="no"?"Declined":"Awaiting"}</Badge></div><div className="mt-2 flex flex-wrap gap-1.5">{(["yes","pending","no"] as const).map(r=><button key={r} onClick={()=>start(()=>setGuestRsvp(eventId,g.id,r))} className={`rounded-lg border px-2 py-1 text-[11px] font-semibold ${g.rsvp===r?"border-plum-200 bg-plum-50 text-plum-700":"border-slate-100 text-ink-400"}`}>{r==="yes"?"Going":r==="no"?"Decline":"Reset"}</button>)}<button onClick={()=>navigator.clipboard.writeText(`${window.location.origin}/rsvp/${g.rsvp_token}`)} className="rounded-lg border border-plum-100 px-2 py-1 text-[11px] font-semibold text-plum-700">Copy RSVP link</button><button onClick={()=>start(()=>removeGuest(eventId,g.id))} className="ml-auto text-[11px] text-rose-500">Remove</button></div></li>)}{!guests.length&&<li className="py-2 text-sm text-ink-400">No guests added yet.</li>}</ul><form action={fd=>start(()=>addGuest(eventId,fd))} className="rounded-xl bg-plum-50/50 p-3"><p className="mb-2 text-xs font-bold text-ink-700">Add guest</p><div className="grid gap-2 sm:grid-cols-2"><Input name="name" placeholder="Guest name" required/><Input name="email" type="email" placeholder="Email for RSVP"/><Input name="phone" placeholder="Phone (optional)"/><Input name="party_size" type="number" min={1} defaultValue={1}/></div><Button type="submit" variant="secondary" size="sm" className="mt-2">Add guest</Button></form><p className="text-[11px] leading-relaxed text-ink-400">Each guest gets a private RSVP link. Email sending and mood-board invitation designs will connect to these links in the next RSVP delivery phase.</p></div>}

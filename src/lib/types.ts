@@ -222,6 +222,10 @@ export type Guest = {
   party_size: number;
   rsvp: RsvpStatus;
   dietary: string | null;
+  phone: string | null;
+  plus_one_name: string | null;
+  rsvp_token: string;
+  rsvp_responded_at: string | null;
   created_at: string;
 };
 
@@ -301,6 +305,14 @@ export type Database = {
       seed_event_checklist: {
         Args: { p_event_id: string };
         Returns: undefined;
+      };
+      get_public_rsvp: {
+        Args: { p_token: string };
+        Returns: Array<{ guest_name: string; party_size: number; rsvp: RsvpStatus; dietary: string | null; plus_one_name: string | null; event_name: string; event_date: string | null; event_location: string | null }>;
+      };
+      submit_public_rsvp: {
+        Args: { p_token: string; p_rsvp: RsvpStatus; p_party_size: number; p_dietary?: string | null; p_plus_one_name?: string | null };
+        Returns: boolean;
       };
     };
     Enums: {

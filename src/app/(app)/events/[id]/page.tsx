@@ -11,6 +11,7 @@ import { Checklist } from "@/components/event/checklist";
 import { GuestList } from "@/components/event/guest-list";
 import type { Vendor } from "@/lib/types";
 import { EventMoodCover } from "@/components/event/event-mood-cover";
+import { EventStatusControls } from "@/components/event/event-status-controls";
 
 export default async function EventPage({
   params,
@@ -81,7 +82,7 @@ export default async function EventPage({
                 {event.color_palette && <span>{event.color_palette}</span>}
               </div>
             </div>
-            <ButtonLink href={`/events/${event.id}/services`} variant="secondary" size="sm">Edit event needs</ButtonLink>
+            <div className="flex flex-wrap gap-2"><ButtonLink href={`/events/${event.id}/edit`} variant="secondary" size="sm">Edit event</ButtonLink><ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink></div>
           </div>
 
           <div className="mt-7 max-w-2xl">
@@ -96,11 +97,13 @@ export default async function EventPage({
         </div>
       </Card>
 
+      <EventStatusControls eventId={event.id} status={event.status} />
+
       {openQuotes.length > 0 && (
         <Card variant="feature" padding="lg" className="border-plum-200 bg-gradient-to-r from-plum-50 via-white to-blush-50">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-plum-100 text-xl">💌</span>
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-plum-100 text-plum-700"><MessageIcon size={25} /></span>
               <div>
                 <p className="fleora-kicker">Quote ready</p>
                 <h2 className="mt-1 font-display text-2xl text-ink-900">You have {openQuotes.length} quote{openQuotes.length === 1 ? "" : "s"} waiting for review.</h2>

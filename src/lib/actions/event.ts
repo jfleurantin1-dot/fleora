@@ -1,39 +1,17 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export async function toggleChecklistItem(eventId: string, itemId: string, done: boolean) {
-  const supabase = createClient();
-  await supabase.from("checklist_items").update({ done }).eq("id", itemId);
-  revalidatePath(`/events/${eventId}`);
-}
+export async function toggleChecklistItem(eventId:string,itemId:string,done:boolean){const s=createClient();await s.from("checklist_items").update({done}).eq("id",itemId);revalidatePath(`/events/${eventId}`)}
+export async function addChecklistItem(eventId:string,formData:FormData){const s=createClient();const title=String(formData.get("title")??"").trim();if(!title)return;const {data:rows}=await s.from("checklist_items").select("sort").eq("event_id",eventId).order("sort",{ascending:false}).limit(1);await s.from("checklist_items").insert({event_id:eventId,title,sort:(rows?.[0]?.sort??0)+1});revalidatePath(`/events/${eventId}`)}
+export async function removeChecklistItem(eventId:string,itemId:string){const s=createClient();await s.from("checklist_items").delete().eq("id",itemId);revalidatePath(`/events/${eventId}`)}
 
-export async function addGuest(eventId: string, formData: FormData) {
-  const supabase = createClient();
-  const name = String(formData.get("name") ?? "").trim();
-  if (!name) return;
-  await supabase.from("guests").insert({
-    event_id: eventId,
-    name,
-    email: String(formData.get("email") ?? "").trim() || null,
-    party_size: Number(formData.get("party_size")) || 1,
-  });
-  revalidatePath(`/events/${eventId}`);
-}
+export async function addGuest(eventId:string,formData:FormData){const s=createClient();const name=String(formData.get("name")??"").trim();if(!name)return;await s.from("guests").insert({event_id:eventId,name,email:String(formData.get("email")??"").trim()||null,phone:String(formData.get("phone")??"").trim()||null,party_size:Number(formData.get("party_size"))||1});revalidatePath(`/events/${eventId}`)}
+export async function setGuestRsvp(eventId:string,guestId:string,rsvp:"pending"|"yes"|"no"){const s=createClient();await s.from("guests").update({rsvp,rsvp_responded_at:rsvp==="pending"?null:new Date().toISOString()}).eq("id",guestId);revalidatePath(`/events/${eventId}`)}
+export async function removeGuest(eventId:string,guestId:string){const s=createClient();await s.from("guests").delete().eq("id",guestId);revalidatePath(`/events/${eventId}`)}
 
-export async function setGuestRsvp(
-  eventId: string,
-  guestId: string,
-  rsvp: "pending" | "yes" | "no",
-) {
-  const supabase = createClient();
-  await supabase.from("guests").update({ rsvp }).eq("id", guestId);
-  revalidatePath(`/events/${eventId}`);
-}
-
-export async function removeGuest(eventId: string, guestId: string) {
-  const supabase = createClient();
-  await supabase.from("guests").delete().eq("id", guestId);
-  revalidatePath(`/events/${eventId}`);
-}
+export async function completeEvent(eventId:string){const s=createClient();await s.from("events").update({status:"completed"}).eq("id",eventId);await s.from("bookings").update({status:"completed"}).eq("event_id",eventId).eq("status","confirmed");revalidatePath(`/events/${eventId}`);revalidatePath("/events")}
+export async function cancelEvent(eventId:string){const s=createClient();const {data:event}=await s.from("events").select("name").eq("id",eventId).single();const {data:reqs}=await s.from("event_requests").select("vendor_id").eq("event_id",eventId);await s.from("events").update({status:"cancelled"}).eq("id",eventId);await s.from("quotes").update({status:"declined"}).eq("event_id",eventId).eq("status","sent");await s.from("event_requests").update({status:"closed"}).eq("event_id",eventId).in("status",["open","quoted"]);const vendorIds=[...new Set((reqs??[]).map(r=>r.vendor_id).filter(Boolean))] as string[];if(vendorIds.length){const {data:vendors}=await s.from("vendors").select("user_id").in("id",vendorIds);const notices=(vendors??[]).filter(v=>v.user_id).map(v=>({user_id:v.user_id!,kind:"event_cancelled",title:"Event canceled",body:`${event?.name??"A client event"} has been canceled. Your open lead or pending quote has been closed.`,href:"/vendor/leads"}));if(notices.length)await s.from("notifications").insert(notices)}revalidatePath(`/events/${eventId}`);revalidatePath("/events")}
+export async function deleteEvent(eventId:string){const s=createClient();await s.from("events").delete().eq("id",eventId);revalidatePath("/events");revalidatePath("/dashboard");redirect("/events")}
