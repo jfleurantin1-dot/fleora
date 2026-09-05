@@ -87,3 +87,17 @@ export async function retrievePaymentReceipt(paymentIntentId: string) {
   const charge = await stripeForm<{ id: string; receipt_url?: string | null }>(`/charges/${encodeURIComponent(chargeId)}`, new URLSearchParams(), "GET");
   return { chargeId: charge.id, receiptUrl: charge.receipt_url ?? null };
 }
+
+export type StripeBalance = {
+  available?: Array<{ amount: number; currency: string }>;
+  pending?: Array<{ amount: number; currency: string }>;
+};
+
+export async function retrievePlatformBalance() {
+  return stripeForm<StripeBalance>("/balance", new URLSearchParams(), "GET");
+}
+
+export function stripeMode() {
+  const key = process.env.STRIPE_SECRET_KEY ?? "";
+  return key.startsWith("sk_live_") ? "live" : "test";
+}
