@@ -2,10 +2,28 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/lib/types";
 
-const PUBLIC_PATHS = ["/", "/login", "/signup", "/auth", "/forgot-password", "/reset-password", "/rsvp"];
+const PUBLIC_PATHS = [
+  "/",
+  "/login",
+  "/signup",
+  "/auth",
+  "/forgot-password",
+  "/reset-password",
+  "/rsvp",
+  "/api/stripe/webhook",
+];
 
 /** Refreshes the Supabase session and gates the /app area behind auth. */
 export async function updateSession(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Stripe sends webhooks server-to-server with no Fleora user session.
+  // Let the webhook reach its route handler directly; the route verifies
+  // Stripe's signature with STRIPE_WEBHOOK_SECRET.
+  if (pathname === "/api/stripe/webhook") {
+    return NextResponse.next({ request });
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
@@ -31,7 +49,6 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { pathname } = request.nextUrl;
   const isPublic = PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
   if (!user && !isPublic) {
