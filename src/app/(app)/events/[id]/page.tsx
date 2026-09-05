@@ -121,6 +121,7 @@ export default async function EventPage({
         {[
           ["#vendors", "Event team"],
           ["#quotes", `Quotes${openQuotes.length ? ` (${openQuotes.length})` : ""}`],
+          [`/events/${event.id}/payments`, "Payments"],
           ["#guests", "Guests"],
           ["#checklist", "Checklist"],
           ["#messages", "Messages"],

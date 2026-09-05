@@ -79,3 +79,11 @@ export function verifyStripeWebhook(rawBody: string, signatureHeader: string | n
   const expected = crypto.createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
   try { return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature)); } catch { return false; }
 }
+
+export async function retrievePaymentReceipt(paymentIntentId: string) {
+  const pi = await stripeForm<{ latest_charge?: string | { id?: string } | null }>(`/payment_intents/${encodeURIComponent(paymentIntentId)}`, new URLSearchParams(), "GET");
+  const chargeId = typeof pi.latest_charge === "string" ? pi.latest_charge : pi.latest_charge?.id;
+  if (!chargeId) return { chargeId: null, receiptUrl: null };
+  const charge = await stripeForm<{ id: string; receipt_url?: string | null }>(`/charges/${encodeURIComponent(chargeId)}`, new URLSearchParams(), "GET");
+  return { chargeId: charge.id, receiptUrl: charge.receipt_url ?? null };
+}

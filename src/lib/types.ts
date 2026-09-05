@@ -232,6 +232,7 @@ export type PaymentRecord = {
   stripe_checkout_session_id: string | null;
   stripe_payment_intent_id: string | null;
   stripe_charge_id: string | null;
+  receipt_url: string | null;
   paid_at: string | null;
   refunded_amount: number;
   created_at: string;
