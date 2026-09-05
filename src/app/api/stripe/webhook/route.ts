@@ -13,7 +13,7 @@ export async function POST(req: Request) {
   const event = JSON.parse(raw) as StripeEvent;
   if (!event.id || !event.type) return new NextResponse("Malformed event", { status: 400 });
   const admin = createAdminClient();
-  const { error: claimError } = await admin.from("stripe_webhook_events").insert({ stripe_event_id: event.id, event_type: event.type });
+  const { error: claimError } = await (admin as any).from("stripe_webhook_events").insert({ stripe_event_id: event.id, event_type: event.type });
   if (claimError?.code === "23505") return NextResponse.json({ received: true, duplicate: true });
   if (claimError) return new NextResponse("Could not claim event", { status: 500 });
   try {
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     }
     return NextResponse.json({ received: true });
   } catch (error) {
-    await admin.from("stripe_webhook_events").delete().eq("stripe_event_id", event.id);
+    await (admin as any).from("stripe_webhook_events").delete().eq("stripe_event_id", event.id);
     console.error("Stripe webhook processing failed", error);
     return new NextResponse("Webhook processing failed", { status: 500 });
   }
