@@ -6,6 +6,7 @@ import { Badge, Card, Empty, PageHeader, StatCard } from "@/components/ui";
 import { money, shortDate } from "@/lib/format";
 import { WalletIcon, CardIcon, StoreIcon } from "@/components/icons";
 import { retrievePlatformBalance, stripeMode } from "@/lib/stripe-checkout";
+import { refundPayment } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -120,10 +121,14 @@ export default async function RevenuePage() {
                   <div className="flex flex-wrap items-center gap-2"><p className="font-bold text-ink-900">{vMap.get(p.vendor_id) ?? "Vendor"}</p><Badge tone={p.status === "paid" ? "green" : p.status === "failed" || p.status === "cancelled" ? "rose" : "amber"}>{String(p.status).replaceAll("_", " ")}</Badge></div>
                   <p className="mt-1 text-sm text-ink-600">{eMap.get(p.event_id) ?? "Event"} · {cMap.get(p.client_id) ?? "Client"} · {shortDate(p.paid_at ?? p.created_at)}</p>
                 </div>
-                <div className="grid grid-cols-3 gap-5 text-right text-sm sm:min-w-[300px]">
-                  <div><p className="text-xs text-ink-400">Client paid</p><p className="mt-1 font-bold text-ink-900">{money(p.amount)}</p></div>
-                  <div><p className="text-xs text-ink-400">Fleora cut</p><p className="mt-1 font-bold text-plum-700">{money(p.platform_fee)}</p></div>
-                  <div><p className="text-xs text-ink-400">Vendor</p><p className="mt-1 font-bold text-sage-700">{money(p.vendor_net)}</p></div>
+                <div className="space-y-3 sm:min-w-[300px]">
+                  <div className="grid grid-cols-3 gap-5 text-right text-sm">
+                    <div><p className="text-xs text-ink-400">Client paid</p><p className="mt-1 font-bold text-ink-900">{money(p.amount)}</p></div>
+                    <div><p className="text-xs text-ink-400">Fleora cut</p><p className="mt-1 font-bold text-plum-700">{money(p.platform_fee)}</p></div>
+                    <div><p className="text-xs text-ink-400">Vendor</p><p className="mt-1 font-bold text-sage-700">{money(p.vendor_net)}</p></div>
+                  </div>
+                  {Number(p.refunded_amount ?? 0) > 0 && <p className="text-right text-xs font-semibold text-rose-600">Refunded {money(p.refunded_amount)}</p>}
+                  {["paid","partially_refunded"].includes(p.status) && p.stripe_payment_intent_id && <form action={refundPayment} className="flex justify-end"><input type="hidden" name="payment_id" value={p.id}/><button type="submit" className="rounded-xl border border-rose-200 bg-white px-3 py-2 text-xs font-semibold text-rose-700 hover:bg-rose-50">Refund remaining payment</button></form>}
                 </div>
               </Card>
             ))}

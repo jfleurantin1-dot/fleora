@@ -70,14 +70,16 @@ export function verifyStripeWebhook(rawBody: string, signatureHeader: string | n
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) throw new Error("STRIPE_WEBHOOK_SECRET is not configured.");
   if (!signatureHeader) return false;
-  const parts = Object.fromEntries(signatureHeader.split(",").map(part => {
-    const [k,v] = part.split("="); return [k,v];
-  }));
-  const timestamp = parts.t;
-  const signature = parts.v1;
-  if (!timestamp || !signature) return false;
+  const parts = signatureHeader.split(",").map(part => part.trim().split("="));
+  const timestamp = parts.find(([k]) => k === "t")?.[1];
+  const signatures = parts.filter(([k]) => k === "v1").map(([,v]) => v).filter(Boolean);
+  if (!timestamp || signatures.length === 0) return false;
+  const age = Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp));
+  if (!Number.isFinite(age) || age > 300) return false;
   const expected = crypto.createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("hex");
-  try { return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature)); } catch { return false; }
+  return signatures.some(signature => {
+    try { return crypto.timingSafeEqual(Buffer.from(expected, "hex"), Buffer.from(signature, "hex")); } catch { return false; }
+  });
 }
 
 export async function retrievePaymentReceipt(paymentIntentId: string) {
@@ -100,4 +102,13 @@ export async function retrievePlatformBalance() {
 export function stripeMode() {
   const key = process.env.STRIPE_SECRET_KEY ?? "";
   return key.startsWith("sk_live_") ? "live" : "test";
+}
+
+export async function refundFleoraPayment(input: { paymentIntentId: string; amountCents?: number }) {
+  const p = new URLSearchParams();
+  p.set("payment_intent", input.paymentIntentId);
+  if (input.amountCents) p.set("amount", String(input.amountCents));
+  p.set("reverse_transfer", "true");
+  p.set("refund_application_fee", "true");
+  return stripeForm<{ id: string; amount: number; status?: string }>("/refunds", p);
 }

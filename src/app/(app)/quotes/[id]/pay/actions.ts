@@ -30,6 +30,10 @@ export async function startQuotePayment(quoteId: string, type: "deposit"|"full"|
   if (type === "full" && alreadyPaid > 0) amount = balance;
   if (amount <= 0) redirect(`/quotes/${quote.id}?payment=already_paid`);
 
+  // Pay 1D: prevent accidental double-click / duplicate open checkouts for the same booking.
+  const { data: openPayment } = await admin.from("payments").select("id,stripe_checkout_session_id,created_at").eq("booking_id", booking.id).in("status", ["pending", "processing"]).gte("created_at", new Date(Date.now() - 30 * 60 * 1000).toISOString()).order("created_at", { ascending: false }).limit(1).maybeSingle();
+  if (openPayment) redirect(`/quotes/${quote.id}?payment=in_progress`);
+
   const feeBps = Number(settings?.platform_fee_bps ?? 800);
   const fee = Math.round(amount * feeBps) / 10000;
   const effectiveType = alreadyPaid > 0 ? "balance" : (type === "deposit" && amount < Number(quote.total) ? "deposit" : "full");
