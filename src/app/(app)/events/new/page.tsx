@@ -178,13 +178,13 @@ export default function NewEventPage() {
               </div>
 
               <div>
-                <h2 className="mb-1 text-sm font-bold text-ink-900">Add inspiration photos <span className="font-normal text-ink-400">(optional)</span></h2>
-                <p className="mb-3 text-xs text-ink-500">Upload up to 6 photos. They&apos;ll be waiting for you on this event&apos;s Inspiration Board.</p>
+                <h2 className="mb-1 text-sm font-bold text-ink-900">Your event mood board <span className="font-normal text-ink-400">(optional)</span></h2>
+                <p className="mb-3 text-xs text-ink-500">Upload up to 6 photos that capture the look and feel you&apos;re going for. These become the visual face of your event.</p>
                 <label className="block cursor-pointer rounded-2xl border-2 border-dashed border-plum-200 bg-plum-50/50 p-5 text-center transition hover:border-plum-300 hover:bg-plum-50">
-                  <span className="text-xl">＋</span><span className="ml-2 text-sm font-bold text-plum-700">Choose inspiration photos</span>
+                  <span className="text-xl">＋</span><span className="ml-2 text-sm font-bold text-plum-700">Add mood board photos</span>
                   <input name="inspiration_photos" onChange={previewInspo} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="sr-only" />
                 </label>
-                {inspoPreviews.length > 0 && <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">{inspoPreviews.map((src, i) => <img key={src} src={src} alt={`Inspiration ${i + 1}`} className="aspect-square w-full rounded-xl object-cover" />)}</div>}
+                {inspoPreviews.length > 0 && <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">{inspoPreviews.map((src, i) => <img key={src} src={src} alt={`Mood board ${i + 1}`} className="aspect-square w-full rounded-xl object-cover" />)}</div>}
                 <p className="mt-2 text-xs text-ink-400">JPG, PNG, WEBP or GIF · max 10 MB each</p>
               </div>
 

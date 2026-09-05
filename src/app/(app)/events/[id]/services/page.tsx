@@ -29,7 +29,7 @@ export default async function ServicesPage({ params }: { params: { id: string } 
       />
 
       <div className="mb-5 flex items-start gap-3 rounded-2xl border border-blush-200 bg-blush-50/70 p-4">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white text-plum-600 shadow-sm"><SparkleIcon size={18} /></span>
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white text-plum-600 shadow-sm"><SparkleIcon size={18} /></span>
         <div>
           <div className="flex flex-wrap items-center gap-2"><p className="text-sm font-bold text-ink-900">Fleora starting plan</p><Badge tone="blush">Based on your event type</Badge></div>
           <p className="mt-1 text-xs leading-relaxed text-ink-600">These suggestions are only a starting point. Your plan stays completely customizable.</p>
@@ -50,7 +50,7 @@ export default async function ServicesPage({ params }: { params: { id: string } 
                   return (
                     <label key={c.key} className="group flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-plum-50/70">
                       <input type="checkbox" name="category" value={c.key} defaultChecked={checked} className="h-4 w-4 rounded border-plum-300 text-plum-600 focus:ring-plum-400" />
-                      <span className="grid h-9 w-9 place-items-center rounded-xl bg-plum-50 text-plum-700 transition group-hover:bg-white"><CategoryIcon category={c.key} size={17} /></span>
+                      <span className="grid h-12 w-12 place-items-center rounded-xl bg-plum-50 text-plum-700 transition group-hover:bg-white"><CategoryIcon category={c.key} size={24} /></span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-sm font-semibold text-ink-900">{c.label}</span>
                         {est && <span className="text-[11px] text-ink-400">Suggested budget ~{est}</span>}

@@ -104,7 +104,7 @@ export function VendorForm({
                     className="h-4 w-4 rounded border-plum-300 text-plum-600"
                   />
                   <span>
-                    <><CategoryIcon category={c.key} size={16} /> {c.label}</>
+                    <><CategoryIcon category={c.key} size={22} /> {c.label}</>
                   </span>
                 </label>
               ))}
@@ -148,7 +148,7 @@ export function VendorForm({
             </div>
           );
         })}
-        {serviceCount<12&&<button type="button" onClick={()=>setServiceCount(c=>Math.min(12,c+1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={16}/> Add service</button>}
+        {serviceCount<12&&<button type="button" onClick={()=>setServiceCount(c=>Math.min(12,c+1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={22}/> Add service</button>}
       </Card>
 
       <Card className="space-y-3">
@@ -163,7 +163,7 @@ export function VendorForm({
             </div>
           );
         })}
-        {packageCount<12&&<button type="button" onClick={()=>setPackageCount(c=>Math.min(12,c+1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={16}/> Add package</button>}
+        {packageCount<12&&<button type="button" onClick={()=>setPackageCount(c=>Math.min(12,c+1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={22}/> Add package</button>}
       </Card>
 
       <Card className="space-y-3">

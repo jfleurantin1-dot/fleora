@@ -34,7 +34,7 @@ export default async function MatchesPage({ params }: { params: { id: string; ca
       <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="fleora-kicker mb-2">Top matches for you</p>
-          <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={params.category} size={22}/></span><h1 className="font-display text-4xl text-ink-900 sm:text-5xl">{categoryLabel(params.category)}</h1></div>
+          <div className="flex items-center gap-3"><span className="grid h-14 w-14 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={params.category} size={28}/></span><h1 className="font-display text-4xl text-ink-900 sm:text-5xl">{categoryLabel(params.category)}</h1></div>
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-600">Matched to your event details, location, budget and style. Compare your favorites and request a quote when you&apos;re ready.</p>
         </div>
         <div className="rounded-2xl border border-[#E9E3E7] bg-white px-4 py-3 text-sm shadow-fleora"><span className="text-ink-500">For </span><strong>{event.name}</strong><span className="text-ink-400"> · {money(event.budget)}</span></div>

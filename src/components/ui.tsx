@@ -107,7 +107,7 @@ export function Select(props: ComponentProps<"select">) {
 
 const tones = {
   plum: "bg-plum-100 text-plum-700",
-  green: "bg-emerald-100 text-emerald-700",
+  green: "bg-sage-100 text-sage-700",
   amber: "bg-amber-100 text-amber-700",
   slate: "bg-slate-100 text-ink-600",
   rose: "bg-rose-100 text-rose-700",
@@ -129,9 +129,9 @@ export function Badge({
 }
 
 export function MatchScore({ score }: { score: number }) {
-  const tone = score >= 90 ? "text-emerald-600" : score >= 75 ? "text-plum-600" : "text-amber-600";
+  const tone = score >= 90 ? "text-sage-700" : score >= 75 ? "text-plum-600" : "text-amber-600";
   return (
-    <div className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1">
+    <div className="flex items-center gap-1 rounded-full bg-sage-50 px-2.5 py-1">
       <span className={`text-sm font-bold leading-none ${tone}`}>{score}%</span>
       <span className="text-[10px] font-semibold uppercase tracking-wide text-ink-400">match</span>
     </div>

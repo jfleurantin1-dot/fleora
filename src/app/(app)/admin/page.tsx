@@ -4,6 +4,7 @@ import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, Badge, Button, PageHeader, Stars, StatCard } from "@/components/ui";
 import { money, shortDate } from "@/lib/format";
+import { StoreIcon, UserIcon, CalendarIcon, CardIcon, WalletIcon, SearchIcon } from "@/components/icons";
 import { categoryLabel } from "@/lib/constants";
 import { setVendorStatus, reviewVendorClaim } from "./actions";
 import { AddVendorForm } from "./add-vendor-form";
@@ -59,12 +60,12 @@ export default async function AdminPage() {
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="All vendors" value={vendorList.length} icon="🏪" />
-        <StatCard label="Unclaimed" value={unclaimed.length} icon="✨" />
-        <StatCard label="Claim requests" value={pendingClaims.length} icon="🙋🏽‍♀️" />
-        <StatCard label="Events" value={(events ?? []).length} icon="🎉" />
-        <StatCard label="Quotes" value={(quotes ?? []).length} icon="🧾" />
-        <StatCard label="GMV" value={money(gmv)} icon="💳" />
+        <StatCard label="All vendors" value={vendorList.length} icon={<StoreIcon size={20} />} />
+        <StatCard label="Unclaimed" value={unclaimed.length} icon={<SearchIcon size={20} />} />
+        <StatCard label="Claim requests" value={pendingClaims.length} icon={<UserIcon size={20} />} />
+        <StatCard label="Events" value={(events ?? []).length} icon={<CalendarIcon size={20} />} />
+        <StatCard label="Quotes" value={(quotes ?? []).length} icon={<CardIcon size={20} />} />
+        <StatCard label="GMV" value={money(gmv)} icon={<WalletIcon size={20} />} />
       </div>
 
       <section id="add-vendor" className="scroll-mt-24">

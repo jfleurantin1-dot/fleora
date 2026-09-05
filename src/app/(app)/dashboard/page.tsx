@@ -75,7 +75,7 @@ export default async function DashboardPage() {
             <SectionHeader title="Your upcoming event" eyebrow="Continue planning" />
             <Card variant="feature" padding="none" className="relative overflow-hidden">
               <div className="grid lg:grid-cols-[.82fr_1.18fr]">
-                <EventMoodCover photos={(inspirationPhotos ?? []).filter((p) => p.event_id === hero.id)} href={`/events/${hero.id}/inspiration`} className="h-60 w-full lg:h-full lg:min-h-[330px]" />
+                <EventMoodCover photos={(inspirationPhotos ?? []).filter((p) => p.event_id === hero.id)} href={`/events/${hero.id}`} className="h-60 w-full lg:h-full lg:min-h-[330px]" />
                 <div className="relative p-6 sm:p-8">
                   <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blush-100/70 blur-3xl" />
                   <div className="pointer-events-none absolute -bottom-28 left-1/3 h-64 w-64 rounded-full bg-plum-100/70 blur-3xl" />
@@ -137,8 +137,8 @@ export default async function DashboardPage() {
                 <div className="max-w-xl">
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-plum-600 shadow-sm"><SparkleIcon /></div>
                   <h2 className="font-display text-2xl text-ink-900">Shape your event vision</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-600">Your mood board is part of your event. Add or refine inspiration anytime, then use it to guide the vendors you discover.</p>
-                  <ButtonLink href={`/events/${hero.id}/inspiration`} variant="magic" className="mt-5">Edit mood board</ButtonLink>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-600">Your photos set the visual direction for your event and will help Fleora personalize vendor recommendations as matching gets smarter.</p>
+                  <ButtonLink href={`/events/${hero.id}`} variant="magic" className="mt-5">Edit mood board</ButtonLink>
                 </div>
                 
               </div>

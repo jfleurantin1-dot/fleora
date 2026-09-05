@@ -6,7 +6,7 @@ export function EventMoodCover({
   photos,
   href,
   className = "",
-  emptyLabel = "Add inspiration",
+  emptyLabel = "Add mood board photos",
 }: {
   photos: Photo[];
   href?: string;
@@ -33,7 +33,7 @@ export function EventMoodCover({
   ) : (
     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blush-50 via-ivory-50 to-plum-50">
       <div className="text-center">
-        <span className="mx-auto grid h-10 w-10 place-items-center rounded-2xl bg-white text-plum-600 shadow-sm">✦</span>
+        <span className="mx-auto block h-10 w-10 rounded-2xl border border-plum-200 bg-white shadow-sm"><span className="mx-auto mt-[18px] block h-1 w-4 rounded-full bg-plum-400" /></span>
         <p className="mt-2 text-xs font-bold text-plum-700">{emptyLabel}</p>
       </div>
     </div>

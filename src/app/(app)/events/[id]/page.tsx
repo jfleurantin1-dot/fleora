@@ -63,7 +63,7 @@ export default async function EventPage({
 
       <Card variant="feature" padding="none" className="relative overflow-hidden">
         <div className="grid lg:grid-cols-[.9fr_1.1fr]">
-          <EventMoodCover photos={inspirationPhotos ?? []} href={`/events/${event.id}/inspiration`} className="h-64 w-full lg:h-full lg:min-h-[340px]" emptyLabel="Build your event mood board" />
+          <EventMoodCover photos={inspirationPhotos ?? []}  className="h-64 w-full lg:h-full lg:min-h-[340px]" emptyLabel="Add mood board photos" />
           <div className="relative p-6 sm:p-8">
             <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-blush-100/80 blur-3xl" />
             <div className="relative">
@@ -100,7 +100,7 @@ export default async function EventPage({
         <Card variant="feature" padding="lg" className="border-plum-200 bg-gradient-to-r from-plum-50 via-white to-blush-50">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-start gap-3">
-              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-plum-100 text-xl">💌</span>
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-plum-100 text-xl">💌</span>
               <div>
                 <p className="fleora-kicker">Quote ready</p>
                 <h2 className="mt-1 font-display text-2xl text-ink-900">You have {openQuotes.length} quote{openQuotes.length === 1 ? "" : "s"} waiting for review.</h2>
@@ -119,7 +119,6 @@ export default async function EventPage({
           ["#vendors", "Vendors"],
           ["#guests", "Guests"],
           ["#checklist", "Checklist"],
-          ["#inspiration", "Inspiration"],
           ["#messages", "Messages"],
         ].map(([href, label], index) => (
           <a key={href} href={href} className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${index === 0 ? "bg-plum-500 text-white" : "bg-white text-ink-600 shadow-sm hover:bg-plum-50 hover:text-plum-700"}`}>{label}</a>
@@ -128,10 +127,10 @@ export default async function EventPage({
 
       <section id="overview" className="scroll-mt-28">
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Budget" value={money(committed)} meta={`${money(budgetRemaining)} remaining of ${money(budget)}`} icon={<WalletIcon size={18} />} />
-          <StatCard label="Guests" value={`${attending} / ${(event.guest_count ?? invited) || "—"}`} meta={`${invited} currently invited`} icon={<UsersIcon size={18} />} />
-          <StatCard label="Vendors" value={`${bk.length} booked`} meta={`${Math.max(0, reqs.length - bookedCats.size)} still to find`} icon={<StoreIcon size={18} />} />
-          <StatCard label="Checklist" value={`${doneTasks} / ${(checklist ?? []).length}`} meta="tasks complete" icon={<CheckIcon size={18} />} />
+          <StatCard label="Budget" value={money(committed)} meta={`${money(budgetRemaining)} remaining of ${money(budget)}`} icon={<WalletIcon size={24} />} />
+          <StatCard label="Guests" value={`${attending} / ${(event.guest_count ?? invited) || "—"}`} meta={`${invited} currently invited`} icon={<UsersIcon size={24} />} />
+          <StatCard label="Vendors" value={`${bk.length} booked`} meta={`${Math.max(0, reqs.length - bookedCats.size)} still to find`} icon={<StoreIcon size={24} />} />
+          <StatCard label="Checklist" value={`${doneTasks} / ${(checklist ?? []).length}`} meta="tasks complete" icon={<CheckIcon size={24} />} />
         </div>
       </section>
 
@@ -150,7 +149,7 @@ export default async function EventPage({
                   return (
                     <Card key={r.id} variant="interactive" className="flex min-h-[116px] items-center justify-between gap-3">
                       <div className="flex min-w-0 items-center gap-3">
-                        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={r.category} size={20}/></span>
+                        <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={r.category} size={27}/></span>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-bold text-ink-900">{categoryLabel(r.category)}</p>
                           {isBooked && booking ? (
@@ -194,7 +193,7 @@ export default async function EventPage({
                 {bk.map((b) => (
                   <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-plum-50 text-plum-700"><CategoryIcon category={b.category} size={18}/></span>
+                      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={b.category} size={24}/></span>
                       <div><p className="text-sm font-bold text-ink-900">{vName.get(b.vendor_id)?.business_name}</p><p className="mt-0.5 text-xs text-ink-600">{categoryLabel(b.category)} · {Number(b.balance) > 0 ? `${money(b.balance)} balance` : "paid in full"}</p></div>
                     </div>
                     <div className="flex items-center gap-3"><span className="text-sm font-semibold text-ink-900">{money(b.total)}</span><Badge tone={b.status === "confirmed" || b.status === "completed" ? "green" : "amber"}>{b.status.replace("_", " ")}</Badge></div>
@@ -214,22 +213,13 @@ export default async function EventPage({
           </Card>
 
           <Card id="checklist" className="scroll-mt-28">
-            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">Planning</p><h3 className="mt-1 font-display text-xl text-ink-900">Checklist</h3></div><CheckIcon size={18} className="text-plum-600" /></div>
+            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">Planning</p><h3 className="mt-1 font-display text-xl text-ink-900">Checklist</h3></div><CheckIcon size={24} className="text-plum-600" /></div>
             <Checklist eventId={event.id} items={checklist ?? []} />
           </Card>
 
           <Card id="guests" className="scroll-mt-28">
-            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">People</p><h3 className="mt-1 font-display text-xl text-ink-900">Guest list</h3></div><UsersIcon size={18} className="text-plum-600" /></div>
+            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">People</p><h3 className="mt-1 font-display text-xl text-ink-900">Guest list</h3></div><UsersIcon size={24} className="text-plum-600" /></div>
             <GuestList eventId={event.id} guests={guests ?? []} />
-          </Card>
-
-          <Card id="inspiration" variant="soft" padding="none" className="scroll-mt-28 overflow-hidden bg-gradient-to-br from-blush-50 via-white to-plum-50">
-            <EventMoodCover photos={inspirationPhotos ?? []} href={`/events/${event.id}/inspiration`} className="h-36 w-full" emptyLabel="Add inspiration photos" />
-            <div className="p-5">
-              <div className="mb-2 flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-plum-600 shadow-sm">✦</span><h3 className="font-display text-xl text-ink-900">Inspiration Board</h3></div>
-              <p className="text-sm leading-relaxed text-ink-600">{(inspirationPhotos ?? []).length ? `${(inspirationPhotos ?? []).length} inspiration photo${(inspirationPhotos ?? []).length === 1 ? "" : "s"} shaping this event.` : "Save the looks you love and turn them into a vendor-ready plan."}</p>
-              <Link href={`/events/${event.id}/inspiration`} className="mt-4 inline-flex text-sm font-bold text-plum-700 hover:underline">Open mood board →</Link>
-            </div>
           </Card>
 
           <Card id="messages" variant="soft" className="scroll-mt-28">
