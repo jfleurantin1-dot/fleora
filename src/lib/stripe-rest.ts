@@ -42,7 +42,9 @@ async function stripeV2Request<T>(
 ): Promise<T> {
   const method = options?.method ?? "GET";
   const url = new URL(`${STRIPE_V2_CORE_API}${path}`);
-  for (const value of options?.include ?? []) url.searchParams.append("include[]", value);
+  for (const [index, value] of (options?.include ?? []).entries()) {
+    url.searchParams.append(`include[${index}]`, value);
+  }
 
   const res = await fetch(url, {
     method,
