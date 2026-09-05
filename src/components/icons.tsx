@@ -63,3 +63,11 @@ export function HeartIcon(props: IconProps) {
 export function ArrowLeftIcon(props: IconProps) {
   return <IconBase {...props}><path d="m15 18-6-6 6-6"/></IconBase>;
 }
+export function BuildingIcon(props: IconProps){return <IconBase {...props}><path d="M4 21V7l8-4 8 4v14"/><path d="M8 10h2m4 0h2M8 14h2m4 0h2M9 21v-3h6v3"/></IconBase>}
+export function ChairIcon(props: IconProps){return <IconBase {...props}><path d="M7 12V6a3 3 0 0 1 6 0v6M5 12h12v4H5zM7 16v5m8-5v5"/></IconBase>}
+export function UtensilsIcon(props: IconProps){return <IconBase {...props}><path d="M6 3v8m-3-8v5a3 3 0 0 0 6 0V3M6 11v10M15 3v18M15 3c4 2 4 8 0 10"/></IconBase>}
+export function CakeIcon(props: IconProps){return <IconBase {...props}><path d="M4 11h16v10H4zM7 11V8h10v3M12 8V5M10 4c.7-1.3 1.3-1.3 2 0s1.3 1.3 2 0"/><path d="M4 15c2 1.5 4 1.5 6 0 2 1.5 4 1.5 6 0 1.3 1 2.7 1.2 4 .5"/></IconBase>}
+export function CameraIcon(props: IconProps){return <IconBase {...props}><path d="M4 7h4l1.5-2h5L16 7h4a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></IconBase>}
+export function MusicIcon(props: IconProps){return <IconBase {...props}><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></IconBase>}
+export function CardIcon(props: IconProps){return <IconBase {...props}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></IconBase>}
+export function BeautyIcon(props: IconProps){return <IconBase {...props}><path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M5 16l.8 2.2L8 19l-2.2.8L5 22l-.8-2.2L2 19l2.2-.8z"/></IconBase>}

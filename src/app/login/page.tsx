@@ -32,7 +32,7 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
             <form action={formAction} className="space-y-4">
               <input type="hidden" name="next" value={searchParams.next ?? "/dashboard"} />
               <Field label="Email"><Input name="email" type="email" autoComplete="email" placeholder="you@example.com" required /></Field>
-              <Field label="Password"><Input name="password" type="password" autoComplete="current-password" placeholder="••••••••" required /></Field>
+              <div><div className="mb-1.5 flex items-center justify-between"><label className="text-sm font-semibold text-ink-800">Password</label><Link href="/forgot-password" className="text-xs font-semibold text-plum-700 hover:underline">Forgot password?</Link></div><Input name="password" type="password" autoComplete="current-password" placeholder="••••••••" required /></div>
               <FormError message={state.error} />
               <Submit />
             </form>

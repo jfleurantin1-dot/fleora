@@ -1,0 +1,3 @@
+"use server";
+import {revalidatePath} from "next/cache";import {createClient} from "@/lib/supabase/server";import {requireProfile} from "@/lib/auth";
+export async function updateProfile(formData:FormData){const profile=await requireProfile();const first_name=String(formData.get("first_name")??"").trim();const last_name=String(formData.get("last_name")??"").trim();const phone=String(formData.get("phone")??"").trim()||null;if(!first_name||!last_name)return;const supabase=createClient();await supabase.from("profiles").update({first_name,last_name,phone}).eq("id",profile.id);revalidatePath("/profile");revalidatePath("/dashboard");}

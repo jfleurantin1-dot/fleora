@@ -3,7 +3,8 @@ import Link from "next/link";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Badge, ButtonLink, Card, Empty, Progress, SectionHeader, StatCard } from "@/components/ui";
-import { CalendarIcon, CheckIcon, ChevronRightIcon, SparkleIcon, StoreIcon, UsersIcon, WalletIcon } from "@/components/icons";
+import { CalendarIcon, ChevronRightIcon, SparkleIcon } from "@/components/icons";
+import { TimeGreeting } from "@/components/time-greeting";
 import { money, relativeDay, shortDate } from "@/lib/format";
 import { EventMoodCover } from "@/components/event/event-mood-cover";
 
@@ -56,7 +57,7 @@ export default async function DashboardPage() {
         <div>
           <p className="fleora-kicker mb-2">Your planning space</p>
           <h1 className="font-display text-4xl leading-none text-ink-900 sm:text-5xl">
-            Good morning, {profile.first_name ?? "there"}
+            <TimeGreeting name={profile.first_name ?? "there"} />
           </h1>
           <p className="mt-3 text-sm text-ink-600 sm:text-base">Let&apos;s make something beautiful.</p>
         </div>
@@ -130,26 +131,16 @@ export default async function DashboardPage() {
             </Card>
           </section>
 
-          <section>
-            <SectionHeader title="Keep the momentum going" eyebrow="At a glance" />
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <StatCard label="Guests" value={`${heroStats.attending} / ${(hero.guest_count ?? heroStats.invited) || "—"}`} meta="confirmed / goal" icon={<UsersIcon size={18} />} />
-              <StatCard label="Budget" value={money(heroStats.committed)} meta={`${money(Math.max(0, Number(hero.budget ?? 0) - heroStats.committed))} remaining`} icon={<WalletIcon size={18} />} />
-              <StatCard label="Vendors" value={`${heroStats.eventBookings.length} booked`} meta={`${Math.max(0, heroStats.eventRequests.length - heroStats.eventBookings.length)} still to find`} icon={<StoreIcon size={18} />} />
-              <StatCard label="Checklist" value={`${heroStats.done} / ${heroStats.taskTotal}`} meta="tasks completed" icon={<CheckIcon size={18} />} />
-            </div>
-          </section>
-
           <section className="grid gap-4 lg:grid-cols-[1.3fr_.7fr]">
             <Card variant="interactive" padding="lg" className="overflow-hidden bg-gradient-to-br from-blush-50 via-white to-plum-50">
               <div className="flex h-full flex-col justify-between gap-8 sm:flex-row sm:items-center">
                 <div className="max-w-xl">
                   <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-plum-600 shadow-sm"><SparkleIcon /></div>
-                  <h2 className="font-display text-2xl text-ink-900">Have an inspiration photo?</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-600">Save inspiration photos, choose the details you want to recreate, and turn the look into a vendor-ready plan.</p>
-                  <ButtonLink href={`/events/${hero.id}/inspiration`} variant="magic" className="mt-5">Build This Look</ButtonLink>
+                  <h2 className="font-display text-2xl text-ink-900">Shape your event vision</h2>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-600">Your mood board is part of your event. Add or refine inspiration anytime, then use it to guide the vendors you discover.</p>
+                  <ButtonLink href={`/events/${hero.id}/inspiration`} variant="magic" className="mt-5">Edit mood board</ButtonLink>
                 </div>
-                <div className="shrink-0"><Badge tone="champagne">Phase 2 · live preview</Badge></div>
+                
               </div>
             </Card>
 

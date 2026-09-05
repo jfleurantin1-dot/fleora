@@ -1,0 +1,3 @@
+import {BeautyIcon,BuildingIcon,CakeIcon,CameraIcon,CardIcon,ChairIcon,MusicIcon,SparkleIcon,UtensilsIcon} from "@/components/icons";
+import {CATEGORY_MAP} from "@/lib/constants";
+export function CategoryIcon({category,size=18,className}:{category:string;size?:number;className?:string}){const group=CATEGORY_MAP[category]?.group;const Icon=group==="venue"?BuildingIcon:group==="rentals"?ChairIcon:group==="food"?UtensilsIcon:group==="dessert"?CakeIcon:group==="media"?CameraIcon:group==="entertainment"?MusicIcon:group==="stationery"?CardIcon:group==="beauty"?BeautyIcon:SparkleIcon;return <Icon size={size} className={className}/>}

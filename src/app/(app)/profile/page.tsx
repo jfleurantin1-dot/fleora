@@ -1,22 +1,2 @@
-import { requireProfile } from "@/lib/auth";
-import { ButtonLink, Card, PageHeader } from "@/components/ui";
-import { initials } from "@/lib/format";
-
-export default async function ProfilePage() {
-  const profile = await requireProfile();
-  return (
-    <div className="mx-auto max-w-3xl">
-      <PageHeader title="Your profile" subtitle="Your Fleora account and planning preferences." />
-      <Card variant="feature" padding="lg">
-        <div className="flex flex-wrap items-center gap-5">
-          <div className="grid h-20 w-20 place-items-center rounded-full border border-plum-100 bg-white font-display text-2xl text-plum-700 shadow-sm">{initials(profile.first_name, profile.last_name)}</div>
-          <div><p className="fleora-kicker">Fleora member</p><h2 className="mt-1 font-display text-3xl text-ink-900">{profile.first_name} {profile.last_name}</h2><p className="mt-1 text-sm capitalize text-ink-600">{profile.account_type} account</p></div>
-        </div>
-      </Card>
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
-        <Card><p className="fleora-kicker">Planning</p><h3 className="mt-2 font-display text-xl text-ink-900">Your celebrations</h3><p className="mt-2 text-sm leading-relaxed text-ink-600">Open your event workspace to manage vendors, guests, budget and tasks.</p><ButtonLink href="/events" variant="secondary" className="mt-5 w-full">View my events</ButtonLink></Card>
-        <Card><p className="fleora-kicker">Account</p><h3 className="mt-2 font-display text-xl text-ink-900">Profile settings</h3><p className="mt-2 text-sm leading-relaxed text-ink-600">Editable contact and personalization settings will live here as Fleora expands.</p><form action="/auth/signout" method="post" className="mt-5"><button className="text-sm font-bold text-plum-700 hover:underline">Sign out →</button></form></Card>
-      </div>
-    </div>
-  );
-}
+import Link from "next/link";import {requireProfile} from "@/lib/auth";import {createClient} from "@/lib/supabase/server";import {Button,Card,Field,Input,PageHeader} from "@/components/ui";import {initials} from "@/lib/format";import {updateProfile} from "./actions";
+export default async function ProfilePage(){const profile=await requireProfile();const supabase=createClient();const{data:{user}}=await supabase.auth.getUser();return <div className="mx-auto max-w-4xl"><PageHeader title="Profile & Settings" subtitle="Manage your Fleora account and how your planning space feels."/><Card variant="feature" padding="lg"><div className="flex flex-wrap items-center gap-5"><div className="grid h-20 w-20 place-items-center rounded-full border border-plum-100 bg-plum-50 font-display text-2xl text-plum-700">{initials(profile.first_name,profile.last_name)}</div><div><p className="fleora-kicker">Your Fleora</p><h2 className="mt-1 font-display text-3xl">{profile.first_name} {profile.last_name}</h2><p className="mt-1 text-sm text-ink-600">{user?.email}</p></div></div></Card><div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_.85fr]"><Card padding="lg"><p className="fleora-kicker">Personal information</p><h3 className="mt-2 font-display text-2xl">Your details</h3><form action={updateProfile} className="mt-5 grid gap-4 sm:grid-cols-2"><Field label="First name"><Input name="first_name" defaultValue={profile.first_name??""} required/></Field><Field label="Last name"><Input name="last_name" defaultValue={profile.last_name??""} required/></Field><Field label="Phone number"><Input name="phone" type="tel" defaultValue={profile.phone??""} placeholder="(555) 555-5555"/></Field><Field label="Email"><Input value={user?.email??""} disabled/></Field><div className="sm:col-span-2"><Button type="submit">Save profile</Button></div></form></Card><div className="space-y-4"><Card><p className="fleora-kicker">Security</p><h3 className="mt-2 font-display text-xl">Password</h3><p className="mt-2 text-sm text-ink-600">Use a secure email link whenever you need to change your password.</p><Link href="/forgot-password" className="mt-4 inline-block text-sm font-bold text-plum-700 hover:underline">Change password →</Link></Card><Card><p className="fleora-kicker">Notifications</p><h3 className="mt-2 font-display text-xl">Stay in the loop</h3><p className="mt-2 text-sm text-ink-600">Email controls for messages, quotes, leads and bookings are coming in the marketplace update.</p></Card><Card><p className="fleora-kicker">Account</p><form action="/auth/signout" method="post" className="mt-3"><button className="text-sm font-bold text-plum-700 hover:underline">Sign out →</button></form></Card></div></div></div>}

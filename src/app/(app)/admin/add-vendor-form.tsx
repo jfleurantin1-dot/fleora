@@ -1,4 +1,5 @@
 "use client";
+import { CategoryIcon } from "@/components/category-icon";
 
 import { useFormState, useFormStatus } from "react-dom";
 import { createDirectoryVendor, type AdminVendorState } from "./actions";
@@ -50,7 +51,7 @@ export function AddVendorForm() {
                   {categoriesInGroup(group.key).map((category) => (
                     <label key={category.key} className="flex cursor-pointer items-center gap-2 rounded-xl border border-[#E9E3E7] bg-white px-3 py-2.5 text-sm text-ink-700 transition hover:border-plum-200 hover:bg-plum-50">
                       <input name="category" value={category.key} type="checkbox" className="h-4 w-4 rounded border-plum-300 text-plum-600" />
-                      <span>{category.emoji} {category.label}</span>
+                      <span className="inline-flex items-center gap-2"><CategoryIcon category={category.key} size={16} /> {category.label}</span>
                     </label>
                   ))}
                 </div>

@@ -1,4 +1,5 @@
 "use client";
+import { CategoryIcon } from "@/components/category-icon";
 
 import { useFormState, useFormStatus } from "react-dom";
 import { saveVendorProfile, type VendorOnboardingState } from "./actions";
@@ -99,7 +100,7 @@ export function VendorForm({
                     className="h-4 w-4 rounded border-plum-300 text-plum-600"
                   />
                   <span>
-                    {c.emoji} {c.label}
+                    <><CategoryIcon category={c.key} size={16} /> {c.label}</>
                   </span>
                 </label>
               ))}
