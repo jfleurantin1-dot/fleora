@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
 import { money, shortDate } from "@/lib/format";
-import { categoryEmoji, categoryLabel } from "@/lib/constants";
+import { categoryLabel } from "@/lib/constants";
 import { acceptQuote, declineQuote } from "../actions";
 
 const statusTone={sent:"amber",accepted:"green",declined:"rose",expired:"slate"} as const;
@@ -18,7 +18,7 @@ export default async function QuotePage({params}:{params:{id:string}}){
  ]);
  const isClient=profile.id===event?.client_id; const canDecide=isClient&&quote.status==="sent"; const accept=acceptQuote.bind(null,quote.id); const decline=declineQuote.bind(null,quote.id);
  return <div className="mx-auto max-w-2xl">
-  <PageHeader title={`Quote from ${vendor?.business_name??"vendor"}`} subtitle={`${categoryEmoji(quote.category)} ${categoryLabel(quote.category)} · ${event?.name??"your event"}`} action={<Badge tone={statusTone[quote.status]}>{quote.status}</Badge>}/>
+  <PageHeader title={`Quote from ${vendor?.business_name??"vendor"}`} subtitle={`${categoryLabel(quote.category)} · ${event?.name??"your event"}`} action={<Badge tone={statusTone[quote.status]}>{quote.status}</Badge>}/>
   <Card variant="feature" padding="lg" className="overflow-hidden">
    <div className="mb-6 rounded-2xl bg-ivory-100 p-4"><p className="fleora-kicker">Event</p><p className="mt-1 font-semibold text-ink-900">{event?.name}</p><p className="mt-1 text-sm text-ink-600">{shortDate(event?.event_date)} · {event?.location??vendor?.location??"Location TBD"}</p></div>
    <div className="space-y-1">{(items??[]).map(it=><div key={it.id} className="flex items-center justify-between border-b border-[#F0EBEE] py-3 text-sm"><span className="text-ink-700">{it.label}</span><span className="font-medium text-ink-900">{money(it.amount)}</span></div>)}</div>

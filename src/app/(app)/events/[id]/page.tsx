@@ -5,7 +5,8 @@ import { requireProfile } from "@/lib/auth";
 import { Badge, ButtonLink, Card, Empty, Progress, SectionHeader, StatCard } from "@/components/ui";
 import { CalendarIcon, CheckIcon, MessageIcon, StoreIcon, UsersIcon, WalletIcon } from "@/components/icons";
 import { money, relativeDay, shortDate } from "@/lib/format";
-import { categoryEmoji, categoryLabel, CATEGORIES } from "@/lib/constants";
+import { categoryLabel, CATEGORIES } from "@/lib/constants";
+import { CategoryIcon } from "@/components/category-icon";
 import { Checklist } from "@/components/event/checklist";
 import { GuestList } from "@/components/event/guest-list";
 import type { Vendor } from "@/lib/types";
@@ -149,7 +150,7 @@ export default async function EventPage({
                   return (
                     <Card key={r.id} variant="interactive" className="flex min-h-[116px] items-center justify-between gap-3">
                       <div className="flex min-w-0 items-center gap-3">
-                        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-ivory-100 text-xl">{categoryEmoji(r.category)}</span>
+                        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-plum-50 text-plum-700"><CategoryIcon category={r.category} size={20}/></span>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-bold text-ink-900">{categoryLabel(r.category)}</p>
                           {isBooked && booking ? (
@@ -193,7 +194,7 @@ export default async function EventPage({
                 {bk.map((b) => (
                   <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
-                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-emerald-50 text-lg">{categoryEmoji(b.category)}</span>
+                      <span className="grid h-10 w-10 place-items-center rounded-xl bg-plum-50 text-plum-700"><CategoryIcon category={b.category} size={18}/></span>
                       <div><p className="text-sm font-bold text-ink-900">{vName.get(b.vendor_id)?.business_name}</p><p className="mt-0.5 text-xs text-ink-600">{categoryLabel(b.category)} · {Number(b.balance) > 0 ? `${money(b.balance)} balance` : "paid in full"}</p></div>
                     </div>
                     <div className="flex items-center gap-3"><span className="text-sm font-semibold text-ink-900">{money(b.total)}</span><Badge tone={b.status === "confirmed" || b.status === "completed" ? "green" : "amber"}>{b.status.replace("_", " ")}</Badge></div>

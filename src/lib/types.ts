@@ -89,6 +89,24 @@ export type VendorCategory = {
 };
 
 
+
+export type VendorFavorite = {
+  user_id: string;
+  vendor_id: string;
+  created_at: string;
+};
+
+export type Notification = {
+  id: string;
+  user_id: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  href: string | null;
+  read_at: string | null;
+  created_at: string;
+};
+
 export type VendorUnavailableDate = {
   id: string;
   vendor_id: string;
@@ -260,6 +278,8 @@ export type Database = {
       vendor_categories: TableDef<VendorCategory>;
       vendor_photos: TableDef<VendorPhoto>;
       vendor_unavailable_dates: TableDef<VendorUnavailableDate>;
+      vendor_favorites: TableDef<VendorFavorite>;
+      notifications: TableDef<Notification>;
       services: TableDef<Service>;
       packages: TableDef<Package>;
       event_requests: TableDef<EventRequest>;

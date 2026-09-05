@@ -1,0 +1,7 @@
+import Link from "next/link";
+import {requireProfile} from "@/lib/auth";
+import {createClient} from "@/lib/supabase/server";
+import {Badge,Button,Card,Empty,PageHeader} from "@/components/ui";
+import {timeAgo} from "@/lib/format";
+import {markAllNotificationsRead} from "./actions";
+export default async function NotificationsPage(){const profile=await requireProfile();const supabase=createClient();const{data:items}=await supabase.from("notifications").select("*").eq("user_id",profile.id).order("created_at",{ascending:false}).limit(75);const unread=(items??[]).filter(n=>!n.read_at).length;return <div className="mx-auto max-w-3xl"><PageHeader title="Notifications" subtitle="Messages, quotes, leads and important Fleora activity." action={unread?<form action={markAllNotificationsRead}><Button type="submit" variant="secondary" size="sm">Mark all read</Button></form>:undefined}/>{!items?.length?<Empty title="You’re all caught up"><p>New Fleora activity will appear here.</p></Empty>:<div className="space-y-3">{items.map(n=><Card key={n.id} variant={n.read_at?"default":"feature"}><Link href={n.href??"/notifications"} className="block"><div className="flex items-start justify-between gap-4"><div><div className="flex items-center gap-2"><p className="font-semibold text-ink-900">{n.title}</p>{!n.read_at&&<Badge tone="plum">New</Badge>}</div>{n.body&&<p className="mt-1 text-sm leading-relaxed text-ink-600">{n.body}</p>}</div><span className="shrink-0 text-xs text-ink-400">{timeAgo(n.created_at)}</span></div></Link></Card>)}</div>}</div>}

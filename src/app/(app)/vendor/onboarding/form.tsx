@@ -2,10 +2,12 @@
 import { CategoryIcon } from "@/components/category-icon";
 
 import { useFormState, useFormStatus } from "react-dom";
+import { useState } from "react";
 import { saveVendorProfile, type VendorOnboardingState } from "./actions";
 import { Button, ButtonLink, Card, Field, Input, Textarea, Select, FormError } from "@/components/ui";
 import { CATEGORY_GROUPS, categoriesInGroup } from "@/lib/constants";
 import { PhotoUploader } from "@/components/vendor/photo-uploader";
+import { PlusIcon } from "@/components/icons";
 import type { Package, Service, Vendor } from "@/lib/types";
 
 function Submit() {
@@ -34,6 +36,8 @@ export function VendorForm({
 }) {
   const [state, formAction] = useFormState<VendorOnboardingState, FormData>(saveVendorProfile, {});
   const catSet = new Set(categories);
+  const [serviceCount, setServiceCount] = useState(Math.max(4, Math.min(12, services.length || 0)));
+  const [packageCount, setPackageCount] = useState(Math.max(3, Math.min(12, packages.length || 0)));
 
   return (
     <form action={formAction} className="space-y-6">
@@ -111,7 +115,7 @@ export function VendorForm({
 
       <Card className="space-y-3">
         <div><p className="fleora-kicker">Pricing</p><h2 className="mt-1 font-display text-2xl text-ink-900">Starting prices</h2><p className="mt-1 text-sm text-ink-600">Give clients a useful starting point before they request a custom quote.</p></div>
-        {[0, 1, 2, 3].map((i) => {
+        {Array.from({length:serviceCount},(_,i)=>i).map((i) => {
           const s = services[i];
           return (
             <div key={i} className="grid grid-cols-12 gap-2">
@@ -144,11 +148,12 @@ export function VendorForm({
             </div>
           );
         })}
+        {serviceCount<12&&<button type="button" onClick={()=>setServiceCount(c=>Math.min(12,c+1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={16}/> Add service</button>}
       </Card>
 
       <Card className="space-y-3">
         <div><p className="fleora-kicker">Packages</p><h2 className="mt-1 font-display text-2xl text-ink-900">Create easy-to-shop packages</h2><p className="mt-1 text-sm text-ink-600">Packages help clients understand what they can book before requesting a custom quote.</p></div>
-        {[0, 1, 2].map((i) => {
+        {Array.from({length:packageCount},(_,i)=>i).map((i) => {
           const pkg = packages[i];
           return (
             <div key={i} className="grid gap-2 rounded-2xl border border-[#E9E3E7] bg-white p-3 sm:grid-cols-12">
@@ -158,6 +163,7 @@ export function VendorForm({
             </div>
           );
         })}
+        {packageCount<12&&<button type="button" onClick={()=>setPackageCount(c=>Math.min(12,c+1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={16}/> Add package</button>}
       </Card>
 
       <Card className="space-y-3">

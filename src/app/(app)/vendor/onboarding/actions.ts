@@ -102,7 +102,7 @@ export async function saveVendorProfile(
   // Replace services (up to 4 rows from the form).
   await supabase.from("services").delete().eq("vendor_id", vendorId);
   const svc: { vendor_id: string; category: string; name: string; starting_price: number | null }[] = [];
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 12; i++) {
     const name = String(formData.get(`svc_name_${i}`) ?? "").trim();
     const category = String(formData.get(`svc_cat_${i}`) ?? "").trim();
     const price = Number(formData.get(`svc_price_${i}`)) || null;
@@ -113,7 +113,7 @@ export async function saveVendorProfile(
   // Replace storefront packages (up to 3 rows from the form).
   await supabase.from("packages").delete().eq("vendor_id", vendorId);
   const pkgs: { vendor_id: string; name: string; description: string | null; price: number | null }[] = [];
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 12; i++) {
     const name = String(formData.get(`pkg_name_${i}`) ?? "").trim();
     const description = String(formData.get(`pkg_desc_${i}`) ?? "").trim() || null;
     const price = Number(formData.get(`pkg_price_${i}`)) || null;

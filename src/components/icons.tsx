@@ -71,3 +71,5 @@ export function CameraIcon(props: IconProps){return <IconBase {...props}><path d
 export function MusicIcon(props: IconProps){return <IconBase {...props}><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></IconBase>}
 export function CardIcon(props: IconProps){return <IconBase {...props}><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h10M7 13h6"/></IconBase>}
 export function BeautyIcon(props: IconProps){return <IconBase {...props}><path d="m12 3 1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5z"/><path d="M5 16l.8 2.2L8 19l-2.2.8L5 22l-.8-2.2L2 19l2.2-.8z"/></IconBase>}
+export function BellIcon(props: IconProps){return <IconBase {...props}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></IconBase>}
+export function PlusIcon(props: IconProps){return <IconBase {...props}><path d="M12 5v14M5 12h14"/></IconBase>}
