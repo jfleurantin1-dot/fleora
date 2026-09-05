@@ -38,15 +38,10 @@ function secretKey() {
 
 async function stripeV2Request<T>(
   path: string,
-  options?: { method?: "GET" | "POST"; body?: Record<string, unknown>; include?: string[] },
+  options?: { method?: "GET" | "POST"; body?: Record<string, unknown> },
 ): Promise<T> {
   const method = options?.method ?? "GET";
-  const url = new URL(`${STRIPE_V2_CORE_API}${path}`);
-  for (const [index, value] of (options?.include ?? []).entries()) {
-    url.searchParams.append(`include[${index}]`, value);
-  }
-
-  const res = await fetch(url, {
+  const res = await fetch(`${STRIPE_V2_CORE_API}${path}`, {
     method,
     headers: {
       Authorization: `Bearer ${secretKey()}`,
@@ -105,9 +100,14 @@ export async function createFleoraConnectedAccount(input: { vendorId: string; bu
 }
 
 export async function retrieveConnectedAccount(accountId: string) {
-  return stripeV2Request<StripeAccount>(`/accounts/${encodeURIComponent(accountId)}`, {
-    include: ["configuration.recipient", "identity", "requirements"],
-  });
+  // Stripe Accounts v2 requires explicitly indexed include parameters on GET.
+  // Build the query string literally to avoid frameworks/URL helpers rewriting
+  // the array syntax into the unsupported include[] form.
+  const query = [
+    "include[0]=configuration.recipient",
+    "include[1]=requirements",
+  ].join("&");
+  return stripeV2Request<StripeAccount>(`/accounts/${encodeURIComponent(accountId)}?${query}`);
 }
 
 export async function createOnboardingLink(accountId: string, baseUrl: string) {

@@ -36,11 +36,10 @@ export async function startStripeOnboarding() {
     });
     accountId = account.id;
     await saveStripeState(vendor.id, account);
-  } else {
-    const account = await retrieveConnectedAccount(accountId);
-    await saveStripeState(vendor.id, account);
   }
 
+  // Do not block resuming hosted onboarding on an account-status fetch.
+  // The Account Link endpoint only needs the connected account ID.
   const link = await createOnboardingLink(accountId, appBaseUrl());
   redirect(link.url);
 }
