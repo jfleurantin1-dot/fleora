@@ -71,6 +71,13 @@ export type Vendor = {
   contact_phone: string | null;
   source: string;
   created_at: string;
+  stripe_account_id: string | null;
+  stripe_onboarding_status: "not_started" | "in_progress" | "ready" | "restricted";
+  stripe_details_submitted: boolean;
+  stripe_charges_enabled: boolean;
+  stripe_payouts_enabled: boolean;
+  stripe_transfers_status: string | null;
+  stripe_last_synced_at: string | null;
 };
 
 export type VendorClaim = {
@@ -200,6 +207,37 @@ export type Booking = {
   created_at: string;
 };
 
+export type PaymentSettings = {
+  id: number;
+  platform_fee_bps: number;
+  currency: string;
+  deposits_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PaymentRecord = {
+  id: string;
+  booking_id: string | null;
+  quote_id: string | null;
+  event_id: string;
+  vendor_id: string;
+  client_id: string;
+  payment_type: "deposit" | "balance" | "full";
+  status: "pending" | "processing" | "paid" | "failed" | "cancelled" | "refunded" | "partially_refunded";
+  amount: number;
+  platform_fee: number;
+  vendor_net: number;
+  currency: string;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  stripe_charge_id: string | null;
+  paid_at: string | null;
+  refunded_amount: number;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Review = {
   id: string;
   booking_id: string;
@@ -292,6 +330,8 @@ export type Database = {
       quotes: TableDef<Quote>;
       quote_items: TableDef<QuoteItem>;
       bookings: TableDef<Booking>;
+      payment_settings: TableDef<PaymentSettings>;
+      payments: TableDef<PaymentRecord>;
       reviews: TableDef<Review>;
       guests: TableDef<Guest>;
       checklist_items: TableDef<ChecklistItem>;
