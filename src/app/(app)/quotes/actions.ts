@@ -48,7 +48,7 @@ export async function acceptQuote(quoteId: string) {
     .eq("category", quote.category);
 
   revalidatePath(`/events/${quote.event_id}`);
-  redirect(`/events/${quote.event_id}?booked=${quote.category}`);
+  redirect(`/quotes/${quote.id}?accepted=1`);
 }
 
 export async function declineQuote(quoteId: string) {
