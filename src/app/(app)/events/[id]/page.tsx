@@ -3,7 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { Badge, ButtonLink, Card, Empty, Progress, SectionHeader } from "@/components/ui";
-import { CalendarIcon, CheckIcon, MapPinIcon, MessageIcon, StoreIcon, UsersIcon, WalletIcon } from "@/components/icons";
+import { CalendarIcon, CheckIcon, MapPinIcon, MessageIcon, SparkleIcon, StoreIcon, UsersIcon, WalletIcon } from "@/components/icons";
 import { money, relativeDay, shortDate } from "@/lib/format";
 import { categoryLabel, CATEGORIES } from "@/lib/constants";
 import { CategoryIcon } from "@/components/category-icon";
@@ -48,13 +48,33 @@ export default async function EventPage({
   const quotedCats = new Set(openQuotes.map((q) => q.category));
   const committed = bk.reduce((s, b) => s + Number(b.total), 0);
   const budget = Number(event.budget ?? 0);
-  const pct = reqs.length ? Math.round((bookedCats.size / reqs.length) * 100) : 0;
   const attending = (guests ?? []).filter((g) => g.rsvp === "yes").reduce((s, g) => s + Number(g.party_size ?? 1), 0);
   const invited = (guests ?? []).reduce((s, g) => s + Number(g.party_size ?? 1), 0);
   const awaiting = (guests ?? []).filter((g) => g.rsvp === "pending").length;
   const doneTasks = (checklist ?? []).filter((i) => i.done).length;
   const budgetRemaining = Math.max(0, budget - committed);
   const stillNeeded = Math.max(0, reqs.length - bookedCats.size);
+  const planningSteps = [
+    { label: "Event details", done: Boolean(event.event_date && event.location && event.guest_count && budget > 0) },
+    { label: "Mood board", done: (inspirationPhotos ?? []).length > 0 },
+    { label: "Guest list", done: (guests ?? []).length > 0 },
+    { label: "Checklist", done: (checklist ?? []).length > 0 },
+    { label: "Vendors", done: reqs.length > 0 },
+    { label: "Bookings", done: reqs.length > 0 && bookedCats.size >= reqs.length },
+  ];
+  const completedPlanningSteps = planningSteps.filter((step) => step.done).length;
+  const pct = Math.round((completedPlanningSteps / planningSteps.length) * 100);
+
+  const nextSteps: Array<{ title: string; description: string; href: string; action: string }> = [];
+  if (!(inspirationPhotos ?? []).length) nextSteps.push({ title: "Give your event a look", description: "Add inspiration photos so your mood board becomes the visual home for this event.", href: `/events/${event.id}/edit`, action: "Add inspiration" });
+  if (!(guests ?? []).length) nextSteps.push({ title: "Start your guest list", description: "Add guests now so RSVPs and headcount stay organized in one place.", href: "#guests", action: "Add guests" });
+  if (!reqs.length) nextSteps.push({ title: "Build your event team", description: "Choose the services you need and Fleora will help you find matching vendors.", href: `/events/${event.id}/services`, action: "Choose services" });
+  else if (stillNeeded > 0) {
+    const firstNeeded = reqs.find((r) => !bookedCats.has(r.category));
+    if (firstNeeded) nextSteps.push({ title: `Find your ${categoryLabel(firstNeeded.category)}`, description: `${stillNeeded} service${stillNeeded === 1 ? "" : "s"} still need a vendor for this event.`, href: `/events/${event.id}/matches/${firstNeeded.category}`, action: "Explore vendors" });
+  }
+  if (openQuotes.length) nextSteps.unshift({ title: "A quote needs your attention", description: `You have ${openQuotes.length} quote${openQuotes.length === 1 ? "" : "s"} ready to review.`, href: openQuotes.length === 1 ? `/quotes/${openQuotes[0].id}` : "#quotes", action: openQuotes.length === 1 ? "View quote" : "Review quotes" });
+  if (!nextSteps.length && (checklist ?? []).length > doneTasks) nextSteps.push({ title: "Keep the plan moving", description: `${(checklist ?? []).length - doneTasks} checklist item${(checklist ?? []).length - doneTasks === 1 ? "" : "s"} still to complete.`, href: "#checklist", action: "View checklist" });
 
   return (
     <div className="space-y-7">
@@ -87,12 +107,35 @@ export default async function EventPage({
                 <div className="flex flex-wrap gap-2"><ButtonLink href={`/events/${event.id}/edit`} variant="secondary" size="sm">Edit event</ButtonLink><ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink></div>
               </div>
 
-              <div className="mt-7 max-w-2xl">
+              <div className="mt-7 max-w-3xl">
                 <div className="mb-2 flex items-center justify-between text-sm">
                   <span className="font-bold text-ink-900">{pct}% planned</span>
                   <span className="text-ink-500">{relativeDay(event.event_date)}</span>
                 </div>
                 <Progress value={pct} />
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {planningSteps.map((step) => (
+                    <span key={step.label} className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${step.done ? "bg-sage-50 text-sage-700" : "bg-white text-ink-500 shadow-sm"}`}>
+                      {step.done && <CheckIcon size={12} />}
+                      {step.label}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-6 border-t border-plum-100 pt-5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div><p className="fleora-kicker">Event overview</p><h2 className="mt-1 font-display text-2xl text-ink-900">Your plan at a glance</h2></div>
+                    <span className="text-xs font-semibold text-ink-500">{completedPlanningSteps} of {planningSteps.length} planning steps started</span>
+                  </div>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                    <OverviewRow icon={<CalendarIcon size={17} />} label="Date" value={shortDate(event.event_date)} />
+                    <OverviewRow icon={<MapPinIcon size={17} />} label="Location" value={event.location ?? "TBD"} />
+                    <OverviewRow icon={<UsersIcon size={17} />} label="Guests" value={invited ? `${attending} attending · ${awaiting} awaiting` : `${event.guest_count ?? "?"} expected`} accent="blush" />
+                    <OverviewRow icon={<StoreIcon size={17} />} label="Vendors" value={`${bk.length} booked · ${stillNeeded} to find`} accent="sage" />
+                    <OverviewRow icon={<WalletIcon size={17} />} label="Budget" value={`${money(committed)} of ${money(budget)}`} />
+                    <OverviewRow icon={<CheckIcon size={17} />} label="Checklist" value={`${doneTasks} of ${(checklist ?? []).length} complete`} accent="sage" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -100,6 +143,22 @@ export default async function EventPage({
       </Card>
 
       <EventStatusControls eventId={event.id} status={event.status} />
+
+      {nextSteps.length > 0 && (
+        <section>
+          <SectionHeader title="What’s next" eyebrow="Keep planning" description="Fleora is keeping an eye on the pieces that still need your attention." />
+          <div className="grid gap-3 md:grid-cols-3">
+            {nextSteps.slice(0, 3).map((step, index) => (
+              <Card key={`${step.title}-${index}`} variant="interactive" className="flex h-full flex-col">
+                <span className="grid h-10 w-10 place-items-center rounded-2xl bg-plum-50 text-plum-700"><SparkleIcon size={18} /></span>
+                <h3 className="mt-4 font-display text-xl text-ink-900">{step.title}</h3>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">{step.description}</p>
+                <Link href={step.href} className="mt-4 inline-flex text-sm font-bold text-plum-700 hover:underline">{step.action} →</Link>
+              </Card>
+            ))}
+          </div>
+        </section>
+      )}
 
       {openQuotes.length > 0 && (
         <Card variant="feature" padding="lg" className="border-plum-200 bg-gradient-to-r from-plum-50 via-white to-blush-50">
@@ -131,8 +190,7 @@ export default async function EventPage({
       </nav>
 
       <section id="vendors" className="scroll-mt-28">
-        <div className="grid gap-6 lg:grid-cols-[1.55fr_.75fr] lg:items-start">
-          <div>
+        <div>
             <SectionHeader
               title="Your Event Team"
               eyebrow="Marketplace"
@@ -166,28 +224,6 @@ export default async function EventPage({
                 })}
               </div>
             )}
-          </div>
-
-          <Card variant="feature" padding="lg" className="lg:sticky lg:top-24">
-            <div className="flex items-start justify-between gap-4">
-              <div><p className="fleora-kicker">Event overview</p><h2 className="mt-1 font-display text-2xl text-ink-900">Your plan at a glance</h2></div>
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-plum-600 shadow-sm"><CalendarIcon size={20} /></span>
-            </div>
-
-            <div className="mt-5 space-y-4">
-              <OverviewRow icon={<CalendarIcon size={17} />} label="Date" value={shortDate(event.event_date)} />
-              <OverviewRow icon={<MapPinIcon size={17} />} label="Location" value={event.location ?? "TBD"} />
-              <OverviewRow icon={<UsersIcon size={17} />} label="Guest list" value={`${attending} attending · ${awaiting} awaiting`} accent="blush" />
-              <OverviewRow icon={<StoreIcon size={17} />} label="Vendors" value={`${bk.length} booked · ${stillNeeded} to find`} accent="sage" />
-              <OverviewRow icon={<WalletIcon size={17} />} label="Budget" value={`${money(committed)} of ${money(budget)}`} />
-              <OverviewRow icon={<CheckIcon size={17} />} label="Checklist" value={`${doneTasks} of ${(checklist ?? []).length} complete`} accent="sage" />
-            </div>
-
-            <div className="mt-6 rounded-2xl bg-white p-4 shadow-sm">
-              <div className="mb-2 flex items-center justify-between text-xs font-semibold"><span className="text-ink-600">Planning progress</span><span className="text-plum-700">{pct}%</span></div>
-              <Progress value={pct} />
-            </div>
-          </Card>
         </div>
       </section>
 
