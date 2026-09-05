@@ -99,15 +99,11 @@ export async function createFleoraConnectedAccount(input: { vendorId: string; bu
 }
 
 export async function retrieveConnectedAccount(accountId: string) {
-  // Accounts v2 only accepts indexed include keys. Build them with
-  // URLSearchParams so the square brackets are percent-encoded on the wire
-  // exactly like Stripe's documented curl -G -d "include[0]=..." request.
-  const params = new URLSearchParams();
-  params.set("include[0]", "configuration.recipient");
-  params.set("include[1]", "requirements");
-  return stripeV2Request<StripeAccount>(
-    `/accounts/${encodeURIComponent(accountId)}?${params.toString()}`,
-  );
+  // Stripe Accounts v2 requires literal indexed query keys like include[0].
+  // Do not build these with URLSearchParams: it percent-encodes the brackets
+  // (include%5B0%5D), which Stripe's v2 parser rejects for this endpoint.
+  const path = `/accounts/${encodeURIComponent(accountId)}?include[0]=configuration.recipient&include[1]=requirements`;
+  return stripeV2Request<StripeAccount>(path);
 }
 
 export async function createOnboardingLink(accountId: string, baseUrl: string) {
