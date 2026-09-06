@@ -103,7 +103,7 @@ export default async function EventPage({
                     {event.color_palette && <span>{event.color_palette}</span>}
                   </div>
                 </div>
-                <div className="flex flex-wrap gap-2"><ButtonLink href={`/events/${event.id}/edit`} variant="secondary" size="sm">Edit event</ButtonLink><ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink></div>
+                <ButtonLink href={`/events/${event.id}/plan`} size="sm">Continue planning →</ButtonLink>
               </div>
 
               <div className="mt-7 max-w-3xl">
@@ -127,8 +127,6 @@ export default async function EventPage({
                     <span className="text-xs font-semibold text-ink-500">{completedPlanningSteps} of {planningSteps.length} planning steps started</span>
                   </div>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                    <OverviewRow icon={<CalendarIcon size={17} />} label="Date" value={shortDate(event.event_date)} />
-                    <OverviewRow icon={<MapPinIcon size={17} />} label="Location" value={event.location ?? "TBD"} />
                     <OverviewRow icon={<UsersIcon size={17} />} label="Guests" value={invited ? `${attending} attending · ${awaiting} awaiting` : `${event.guest_count ?? "?"} expected`} accent="blush" />
                     <OverviewRow icon={<StoreIcon size={17} />} label="Vendors" value={`${bk.length} booked · ${stillNeeded} to find`} accent="sage" />
                     <OverviewRow icon={<WalletIcon size={17} />} label="Budget" value={`${money(committed)} of ${money(budget)}`} />
@@ -140,8 +138,6 @@ export default async function EventPage({
           </div>
         </div>
       </Card>
-
-      <EventStatusControls eventId={event.id} status={event.status} />
 
       {nextSteps.length > 0 && (
         <section>
@@ -183,10 +179,10 @@ export default async function EventPage({
               title="Your Event Team"
               eyebrow="Marketplace"
               description={`${reqs.length} services selected · ${bk.length} booked · ${stillNeeded} still to find`}
-              action={<ButtonLink href={`/events/${event.id}/services`} variant="ghost" size="sm">Edit services</ButtonLink>}
+              action={<ButtonLink href={`/events/${event.id}/plan`} variant="ghost" size="sm">Continue planning →</ButtonLink>}
             />
             {reqs.length === 0 ? (
-              <Empty title="No services selected yet"><ButtonLink href={`/events/${event.id}/services`} size="sm" className="mt-3">Choose services</ButtonLink></Empty>
+              <Empty title="No services selected yet"><ButtonLink href={`/events/${event.id}/plan`} size="sm" className="mt-3">Continue planning</ButtonLink></Empty>
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {reqs.map((r) => {
@@ -244,6 +240,16 @@ export default async function EventPage({
             </section>
           )}
       </div>
+
+      <section className="border-t border-plum-100 pt-6">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-ink-700">Event settings</p>
+            <p className="mt-1 text-xs text-ink-500">Finished planning or no longer hosting this event? Manage its status here.</p>
+          </div>
+          <EventStatusControls eventId={event.id} status={event.status} />
+        </div>
+      </section>
     </div>
   );
 }
