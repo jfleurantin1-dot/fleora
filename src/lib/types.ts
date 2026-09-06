@@ -40,6 +40,8 @@ export type EventRow = {
   style: string | null;
   color_palette: string | null;
   status: EventStatus;
+  rsvp_title: string | null;
+  rsvp_deadline: string | null;
   created_at: string;
 };
 
@@ -259,6 +261,9 @@ export type Guest = {
   name: string;
   email: string | null;
   party_size: number;
+  invited_party_size: number;
+  invitation_name: string | null;
+  plus_one_allowed: boolean;
   rsvp: RsvpStatus;
   dietary: string | null;
   phone: string | null;

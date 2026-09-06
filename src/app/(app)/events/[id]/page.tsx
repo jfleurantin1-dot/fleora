@@ -266,7 +266,7 @@ export default async function EventPage({
 
           <Card id="guests" className="scroll-mt-28">
             <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">People</p><h3 className="mt-1 font-display text-xl text-ink-900">Guest list</h3></div><UsersIcon size={24} className="text-[#9B5065]" /></div>
-            <GuestList eventId={event.id} guests={guests ?? []} />
+            <GuestList eventId={event.id} guests={guests ?? []} rsvpTitle={event.rsvp_title ?? null} rsvpDeadline={event.rsvp_deadline ?? null} eventName={event.name} />
           </Card>
 
           <Card id="messages" variant="soft" className="scroll-mt-28">
