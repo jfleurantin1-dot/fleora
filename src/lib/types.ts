@@ -171,6 +171,17 @@ export type EventPlanItemPhoto = {
   created_at: string;
 };
 
+export type EventPotluckItem = {
+  id: string;
+  event_id: string;
+  item: string;
+  category: string;
+  assigned_to: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type EventVendorNeed = {
   id: string;
   event_id: string;
@@ -369,6 +380,7 @@ export type Database = {
       event_requests: TableDef<EventRequest>;
       event_plan_items: TableDef<EventPlanItem>;
       event_plan_item_photos: TableDef<EventPlanItemPhoto>;
+      event_potluck_items: TableDef<EventPotluckItem>;
       event_vendor_needs: TableDef<EventVendorNeed>;
       conversations: TableDef<Conversation>;
       messages: TableDef<Message>;

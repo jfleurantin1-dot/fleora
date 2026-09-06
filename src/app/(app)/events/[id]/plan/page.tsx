@@ -16,18 +16,21 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   ]);
   const decorItems=(planItems??[]).filter(item=>item.chapter==="decor");
   const decorDecided=decorItems.filter(item=>item.choice!=="undecided").length;
+  const foodItems=(planItems??[]).filter(item=>item.chapter==="food_drinks");
+  const foodDecided=foodItems.filter(item=>item.choice!=="undecided").length;
   const chapters=[
     {title:"Event Details & Vision",desc:"Event essentials, theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:(photos??[]).length?"Started":"Start here",href:`/events/${event.id}/edit`,live:true},
     {title:"Decor",desc:"Welcome signs, focal backdrops, tablescapes, centerpieces, balloons, favors and custom signage.",icon:<SparkleIcon size={23}/>,status:decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
-    {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:"Coming soon",href:"#",live:false},
+    {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, cake, desserts, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:foodItems.length?`${foodDecided}/${foodItems.length} decided`:"Plan food & drinks",href:`/events/${event.id}/plan/food-drinks`,live:true},
     {title:"Services",desc:"Photography, coordination, staffing, cleanup and more.",icon:<StoreIcon size={23}/>,status:(requests??[]).length?"Started":"Plan services",href:`/events/${event.id}/services`,live:true},
     {title:"Entertainment",desc:"DJ, photo booth, performers, kids entertainment and activities.",icon:<MusicIcon size={23}/>,status:"Coming soon",href:"#",live:false},
     {title:"Venue & Logistics",desc:"Venue needs, access, parking, setup, cleanup and important notes.",icon:<MapPinIcon size={23}/>,status:"Coming soon",href:"#",live:false},
   ];
   const started=(photos??[]).length?1:0;
   const decorProgress=decorItems.length ? decorDecided/decorItems.length : 0;
+  const foodProgress=foodItems.length ? foodDecided/foodItems.length : 0;
   const servicesStarted=(requests??[]).length?1:0;
-  const pct=Math.round(((started+decorProgress+servicesStarted)/chapters.length)*100);
+  const pct=Math.round(((started+decorProgress+foodProgress+servicesStarted)/chapters.length)*100);
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/>
     <Card variant="feature" className="overflow-hidden bg-gradient-to-br from-plum-50 via-white to-blush-50">

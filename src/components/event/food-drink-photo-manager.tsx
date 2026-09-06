@@ -1,0 +1,35 @@
+"use client";
+import { ChangeEvent, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { removeFoodDrinkPhoto, uploadFoodDrinkPhotos } from "@/app/(app)/events/[id]/plan/food-drinks/actions";
+
+type Photo = { id: string; url: string; sort: number };
+export function FoodDrinkPhotoManager({ eventId, planItemId, photos }: { eventId: string; planItemId: string; photos: Photo[] }) {
+  const router = useRouter();
+  const [pending, startTransition] = useTransition();
+  const [status, setStatus] = useState<string | null>(null);
+  async function pick(e: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []).slice(0, 6);
+    if (!files.length) return;
+    const fd = new FormData();
+    files.forEach((f) => fd.append("photos", f));
+    setStatus("Uploading…");
+    startTransition(async () => {
+      const r = await uploadFoodDrinkPhotos(eventId, planItemId, fd);
+      setStatus(r?.error ?? "Photos saved ✓");
+      e.target.value = "";
+      router.refresh();
+    });
+  }
+  function remove(id: string) {
+    startTransition(async () => {
+      await removeFoodDrinkPhoto(eventId, planItemId, id);
+      router.refresh();
+    });
+  }
+  return <div className="mt-4 rounded-xl border border-plum-100 bg-plum-50/30 p-3">
+    <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold text-ink-800">Inspiration for this item</p><p className="text-[11px] text-ink-500">Cake designs, plating ideas, bar setups and other references stay attached for future vendor inquiries.</p></div>{status && <span className="text-[10px] font-semibold text-plum-700">{status}</span>}</div>
+    {photos.length > 0 && <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">{photos.map((p) => <div key={p.id} className="group relative overflow-hidden rounded-lg"><img src={p.url} alt="Food or drink inspiration" className="aspect-square w-full object-cover"/><button type="button" disabled={pending} onClick={() => remove(p.id)} className="absolute right-1 top-1 rounded-full bg-white/95 px-1.5 py-0.5 text-[9px] font-bold text-rose-600">×</button></div>)}</div>}
+    <label className="mt-3 block cursor-pointer rounded-lg border border-dashed border-plum-200 bg-white px-3 py-2 text-center text-xs font-bold text-plum-700 hover:bg-plum-50">＋ Add inspiration photos<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={pick} disabled={pending}/></label>
+  </div>;
+}
