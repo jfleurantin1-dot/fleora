@@ -43,7 +43,7 @@ export default async function FoodDrinksPlanPage({ params, searchParams }: { par
     <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan · Food & Drinks" />
 
     <div className="flex flex-wrap items-end justify-between gap-4">
-      <div><p className="fleora-kicker">Chapter 3</p><h1 className="mt-1 font-display text-4xl text-ink-900">Plan your food & drinks.</h1><p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-600">Choose what applies to your event. Add notes and inspiration now so catering, cake, bartender and other vendor requests are already organized when you're ready to reach out.</p></div>
+      <div><p className="fleora-kicker">Chapter 3</p><h1 className="mt-1 font-display text-4xl text-ink-900">Plan your food & drinks.</h1><p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-600">Choose what applies to your event. Add notes and inspiration now so catering, cake, bartender and other vendor requests are already organized when you&apos;re ready to reach out.</p></div>
       <Link href={`/events/${event.id}/plan`} className="text-sm font-semibold text-plum-700 hover:underline">← Back to Party Plan</Link>
     </div>
 
