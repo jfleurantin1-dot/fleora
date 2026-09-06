@@ -28,7 +28,9 @@ export async function updateEvent(eventId: string, fd: FormData) {
 
   revalidatePath(`/events/${eventId}`);
   revalidatePath("/events");
-  redirect(`/events/${eventId}`);
+  const intent = String(fd.get("intent") ?? "save");
+  if (intent === "continue") redirect(`/events/${eventId}/plan/decor`);
+  redirect(`/events/${eventId}/edit?saved=1`);
 }
 
 export async function uploadMoodPhotos(eventId: string, fd: FormData): Promise<{ error?: string }> {
@@ -82,6 +84,17 @@ export async function uploadMoodPhotos(eventId: string, fd: FormData): Promise<{
 export async function removeMoodPhoto(eventId: string, photoId: string) {
   const s = createClient();
   await s.from("event_inspiration_photos").delete().eq("id", photoId).eq("event_id", eventId);
+  revalidatePath(`/events/${eventId}/edit`);
+  revalidatePath(`/events/${eventId}`);
+  revalidatePath("/events");
+  revalidatePath("/dashboard");
+}
+
+export async function reorderMoodPhotos(eventId: string, photoIds: string[]) {
+  const s = createClient();
+  for (let i = 0; i < photoIds.length; i++) {
+    await s.from("event_inspiration_photos").update({ sort: i }).eq("id", photoIds[i]).eq("event_id", eventId);
+  }
   revalidatePath(`/events/${eventId}/edit`);
   revalidatePath(`/events/${eventId}`);
   revalidatePath("/events");

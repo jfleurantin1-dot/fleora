@@ -6,7 +6,7 @@ import { EVENT_TYPES, STYLE_OPTIONS } from "@/lib/constants";
 import { MoodPhotoManager } from "@/components/event/mood-photo-manager";
 import { updateEvent } from "./actions";
 
-export default async function EditEvent({ params }: { params: { id: string } }) {
+export default async function EditEvent({ params, searchParams }: { params: { id: string }; searchParams?: { saved?: string } }) {
   await requireProfile();
   const s = createClient();
   const [{ data: e }, { data: photos }] = await Promise.all([
@@ -18,10 +18,12 @@ export default async function EditEvent({ params }: { params: { id: string } }) 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <p className="fleora-kicker">Event settings</p>
-        <h1 className="mt-1 font-display text-4xl text-ink-900">Edit your event</h1>
-        <p className="mt-2 text-sm text-ink-600">Update details and keep your mood board in one place.</p>
+        <p className="fleora-kicker">Chapter 1 · Event Details & Vision</p>
+        <h1 className="mt-1 font-display text-4xl text-ink-900">Set the foundation for your event.</h1>
+        <p className="mt-2 text-sm text-ink-600">Confirm the essentials, then shape the theme, colors and overall visual direction.</p>
       </div>
+
+      {searchParams?.saved === "1" && <Card className="border-sage-200 bg-sage-50/70"><p className="text-sm font-semibold text-ink-900">Event details saved ✓</p></Card>}
 
       <Card padding="lg" className="space-y-6">
         <MoodPhotoManager eventId={e.id} photos={photos ?? []} />
@@ -39,7 +41,7 @@ export default async function EditEvent({ params }: { params: { id: string } }) 
             <label className="block text-sm font-semibold">Style<Select name="style" defaultValue={e.style ?? STYLE_OPTIONS[0]} className="mt-1">{STYLE_OPTIONS.map((x) => <option key={x}>{x}</option>)}</Select></label>
           </div>
           <label className="block text-sm font-semibold">Color palette<Input name="color_palette" defaultValue={e.color_palette ?? ""} className="mt-1" /></label>
-          <Button type="submit" size="lg">Save event details</Button>
+          <div className="flex flex-wrap justify-end gap-2"><Button type="submit" name="intent" value="save" variant="secondary" size="lg">Save & stay</Button><Button type="submit" name="intent" value="continue" size="lg">Save & continue to Decor →</Button></div>
         </form>
       </Card>
     </div>

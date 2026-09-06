@@ -8,6 +8,7 @@ import { DECOR_PLAN_ITEMS, planChoiceLabel, type PlanChoice } from "@/lib/planni
 import { categoryLabel } from "@/lib/constants";
 import { ChevronRightIcon, SparkleIcon } from "@/components/icons";
 import { saveDecorPlan } from "./actions";
+import { DecorPhotoManager } from "@/components/event/decor-photo-manager";
 
 export default async function DecorPlanPage({ params, searchParams }: { params: { id: string }; searchParams?: { saved?: string } }) {
   await requireProfile();
@@ -15,9 +16,10 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
   const { data: event } = await supabase.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();
 
-  const [{ data: rows }, { data: needs }] = await Promise.all([
+  const [{ data: rows }, { data: needs }, { data: itemPhotos }] = await Promise.all([
     supabase.from("event_plan_items").select("*").eq("event_id", params.id).eq("chapter", "decor"),
     supabase.from("event_vendor_needs").select("*").eq("event_id", params.id).eq("status", "needed"),
+    supabase.from("event_plan_item_photos").select("id,plan_item_id,url,sort").eq("event_id", params.id).order("sort"),
   ]);
 
   const byKey = new Map((rows ?? []).map((row) => [row.item_key, row]));
@@ -25,6 +27,8 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
   const decidedCount = (rows ?? []).filter((row) => row.choice !== "undecided").length;
   const progress = selectedCount ? Math.round((decidedCount / selectedCount) * 100) : 0;
   const saveWithId = saveDecorPlan.bind(null, params.id);
+  const photosByItem = new Map<string, any[]>();
+  for (const photo of itemPhotos ?? []) photosByItem.set(photo.plan_item_id, [...(photosByItem.get(photo.plan_item_id) ?? []), photo]);
 
   return (
     <div className="space-y-7">
@@ -34,7 +38,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
         <div>
           <p className="fleora-kicker">Chapter 2</p>
           <h1 className="mt-1 font-display text-4xl text-ink-900">Plan your decor.</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-600">Choose only the elements you want for this event. For each one, tell Fleora whether you’ll DIY it, hire someone, or decide later.</p>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-ink-600">Choose only the elements you want for this event. Add notes and specific inspiration so anything you hire for is already packaged into a useful vendor brief.</p>
         </div>
         <Link href={`/events/${event.id}/plan`} className="text-sm font-semibold text-plum-700 hover:underline">← Back to Party Plan</Link>
       </div>
@@ -78,7 +82,9 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
                     ))}
                   </div>
                   {item.vendorCategory && <p className="mt-2 text-[11px] text-ink-400">Hire option → {categoryLabel(item.vendorCategory)} vendor need</p>}
+                  {item.key === "other_custom" && <input name="custom_label__other_custom" defaultValue={row?.label === item.label ? "" : row?.label ?? ""} placeholder="What are you planning? e.g. Champagne wall" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />}
                   <textarea name={`notes__${item.key}`} defaultValue={row?.notes ?? ""} rows={2} placeholder="Optional notes — size, quantity, style, ideas…" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />
+                  {row ? <DecorPhotoManager eventId={event.id} planItemId={row.id} photos={photosByItem.get(row.id) ?? []} /> : <p className="mt-3 rounded-xl bg-ivory-50 px-3 py-2 text-[11px] text-ink-500">Save this decor selection once to unlock item-specific inspiration uploads.</p>}
                 </div>
               </Card>
             );
@@ -90,7 +96,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
             <p className="text-sm font-bold text-ink-900">You can change this anytime.</p>
             <p className="text-xs text-ink-500">DIY choices will later feed Shopping + Checklist. Hire choices become Vendor Needs now.</p>
           </div>
-          <Button type="submit" size="lg">Save decor plan</Button>
+          <div className="flex flex-wrap gap-2"><Button type="submit" name="intent" value="save" variant="secondary" size="lg">Save & stay</Button><Button type="submit" name="intent" value="continue" size="lg">Save & continue →</Button></div>
         </Card>
       </form>
 

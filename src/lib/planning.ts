@@ -12,16 +12,12 @@ export type DecorPlanDefinition = {
 export const DECOR_PLAN_ITEMS: DecorPlanDefinition[] = [
   { key: "welcome_sign", label: "Welcome sign", description: "A statement sign to greet guests and introduce the event style.", vendorCategory: "signage" },
   { key: "focal_backdrop", label: "Focal backdrop", description: "The main photo moment, feature wall or focal installation.", vendorCategory: "backdrops" },
-  { key: "balloons", label: "Balloon decor", description: "Garlands, arches, columns or custom balloon installations.", vendorCategory: "balloons" },
-  { key: "florals", label: "Florals", description: "Fresh, faux or dried florals used throughout the event design.", vendorCategory: "florals" },
-  { key: "table_setup", label: "Table setup / tablescape", description: "Linens, chargers, plates, glassware, napkins and tabletop styling.", vendorCategory: "dinnerware" },
+  { key: "table_setup", label: "Table setup / tablescape", description: "The complete tabletop look — linens, place settings, napkins and styling.", vendorCategory: "dinnerware" },
   { key: "centerpieces", label: "Centerpieces", description: "Florals, candles, bud vases or statement pieces for guest tables.", vendorCategory: "event_styling" },
-  { key: "linens", label: "Linens", description: "Tablecloths, runners, napkins and specialty fabrics.", vendorCategory: "linens" },
-  { key: "treat_table", label: "Dessert / treat table", description: "Styled display area for cake, desserts or favors.", vendorCategory: "event_styling" },
-  { key: "gift_table", label: "Gift table", description: "A designated styled area for cards and gifts.", vendorCategory: "event_styling" },
+  { key: "balloons", label: "Balloon decor", description: "Garlands, arches, columns or custom balloon installations.", vendorCategory: "balloons" },
   { key: "party_favors", label: "Party favors", description: "Take-home gifts, favor packaging and personalized details.", vendorCategory: "event_styling" },
-  { key: "custom_signage", label: "Custom signage", description: "Menus, seating signs, bar signs, table numbers and other event signage.", vendorCategory: "signage" },
-  { key: "rentals", label: "Decor & specialty rentals", description: "Props, plinths, arches, furniture or other specialty rental pieces.", vendorCategory: "specialty_rentals" },
+  { key: "custom_signage", label: "Custom signage", description: "Menus, bar signs, table numbers and other personalized event signage.", vendorCategory: "signage" },
+  { key: "other_custom", label: "Other / custom", description: "Something unique that isn't listed above — tell Fleora what you're planning.", vendorCategory: "event_styling" },
 ];
 
 export function planChoiceLabel(choice: PlanChoice) {

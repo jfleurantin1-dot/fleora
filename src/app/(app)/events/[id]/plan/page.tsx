@@ -17,8 +17,8 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   const decorItems=(planItems??[]).filter(item=>item.chapter==="decor");
   const decorDecided=decorItems.filter(item=>item.choice!=="undecided").length;
   const chapters=[
-    {title:"Vision",desc:"Theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:(photos??[]).length?"Started":"Start here",href:`/events/${event.id}/edit`,live:true},
-    {title:"Decor",desc:"Backdrops, tablescapes, signs, florals, favors and rentals.",icon:<SparkleIcon size={23}/>,status:decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
+    {title:"Event Details & Vision",desc:"Event essentials, theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:(photos??[]).length?"Started":"Start here",href:`/events/${event.id}/edit`,live:true},
+    {title:"Decor",desc:"Welcome signs, focal backdrops, tablescapes, centerpieces, balloons, favors and custom signage.",icon:<SparkleIcon size={23}/>,status:decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
     {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:"Coming soon",href:"#",live:false},
     {title:"Services",desc:"Photography, coordination, staffing, cleanup and more.",icon:<StoreIcon size={23}/>,status:(requests??[]).length?"Started":"Plan services",href:`/events/${event.id}/services`,live:true},
     {title:"Entertainment",desc:"DJ, photo booth, performers, kids entertainment and activities.",icon:<MusicIcon size={23}/>,status:"Coming soon",href:"#",live:false},

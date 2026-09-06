@@ -157,8 +157,18 @@ export type EventPlanItem = {
   choice: "diy" | "hire" | "undecided";
   vendor_category: string | null;
   notes: string | null;
+  budget_estimate: number | null;
   created_at: string;
   updated_at: string;
+};
+
+export type EventPlanItemPhoto = {
+  id: string;
+  event_id: string;
+  plan_item_id: string;
+  url: string;
+  sort: number;
+  created_at: string;
 };
 
 export type EventVendorNeed = {
@@ -358,6 +368,7 @@ export type Database = {
       packages: TableDef<Package>;
       event_requests: TableDef<EventRequest>;
       event_plan_items: TableDef<EventPlanItem>;
+      event_plan_item_photos: TableDef<EventPlanItemPhoto>;
       event_vendor_needs: TableDef<EventVendorNeed>;
       conversations: TableDef<Conversation>;
       messages: TableDef<Message>;
