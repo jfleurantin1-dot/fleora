@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { CATEGORY_GROUPS, categoriesInGroup, EVENT_TYPE_MAP } from "@/lib/constants";
-import { Button, Card, PageHeader, Badge } from "@/components/ui";
+import { Button, Card, Badge } from "@/components/ui";
+import { EventWorkspaceHeader } from "@/components/event/event-workspace-header";
 import { SparkleIcon } from "@/components/icons";
 import { money } from "@/lib/format";
 import { saveServices } from "./actions";
@@ -22,11 +23,13 @@ export default async function ServicesPage({ params }: { params: { id: string } 
   const saveWithId = saveServices.bind(null, params.id);
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <PageHeader
-        title="What can we help you find?"
-        subtitle={`We pre-selected a thoughtful starting mix for ${event.name}. Keep what you need, remove what you don’t, and add anything missing.`}
-      />
+    <div className="space-y-7">
+      <EventWorkspaceHeader event={event} active="/services" eyebrow="Vendors" />
+      <div>
+        <p className="fleora-kicker">Build your event team</p>
+        <h1 className="mt-1 font-display text-4xl text-ink-900">What can we help you find?</h1>
+        <p className="mt-2 max-w-2xl text-sm text-ink-600">We pre-selected a thoughtful starting mix for {event.name}. Keep what you need, remove what you don’t, and add anything missing.</p>
+      </div>
 
       <div className="mb-5 flex items-start gap-3 rounded-2xl border border-blush-200 bg-blush-50/70 p-4">
         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white text-plum-600 shadow-sm"><SparkleIcon size={18} /></span>

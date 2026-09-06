@@ -7,11 +7,10 @@ import { CalendarIcon, CheckIcon, MapPinIcon, MessageIcon, SparkleIcon, StoreIco
 import { money, relativeDay, shortDate } from "@/lib/format";
 import { categoryLabel, CATEGORIES } from "@/lib/constants";
 import { CategoryIcon } from "@/components/category-icon";
-import { Checklist } from "@/components/event/checklist";
-import { GuestList } from "@/components/event/guest-list";
 import type { Vendor } from "@/lib/types";
 import { EventMoodCover } from "@/components/event/event-mood-cover";
 import { EventStatusControls } from "@/components/event/event-status-controls";
+import { EventWorkspaceNav } from "@/components/event/event-workspace-nav";
 
 export default async function EventPage({
   params,
@@ -67,14 +66,14 @@ export default async function EventPage({
 
   const nextSteps: Array<{ title: string; description: string; href: string; action: string }> = [];
   if (!(inspirationPhotos ?? []).length) nextSteps.push({ title: "Give your event a look", description: "Add inspiration photos so your mood board becomes the visual home for this event.", href: `/events/${event.id}/edit`, action: "Add inspiration" });
-  if (!(guests ?? []).length) nextSteps.push({ title: "Start your guest list", description: "Add guests now so RSVPs and headcount stay organized in one place.", href: "#guests", action: "Add guests" });
+  if (!(guests ?? []).length) nextSteps.push({ title: "Start your guest list", description: "Add guests now so RSVPs and headcount stay organized in one place.", href: `/events/${event.id}/guests`, action: "Add guests" });
   if (!reqs.length) nextSteps.push({ title: "Build your event team", description: "Choose the services you need and Fleora will help you find matching vendors.", href: `/events/${event.id}/services`, action: "Choose services" });
   else if (stillNeeded > 0) {
     const firstNeeded = reqs.find((r) => !bookedCats.has(r.category));
     if (firstNeeded) nextSteps.push({ title: `Find your ${categoryLabel(firstNeeded.category)}`, description: `${stillNeeded} service${stillNeeded === 1 ? "" : "s"} still need a vendor for this event.`, href: `/events/${event.id}/matches/${firstNeeded.category}`, action: "Explore vendors" });
   }
   if (openQuotes.length) nextSteps.unshift({ title: "A quote needs your attention", description: `You have ${openQuotes.length} quote${openQuotes.length === 1 ? "" : "s"} ready to review.`, href: openQuotes.length === 1 ? `/quotes/${openQuotes[0].id}` : "#quotes", action: openQuotes.length === 1 ? "View quote" : "Review quotes" });
-  if (!nextSteps.length && (checklist ?? []).length > doneTasks) nextSteps.push({ title: "Keep the plan moving", description: `${(checklist ?? []).length - doneTasks} checklist item${(checklist ?? []).length - doneTasks === 1 ? "" : "s"} still to complete.`, href: "#checklist", action: "View checklist" });
+  if (!nextSteps.length && (checklist ?? []).length > doneTasks) nextSteps.push({ title: "Keep the plan moving", description: `${(checklist ?? []).length - doneTasks} checklist item${(checklist ?? []).length - doneTasks === 1 ? "" : "s"} still to complete.`, href: `/events/${event.id}/checklist`, action: "View checklist" });
 
   return (
     <div className="space-y-7">
@@ -176,18 +175,7 @@ export default async function EventPage({
         </Card>
       )}
 
-      <nav className="scroll-thin -mx-1 flex gap-1 overflow-x-auto px-1 pb-1">
-        {[
-          ["#vendors", "Event team"],
-          ["#quotes", `Quotes${openQuotes.length ? ` (${openQuotes.length})` : ""}`],
-          [`/events/${event.id}/payments`, "Payments"],
-          ["#guests", "Guests"],
-          ["#checklist", "Checklist"],
-          ["#messages", "Messages"],
-        ].map(([href, label], index) => (
-          <a key={href} href={href} className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${index === 0 ? "bg-plum-500 text-white" : "bg-white text-ink-600 shadow-sm hover:bg-plum-50 hover:text-plum-700"}`}>{label}</a>
-        ))}
-      </nav>
+      <EventWorkspaceNav eventId={event.id} active="home" />
 
       <section id="vendors" className="scroll-mt-28">
         <div>
@@ -227,8 +215,7 @@ export default async function EventPage({
         </div>
       </section>
 
-      <div className="grid gap-7 lg:grid-cols-[1.55fr_.75fr]">
-        <div className="space-y-8">
+      <div className="space-y-8">
           {openQuotes.length > 0 && (
             <section id="quotes" className="scroll-mt-28">
               <SectionHeader title="Quotes to review" eyebrow="Needs your attention" description="Compare your vendor quotes and book when you’re ready." />
@@ -256,25 +243,6 @@ export default async function EventPage({
               </div>
             </section>
           )}
-        </div>
-
-        <aside className="space-y-5">
-          <Card id="checklist" className="scroll-mt-28">
-            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">Planning</p><h3 className="mt-1 font-display text-xl text-ink-900">Checklist</h3></div><CheckIcon size={24} className="text-sage-700" /></div>
-            <Checklist eventId={event.id} items={checklist ?? []} />
-          </Card>
-
-          <Card id="guests" className="scroll-mt-28">
-            <div className="mb-4 flex items-center justify-between"><div><p className="fleora-kicker">People</p><h3 className="mt-1 font-display text-xl text-ink-900">Guest list</h3></div><UsersIcon size={24} className="text-[#9B5065]" /></div>
-            <GuestList eventId={event.id} guests={guests ?? []} rsvpTitle={event.rsvp_title ?? null} rsvpDeadline={event.rsvp_deadline ?? null} eventName={event.name} />
-          </Card>
-
-          <Card id="messages" variant="soft" className="scroll-mt-28">
-            <div className="mb-3 flex items-center gap-3"><span className="grid h-9 w-9 place-items-center rounded-xl bg-white text-plum-600 shadow-sm"><MessageIcon size={17} /></span><h3 className="font-display text-xl text-ink-900">Messages</h3></div>
-            <p className="text-sm leading-relaxed text-ink-600">Keep every vendor conversation attached to your planning experience.</p>
-            <Link href="/messages" className="mt-4 inline-flex text-sm font-bold text-plum-700 hover:underline">Open messages →</Link>
-          </Card>
-        </aside>
       </div>
     </div>
   );
