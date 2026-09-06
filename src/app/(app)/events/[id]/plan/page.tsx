@@ -9,19 +9,25 @@ import { SparkleIcon, ImageFrameIcon, UtensilsIcon, StoreIcon, MusicIcon, MapPin
 export default async function PartyPlanPage({ params }: { params: { id: string } }) {
   await requireProfile(); const supabase=createClient();
   const {data:event}=await supabase.from("events").select("*").eq("id",params.id).single(); if(!event) notFound();
-  const [{data:photos},{data:requests}]=await Promise.all([
+  const [{data:photos},{data:requests},{data:planItems}]=await Promise.all([
     supabase.from("event_inspiration_photos").select("id").eq("event_id",params.id),
     supabase.from("event_requests").select("id").eq("event_id",params.id),
+    supabase.from("event_plan_items").select("chapter,item_key,choice").eq("event_id",params.id),
   ]);
+  const decorItems=(planItems??[]).filter(item=>item.chapter==="decor");
+  const decorDecided=decorItems.filter(item=>item.choice!=="undecided").length;
   const chapters=[
     {title:"Vision",desc:"Theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:(photos??[]).length?"Started":"Start here",href:`/events/${event.id}/edit`,live:true},
-    {title:"Decor",desc:"Backdrops, tablescapes, signs, florals, favors and rentals.",icon:<SparkleIcon size={23}/>,status:"Next build",href:"#",live:false},
+    {title:"Decor",desc:"Backdrops, tablescapes, signs, florals, favors and rentals.",icon:<SparkleIcon size={23}/>,status:decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
     {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:"Coming soon",href:"#",live:false},
     {title:"Services",desc:"Photography, coordination, staffing, cleanup and more.",icon:<StoreIcon size={23}/>,status:(requests??[]).length?"Started":"Plan services",href:`/events/${event.id}/services`,live:true},
     {title:"Entertainment",desc:"DJ, photo booth, performers, kids entertainment and activities.",icon:<MusicIcon size={23}/>,status:"Coming soon",href:"#",live:false},
     {title:"Venue & Logistics",desc:"Venue needs, access, parking, setup, cleanup and important notes.",icon:<MapPinIcon size={23}/>,status:"Coming soon",href:"#",live:false},
   ];
-  const started=chapters.filter(c=>c.live && c.status==="Started").length; const pct=Math.round((started/chapters.length)*100);
+  const started=(photos??[]).length?1:0;
+  const decorProgress=decorItems.length ? decorDecided/decorItems.length : 0;
+  const servicesStarted=(requests??[]).length?1:0;
+  const pct=Math.round(((started+decorProgress+servicesStarted)/chapters.length)*100);
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/>
     <Card variant="feature" className="overflow-hidden bg-gradient-to-br from-plum-50 via-white to-blush-50">

@@ -147,6 +147,32 @@ export type Package = {
   price: number | null;
 };
 
+
+export type EventPlanItem = {
+  id: string;
+  event_id: string;
+  chapter: string;
+  item_key: string;
+  label: string;
+  choice: "diy" | "hire" | "undecided";
+  vendor_category: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type EventVendorNeed = {
+  id: string;
+  event_id: string;
+  plan_item_id: string | null;
+  category: string;
+  label: string;
+  status: "needed" | "searching" | "inquired" | "booked" | "dismissed";
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type EventRequest = {
   id: string;
   event_id: string;
@@ -331,6 +357,8 @@ export type Database = {
       services: TableDef<Service>;
       packages: TableDef<Package>;
       event_requests: TableDef<EventRequest>;
+      event_plan_items: TableDef<EventPlanItem>;
+      event_vendor_needs: TableDef<EventVendorNeed>;
       conversations: TableDef<Conversation>;
       messages: TableDef<Message>;
       quotes: TableDef<Quote>;

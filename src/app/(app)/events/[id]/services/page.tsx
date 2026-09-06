@@ -2,11 +2,12 @@ import { CategoryIcon } from "@/components/category-icon";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
-import { CATEGORY_GROUPS, categoriesInGroup, EVENT_TYPE_MAP } from "@/lib/constants";
+import { CATEGORY_GROUPS, categoriesInGroup, EVENT_TYPE_MAP, categoryLabel } from "@/lib/constants";
 import { Button, Card, Badge } from "@/components/ui";
 import { EventWorkspaceHeader } from "@/components/event/event-workspace-header";
 import { SparkleIcon } from "@/components/icons";
 import { money } from "@/lib/format";
+import Link from "next/link";
 import { saveServices } from "./actions";
 
 export default async function ServicesPage({ params }: { params: { id: string } }) {
@@ -16,7 +17,10 @@ export default async function ServicesPage({ params }: { params: { id: string } 
   const { data: event } = await supabase.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();
 
-  const { data: requests } = await supabase.from("event_requests").select("category").eq("event_id", params.id);
+  const [{ data: requests }, { data: vendorNeeds }] = await Promise.all([
+    supabase.from("event_requests").select("category").eq("event_id", params.id),
+    supabase.from("event_vendor_needs").select("id,label,category,status").eq("event_id", params.id).eq("status", "needed"),
+  ]);
   const chosen = new Set((requests ?? []).map((r) => r.category));
   const suggested = new Set(EVENT_TYPE_MAP[event.event_type]?.suggested ?? []);
   const budget = Number(event.budget ?? 0);
@@ -30,6 +34,21 @@ export default async function ServicesPage({ params }: { params: { id: string } 
         <h1 className="mt-1 font-display text-4xl text-ink-900">What can we help you find?</h1>
         <p className="mt-2 max-w-2xl text-sm text-ink-600">We pre-selected a thoughtful starting mix for {event.name}. Keep what you need, remove what you don’t, and add anything missing.</p>
       </div>
+
+      {(vendorNeeds ?? []).length > 0 && (
+        <Card variant="feature" className="border-plum-100 bg-plum-50/50">
+          <p className="fleora-kicker">From your Party Plan</p>
+          <h2 className="mt-1 font-display text-2xl text-ink-900">You already marked these as “Hire a vendor.”</h2>
+          <p className="mt-1 text-sm text-ink-600">They stay on your Vendor Needs list while you keep planning. You can start browsing now or wait until your whole plan is finished.</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {(vendorNeeds ?? []).map((need) => (
+              <Link key={need.id} href={`/events/${event.id}/matches/${need.category}`} className="rounded-full border border-plum-100 bg-white px-3 py-2 text-xs font-semibold text-plum-700 hover:bg-plum-50">
+                {need.label} · {categoryLabel(need.category)} →
+              </Link>
+            ))}
+          </div>
+        </Card>
+      )}
 
       <div className="mb-5 flex items-start gap-3 rounded-2xl border border-blush-200 bg-blush-50/70 p-4">
         <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white text-plum-600 shadow-sm"><SparkleIcon size={18} /></span>
