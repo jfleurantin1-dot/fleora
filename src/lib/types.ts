@@ -354,7 +354,22 @@ export type Database = {
       };
       get_public_rsvp: {
         Args: { p_token: string };
-        Returns: Array<{ guest_name: string; party_size: number; rsvp: RsvpStatus; dietary: string | null; plus_one_name: string | null; event_name: string; event_date: string | null; event_location: string | null }>;
+        Returns: Array<{
+          guest_name: string;
+          invitation_name: string;
+          party_size: number;
+          invited_party_size: number;
+          rsvp: RsvpStatus;
+          dietary: string | null;
+          plus_one_name: string | null;
+          plus_one_allowed: boolean;
+          event_name: string;
+          rsvp_title: string | null;
+          event_date: string | null;
+          event_location: string | null;
+          rsvp_deadline: string | null;
+          rsvp_closed: boolean;
+        }>;
       };
       submit_public_rsvp: {
         Args: { p_token: string; p_rsvp: RsvpStatus; p_party_size: number; p_dietary?: string | null; p_plus_one_name?: string | null };
