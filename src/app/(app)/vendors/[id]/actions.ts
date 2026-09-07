@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
+import { sendFleoraEmail } from "@/lib/email";
+import { notifyFleoraAdmins } from "@/lib/admin-notifications";
 
 export type ClaimState = { ok?: boolean; error?: string };
 
@@ -33,6 +35,36 @@ export async function requestVendorClaim(
     { onConflict: "vendor_id,claimant_id" },
   );
   if (error) return { error: error.message };
+
+  await supabase.from("notifications").insert({
+    user_id: profile.id,
+    kind: "vendor_claim",
+    title: "Business claim submitted",
+    body: `Your claim for ${vendor.business_name} is awaiting Fleora review. We’ll notify you when a decision is made.`,
+    href: `/vendors/${vendorId}`,
+  });
+
+  await notifyFleoraAdmins({
+    title: "Business claim awaiting approval",
+    body: `${profile.first_name ?? "A vendor"}${profile.last_name ? ` ${profile.last_name}` : ""} submitted a claim for ${vendor.business_name}.`,
+    href: "/admin#claim-requests",
+    emailSubject: `Business claim awaiting approval: ${vendor.business_name}`,
+    emailHeading: "A business claim needs your review",
+    emailBody: `${profile.first_name ?? "A vendor"}${profile.last_name ? ` ${profile.last_name}` : ""} submitted a claim for ${vendor.business_name}. Review the claim in Fleora Admin.`,
+    emailCtaLabel: "Review business claim",
+  });
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user?.email) {
+    await sendFleoraEmail({
+      to: user.email,
+      subject: `We received your claim for ${vendor.business_name}`,
+      heading: "Your business claim is under review",
+      body: `We received your request to claim ${vendor.business_name}. Fleora will review the request and notify you as soon as it’s approved or declined.`,
+      ctaLabel: "View business profile",
+      ctaHref: `/vendors/${vendorId}`,
+    });
+  }
 
   revalidatePath(`/vendors/${vendorId}`);
   revalidatePath("/admin");

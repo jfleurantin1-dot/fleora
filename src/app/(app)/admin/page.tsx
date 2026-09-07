@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { CopyClaimLink } from "./copy-claim-link";
 import { redirect } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
@@ -73,7 +72,7 @@ export default async function AdminPage() {
         <AddVendorForm />
       </section>
 
-      <section>
+      <section id="claim-requests" className="scroll-mt-24">
         <div className="mb-3 flex items-end justify-between gap-3">
           <div><p className="fleora-kicker">Ownership</p><h2 className="font-display text-2xl text-ink-900">Profile claim requests</h2></div>
           <Badge tone={pendingClaims.length ? "amber" : "green"}>{pendingClaims.length} pending</Badge>
@@ -133,7 +132,7 @@ export default async function AdminPage() {
                 <div className="mt-2 flex flex-wrap items-center gap-2"><Stars rating={v.rating} count={v.review_count} />{(catMap.get(v.id) ?? []).slice(0, 5).map((c) => <Badge key={c} tone="slate">{categoryLabel(c)}</Badge>)}</div>
               </div>
               <div className="flex flex-wrap gap-2">
-                <Link href={`/vendors/${v.id}`} className="inline-flex min-h-9 items-center rounded-xl border border-plum-200 bg-white px-3 py-1.5 text-sm font-semibold text-plum-700">View profile</Link>{!v.user_id && <CopyClaimLink vendorId={v.id} />}
+                <Link href={`/vendors/${v.id}`} className="inline-flex min-h-9 items-center rounded-xl border border-plum-200 bg-white px-3 py-1.5 text-sm font-semibold text-plum-700">View profile</Link>
                 {v.status !== "approved" ? <form action={setVendorStatus.bind(null, v.id, "approved")}><Button type="submit" size="sm" variant="secondary">Approve</Button></form> : <form action={setVendorStatus.bind(null, v.id, "suspended")}><Button type="submit" size="sm" variant="secondary">Suspend</Button></form>}
               </div>
             </Card>

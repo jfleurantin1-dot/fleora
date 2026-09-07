@@ -38,7 +38,6 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
             </form>
             <p className="text-center text-sm text-ink-600">New to Fleora? <Link href="/signup" className="font-semibold text-plum-700 hover:underline">Create an account</Link></p>
           </Card>
-          <p className="mt-4 text-center text-[11px] text-ink-400">Demo: jerrica@example.com · password <code>fleora123</code></p>
         </div>
       </div>
     </main>
