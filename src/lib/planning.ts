@@ -77,9 +77,9 @@ export const ENTERTAINMENT_PLAN_ITEMS: EntertainmentPlanDefinition[] = [
   { key: "dj", label: "DJ", description: "Keep the party moving with music, announcements and a dance-floor soundtrack.", vendorCategory: "dj" },
   { key: "live_music", label: "Live music / band", description: "Add a band, musician or live musical performance to your event.", vendorCategory: "musician" },
   { key: "kids_entertainment", label: "Kids entertainment", description: "Characters, magicians, balloon artists and other entertainment designed for younger guests.", vendorCategory: "kids_entertainment" },
-  { key: "performers", label: "Performers", description: "Dancers, singers and specialty performers who create a memorable live moment.", vendorCategory: "performer" },
-  { key: "games_activities", label: "Games & activities", description: "Lawn games, casino tables, arcade games and interactive activities for your guests.", vendorCategory: "games_activities" },
-  { key: "inflatables", label: "Bounce house / inflatables", description: "Bounce houses, obstacle courses, slides and other inflatable attractions.", vendorCategory: "inflatables" },
-  { key: "event_experiences", label: "Event experiences", description: "Caricature artists, live painting, permanent jewelry, charm bars, cigar rollers and other interactive experiences.", vendorCategory: "event_experience" },
+  { key: "performers", label: "Performers", description: "Dancers, singers and specialty performers who create a memorable live moment.", vendorCategory: "custom_service" },
+  { key: "games_activities", label: "Games & activities", description: "Lawn games, casino tables, arcade games and interactive activities for your guests.", vendorCategory: "specialty_rentals" },
+  { key: "inflatables", label: "Bounce house / inflatables", description: "Bounce houses, obstacle courses, slides and other inflatable attractions.", vendorCategory: "specialty_rentals" },
+  { key: "event_experiences", label: "Event experiences", description: "Caricature artists, live painting, permanent jewelry, charm bars, cigar rollers and other interactive experiences.", vendorCategory: "custom_service" },
   { key: "other_custom_entertainment", label: "Other / custom entertainment", description: "Add an entertainment idea that is not listed above.", vendorCategory: "custom_service" },
 ];
