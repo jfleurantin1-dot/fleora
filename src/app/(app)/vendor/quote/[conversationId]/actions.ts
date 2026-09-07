@@ -25,6 +25,7 @@ export async function sendQuote(
     .eq("id", conversationId)
     .single();
   if (!convo) return { error: "Conversation not found." };
+  if (String((convo as any).client_inquiry_status ?? "active") === "cancelled" || String((convo as any).vendor_inquiry_status ?? "active") === "declined") return { error: "This inquiry is closed and can no longer be quoted." };
 
   const category = String(formData.get("category") ?? "").trim();
   if (!category) return { error: "Pick which service this quote covers." };

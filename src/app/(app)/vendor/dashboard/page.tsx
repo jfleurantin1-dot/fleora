@@ -19,7 +19,7 @@ export default async function VendorDashboard(){
   supabase.from("packages").select("id").eq("vendor_id",vendor.id),
  ]);
  type EventBrief=NonNullable<typeof events>[number]; const eventMap=new Map<string,EventBrief>(); for(const e of events??[]) eventMap.set(e.id,e);
- const quotedEventIds=new Set((quotes??[]).map(q=>q.event_id)); const newLeads=(convos??[]).filter(c=>!quotedEventIds.has(c.event_id)); const activeBookings=(bookings??[]).filter(b=>b.status!=="cancelled"); const upcoming=activeBookings.filter(b=>{const d=eventMap.get(b.event_id)?.event_date;return d&&d>=today}); const upcomingRevenue=upcoming.reduce((s,b)=>s+Number(b.total),0);
+ const quotedEventIds=new Set((quotes??[]).map(q=>q.event_id)); const newLeads=(convos??[]).filter((c:any)=>!quotedEventIds.has(c.event_id)&&c.vendor_inquiry_status!=="declined"&&c.client_inquiry_status!=="cancelled"); const activeBookings=(bookings??[]).filter(b=>b.status!=="cancelled"); const upcoming=activeBookings.filter(b=>{const d=eventMap.get(b.event_id)?.event_date;return d&&d>=today}); const upcomingRevenue=upcoming.reduce((s,b)=>s+Number(b.total),0);
  const checks=[
   {label:"Business description",done:Boolean(vendor.description),detail:"Tell clients what makes you different."},
   {label:"Service area",done:Boolean(vendor.location),detail:"Add your home base and coverage area."},

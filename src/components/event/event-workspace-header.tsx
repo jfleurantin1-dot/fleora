@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { CalendarIcon, MapPinIcon } from "@/components/icons";
-import { shortDate } from "@/lib/format";
+import { shortDate, timeRange } from "@/lib/format";
 import { EventWorkspaceNav } from "./event-workspace-nav";
 
 export function EventWorkspaceHeader({ event, active, eyebrow }: { event: any; active: string; eyebrow?: string }) {
@@ -10,7 +10,7 @@ export function EventWorkspaceHeader({ event, active, eyebrow }: { event: any; a
         <p className="fleora-kicker">{eyebrow ?? "Event workspace"}</p>
         <Link href={`/events/${event.id}`} className="mt-1 block font-display text-3xl text-ink-900 hover:text-plum-700">{event.name}</Link>
         <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-ink-500">
-          <span className="inline-flex items-center gap-1.5"><CalendarIcon size={15}/>{shortDate(event.event_date)}</span>
+          <span className="inline-flex items-center gap-1.5"><CalendarIcon size={15}/>{shortDate(event.event_date)} · {timeRange(event.event_start_time, event.event_end_time)}</span>
           <span className="inline-flex items-center gap-1.5"><MapPinIcon size={15}/>{event.location ?? "Location TBD"}</span>
         </div>
       </div>

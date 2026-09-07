@@ -17,6 +17,8 @@ export async function createEvent(_prev: NewEventState, formData: FormData): Pro
   const name = String(formData.get("name") ?? "").trim();
   const eventType = String(formData.get("event_type") ?? "custom");
   const eventDate = String(formData.get("event_date") ?? "") || null;
+  const eventStartTime = String(formData.get("event_start_time") ?? "") || null;
+  const eventEndTime = String(formData.get("event_end_time") ?? "") || null;
   const location = String(formData.get("location") ?? "").trim() || null;
   const guestCount = Number(formData.get("guest_count")) || null;
   const budget = Number(formData.get("budget")) || null;
@@ -27,13 +29,14 @@ export async function createEvent(_prev: NewEventState, formData: FormData): Pro
 
   const coords = location ? geocodeMa(location) : null;
 
-  const { data: event, error } = await supabase
-    .from("events")
+  const { data: event, error } = await (supabase.from("events") as any)
     .insert({
       client_id: user.id,
       name,
       event_type: eventType,
       event_date: eventDate,
+      event_start_time: eventStartTime,
+      event_end_time: eventEndTime,
       location,
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
@@ -62,5 +65,5 @@ export async function createEvent(_prev: NewEventState, formData: FormData): Pro
   }
 
   revalidatePath("/dashboard");
-  redirect(`/events/${event.id}/services`);
+  redirect(`/events/${event.id}/plan`);
 }

@@ -19,6 +19,22 @@ export function shortDate(d: string | null | undefined): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
+export function shortTime(t: string | null | undefined): string {
+  if (!t) return "Time TBD";
+  const [hRaw, mRaw = "00"] = t.split(":");
+  const h = Number(hRaw);
+  const m = Number(mRaw);
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return "Time TBD";
+  const suffix = h >= 12 ? "PM" : "AM";
+  const hour = h % 12 || 12;
+  return `${hour}:${String(m).padStart(2, "0")} ${suffix}`;
+}
+
+export function timeRange(start: string | null | undefined, end?: string | null): string {
+  if (!start) return "Time TBD";
+  return end ? `${shortTime(start)} – ${shortTime(end)}` : shortTime(start);
+}
+
 export function relativeDay(d: string | null | undefined): string {
   if (!d) return "";
   const date = new Date(d + (d.length === 10 ? "T00:00:00" : ""));

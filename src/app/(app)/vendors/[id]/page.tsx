@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/auth";
 import { Badge, ButtonLink, Card, Stars } from "@/components/ui";
 import { ArrowLeftIcon, MapPinIcon } from "@/components/icons";
-import { money, shortDate } from "@/lib/format";
+import { money, shortDate, timeRange } from "@/lib/format";
 import { categoryLabel, EVENT_TYPE_MAP } from "@/lib/constants";
 import { requestQuote } from "@/app/(app)/events/[id]/matches/[category]/actions";
 import { ClaimForm } from "./claim-form";
@@ -79,8 +79,8 @@ export default async function VendorProfile({ params, searchParams }: { params: 
             <p className="fleora-kicker">Ready to connect?</p>
             <h2 className="mt-2 font-display text-2xl text-ink-900">{hasContext ? "Request a quote" : `Add ${vendor.business_name} to your event.`}</h2>
             {hasContext ? <>
-              <div className="mt-4 rounded-xl bg-plum-50 p-3 text-xs leading-6 text-ink-600"><p className="font-bold text-ink-900">Inquiry summary</p><p>Event type: {eventTypeLabel}</p><p>Service needed: {categoryLabel(category!)}</p><p>Date: {shortDate(contextEvent!.event_date)}</p><p>Location: {contextEvent!.location ?? "TBD"}</p><p>Guests: {contextEvent!.guest_count ?? "TBD"}</p></div>
-              <form action={requestQuote.bind(null,eventId!,category!,vendor.id)} className="mt-4"><label className="text-xs font-bold uppercase tracking-wide text-ink-500">Your message</label><p className="mt-1 text-xs text-ink-500">We started it for you — edit it however you’d like.</p><textarea name="message" rows={6} defaultValue={`Hi! I’d love to get a quote for ${categoryLabel(category!)} for my event. Please let me know about your availability and pricing. Thank you!`} className="mt-2 w-full rounded-xl border border-plum-100 bg-white px-3 py-2.5 text-sm"/><button type="submit" className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-plum-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-plum-700">Send Request</button></form>
+              <div className="mt-4 rounded-xl bg-plum-50 p-3 text-xs leading-6 text-ink-600"><p className="font-bold text-ink-900">Inquiry summary</p><p>Event type: {eventTypeLabel}</p><p>Service needed: {categoryLabel(category!)}</p><p>Date: {shortDate(contextEvent!.event_date)}</p><p>Time: {timeRange((contextEvent as any).event_start_time,(contextEvent as any).event_end_time)}</p><p>Location: {contextEvent!.location ?? "TBD"}</p><p>Guests: {contextEvent!.guest_count ?? "TBD"}</p></div>
+              <form action={requestQuote.bind(null,eventId!,category!,vendor.id)} className="mt-4"><label className="text-xs font-bold uppercase tracking-wide text-ink-500">Your message</label><p className="mt-1 text-xs text-ink-500">This is your personal note to the vendor. Fleora shares the event details separately.</p><textarea name="message" rows={6} defaultValue={`Hi! I’d love to get a quote for ${categoryLabel(category!)} for my event. Please let me know about your availability and pricing. Thank you!`} className="mt-2 w-full rounded-xl border border-plum-100 bg-white px-3 py-2.5 text-sm"/><button type="submit" className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-plum-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-plum-700">Send Request</button></form>
             </> : <>
               <p className="mt-2 text-sm leading-relaxed text-ink-600">Choose the event you&apos;re planning and Fleora will connect the request to it.</p>
               <ButtonLink href="/events" className="mt-5 w-full">Choose an event</ButtonLink>

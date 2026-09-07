@@ -6,7 +6,7 @@ import { money, shortDate } from "@/lib/format";
 
 export default async function VendorLeads(){
  const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=createClient();
- const {data:convos}=await supabase.from("conversations").select("*").eq("vendor_id",vendor.id).order("created_at",{ascending:false}); const allList=(convos??[]) as any[]; const declined=allList.filter(c=>c.vendor_inquiry_status==="declined"); const list=allList.filter(c=>c.vendor_inquiry_status!=="declined");
+ const {data:convos}=await supabase.from("conversations").select("*").eq("vendor_id",vendor.id).order("created_at",{ascending:false}); const allList=(convos??[]) as any[]; const declined=allList.filter(c=>c.vendor_inquiry_status==="declined"&&c.client_inquiry_status!=="cancelled"); const cancelled=allList.filter(c=>c.client_inquiry_status==="cancelled"); const list=allList.filter(c=>c.vendor_inquiry_status!=="declined"&&c.client_inquiry_status!=="cancelled");
  const eventIds=[...new Set(allList.map(c=>c.event_id))] as string[];
  const [{data:events},{data:quotes},{data:bookings}] = await Promise.all([
   supabase.from("events").select("id,name,event_date,location,guest_count,budget,style").in("id",eventIds.length?eventIds:["00000000-0000-0000-0000-000000000000"]),
@@ -22,7 +22,7 @@ export default async function VendorLeads(){
  {!list.length?<Empty title="No leads yet">When a client reaches out about an event, the opportunity will appear here with their date, location, guest count and budget.</Empty>:<div className="space-y-8">
   <LeadSection title="Needs your response" subtitle="Start here — these clients are waiting to hear from you." conversations={needsQuote} eventMap={eventMap} quoteByEvent={quoteByEvent} bookingByEvent={bookingByEvent}/>
   <LeadSection title="Quotes sent" subtitle="You’ve responded. Keep the conversation moving." conversations={quoted} eventMap={eventMap} quoteByEvent={quoteByEvent} bookingByEvent={bookingByEvent}/>
-  <LeadSection title="Booked" subtitle="Leads that became real Fleora bookings." conversations={booked} eventMap={eventMap} quoteByEvent={quoteByEvent} bookingByEvent={bookingByEvent}/><LeadSection title="Declined" subtitle="Opportunities you chose not to take." conversations={declined} eventMap={eventMap} quoteByEvent={quoteByEvent} bookingByEvent={bookingByEvent}/>
+  <LeadSection title="Booked" subtitle="Leads that became real Fleora bookings." conversations={booked} eventMap={eventMap} quoteByEvent={quoteByEvent} bookingByEvent={bookingByEvent}/><LeadSection title="Cancelled by client" subtitle="Requests the client decided not to continue." conversations={cancelled} eventMap={eventMap} quoteByEvent={quoteByEvent} bookingByEvent={bookingByEvent}/><LeadSection title="Declined" subtitle="Opportunities you chose not to take." conversations={declined} eventMap={eventMap} quoteByEvent={quoteByEvent} bookingByEvent={bookingByEvent}/>
  </div>}
  </div>;
 }

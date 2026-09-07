@@ -14,7 +14,7 @@ function Submit() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={pending}>
-      {pending ? "Creating your plan…" : "Create my event plan"}
+      {pending ? "Creating your party plan…" : "Create my party plan"}
     </Button>
   );
 }
@@ -25,6 +25,8 @@ export default function NewEventPage() {
   const [eventType, setEventType] = useState("birthday");
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
   const [location, setLocation] = useState("");
   const [guestCount, setGuestCount] = useState("");
   const [budget, setBudget] = useState("");
@@ -32,7 +34,7 @@ export default function NewEventPage() {
   const [customPalette, setCustomPalette] = useState("");
   const [inspoPreviews, setInspoPreviews] = useState<string[]>([]);
 
-  const canContinueDetails = name.trim().length > 0;
+  const canContinueDetails = name.trim().length > 0 && startTime.length > 0;
   const finalPalette = customPalette.trim();
 
   function previewInspo(e: ChangeEvent<HTMLInputElement>) {
@@ -77,6 +79,8 @@ export default function NewEventPage() {
         <input type="hidden" name="event_type" value={eventType} />
         <input type="hidden" name="name" value={name} />
         <input type="hidden" name="event_date" value={date} />
+        <input type="hidden" name="event_start_time" value={startTime} />
+        <input type="hidden" name="event_end_time" value={endTime} />
         <input type="hidden" name="location" value={location} />
         <input type="hidden" name="guest_count" value={guestCount} />
         <input type="hidden" name="budget" value={budget} />
@@ -119,16 +123,25 @@ export default function NewEventPage() {
                 <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Jerrica's 36th Birthday" autoFocus />
               </label>
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-5 sm:grid-cols-3">
                 <label className="block space-y-1.5">
                   <span className="text-sm font-semibold text-ink-900">Date</span>
                   <Input value={date} onChange={(e) => setDate(e.target.value)} type="date" />
                 </label>
                 <label className="block space-y-1.5">
-                  <span className="text-sm font-semibold text-ink-900">Location</span>
-                  <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, State" />
+                  <span className="text-sm font-semibold text-ink-900">Start time</span>
+                  <Input value={startTime} onChange={(e) => setStartTime(e.target.value)} type="time" required />
+                </label>
+                <label className="block space-y-1.5">
+                  <span className="text-sm font-semibold text-ink-900">End time <span className="font-normal text-ink-400">(optional)</span></span>
+                  <Input value={endTime} onChange={(e) => setEndTime(e.target.value)} type="time" />
                 </label>
               </div>
+
+              <label className="block space-y-1.5">
+                <span className="text-sm font-semibold text-ink-900">Location</span>
+                <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="City, State" />
+              </label>
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block space-y-1.5">

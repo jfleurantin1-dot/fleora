@@ -12,12 +12,13 @@ export async function updateEvent(eventId: string, fd: FormData) {
   const locationType = String(fd.get("location_type") ?? "tbd");
   const needsVenue = fd.get("needs_venue") === "on";
 
-  await s
-    .from("events")
+  await (s.from("events") as any)
     .update({
       name: String(fd.get("name") ?? "").trim(),
       event_type: String(fd.get("event_type") ?? "custom"),
       event_date: String(fd.get("event_date") ?? "") || null,
+      event_start_time: String(fd.get("event_start_time") ?? "") || null,
+      event_end_time: String(fd.get("event_end_time") ?? "") || null,
       location,
       location_type: locationType,
       needs_venue: needsVenue,
