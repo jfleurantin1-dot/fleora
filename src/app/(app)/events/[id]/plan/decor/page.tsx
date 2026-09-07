@@ -75,8 +75,8 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
 
                 <div data-plan-details-for={item.key} className="mt-5 border-t fleora-divider pt-4">
                   <p className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-400">How will you handle it?</p>
-                  <div className="grid gap-2 sm:grid-cols-3">
-                    {(["diy", "hire", "undecided"] as PlanChoice[]).map((option) => (
+                  <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                    {(["diy", "hire", "existing", "undecided"] as PlanChoice[]).map((option) => (
                       <label key={option} className="flex cursor-pointer items-center gap-2 rounded-xl border border-plum-100 bg-white px-3 py-2.5 text-xs font-semibold text-ink-700 hover:bg-plum-50">
                         <input type="radio" name={`choice__${item.key}`} value={option} defaultChecked={choice === option} className="text-plum-600 focus:ring-plum-400" />
                         {planChoiceLabel(option)}
@@ -86,7 +86,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
                   {item.vendorCategory && <p className="mt-2 text-[11px] text-ink-400">Hire option → {categoryLabel(item.vendorCategory)} vendor need</p>}
                   {item.key === "other_custom" && <input name="custom_label__other_custom" defaultValue={row?.label === item.label ? "" : row?.label ?? ""} placeholder="What are you planning? e.g. Champagne wall" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />}
                   <textarea name={`notes__${item.key}`} defaultValue={row?.notes ?? ""} rows={2} placeholder="Optional notes — size, quantity, style, ideas…" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />
-                  {row ? <DecorPhotoManager eventId={event.id} planItemId={row.id} photos={photosByItem.get(row.id) ?? []} /> : <p className="mt-3 rounded-xl bg-ivory-50 px-3 py-2 text-[11px] text-ink-500">Save this decor selection once to unlock item-specific inspiration uploads.</p>}
+                  <DecorPhotoManager eventId={event.id} planItemId={row?.id ?? null} itemKey={item.key} photos={row ? photosByItem.get(row.id) ?? [] : []} />
                 </div>
               </Card>
             );

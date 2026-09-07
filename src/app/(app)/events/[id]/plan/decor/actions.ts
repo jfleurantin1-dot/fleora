@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DECOR_PLAN_ITEMS, type PlanChoice } from "@/lib/planning";
 
-const VALID_CHOICES = new Set<PlanChoice>(["diy", "hire", "undecided"]);
+const VALID_CHOICES = new Set<PlanChoice>(["diy", "hire", "existing", "undecided"]);
 
 export async function saveDecorPlan(eventId: string, formData: FormData) {
   const supabase = createClient();
@@ -60,26 +60,36 @@ export async function saveDecorPlan(eventId: string, formData: FormData) {
   redirect(`/events/${eventId}/plan/decor?saved=1`);
 }
 
-export async function uploadDecorPhotos(eventId: string, planItemId: string, fd: FormData): Promise<{ error?: string }> {
+export async function uploadDecorPhotos(eventId: string, planItemId: string | null, itemKey: string, fd: FormData): Promise<{ error?: string; planItemId?: string; photos?: {id:string;url:string;sort:number}[] }> {
   const s = createClient();
   const { data: { user } } = await s.auth.getUser();
   if (!user) return { error: "Please sign in again before uploading." };
+  const def = DECOR_PLAN_ITEMS.find((item) => item.key === itemKey);
+  if (!def) return { error: "That decor item could not be found." };
+  let id = planItemId;
+  if (!id) {
+    const { data: row, error } = await s.from("event_plan_items").upsert({event_id:eventId,chapter:"decor",item_key:def.key,label:def.label,choice:"undecided",vendor_category:def.vendorCategory,notes:null,updated_at:new Date().toISOString()},{onConflict:"event_id,chapter,item_key"}).select("id").single();
+    if (error || !row) return { error: error?.message ?? "Could not prepare this decor item for photos." };
+    id = row.id;
+  }
   const files = fd.getAll("photos").filter((v): v is File => v instanceof File && v.size > 0).slice(0, 6);
-  if (!files.length) return {};
-  const { data: existing } = await s.from("event_plan_item_photos").select("sort").eq("plan_item_id", planItemId).order("sort", { ascending: false }).limit(1);
+  const { data: existing } = await s.from("event_plan_item_photos").select("sort").eq("plan_item_id", id).order("sort", { ascending: false }).limit(1);
   let sort = (existing?.[0]?.sort ?? -1) + 1;
+  const uploaded:{id:string;url:string;sort:number}[]=[];
   for (const file of files) {
     if (!file.type.startsWith("image/")) continue;
     if (file.size > 10_000_000) return { error: `${file.name} is larger than 10 MB.` };
     const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `${user.id}/${eventId}/decor/${planItemId}/${crypto.randomUUID()}.${ext}`;
+    const path = `${user.id}/${eventId}/decor/${id}/${crypto.randomUUID()}.${ext}`;
     const { error: uploadError } = await s.storage.from("event-inspiration").upload(path, file, { contentType: file.type, upsert: false });
     if (uploadError) return { error: uploadError.message };
     const { data: publicUrl } = s.storage.from("event-inspiration").getPublicUrl(path);
-    const { error: insertError } = await s.from("event_plan_item_photos").insert({ event_id: eventId, plan_item_id: planItemId, url: publicUrl.publicUrl, sort: sort++ });
-    if (insertError) return { error: insertError.message };
+    const currentSort=sort++;
+    const { data: photo, error: insertError } = await s.from("event_plan_item_photos").insert({ event_id: eventId, plan_item_id: id, url: publicUrl.publicUrl, sort: currentSort }).select("id,url,sort").single();
+    if (insertError || !photo) return { error: insertError?.message ?? "Could not save the uploaded photo." };
+    uploaded.push(photo);
   }
-  revalidatePath(`/events/${eventId}/plan/decor`); return {};
+  revalidatePath(`/events/${eventId}/plan/decor`); return {planItemId:id,photos:uploaded};
 }
 
 export async function removeDecorPhoto(eventId: string, planItemId: string, photoId: string) {

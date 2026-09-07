@@ -1,16 +1,15 @@
 "use client";
 import { ChangeEvent, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { removeDecorPhoto, uploadDecorPhotos } from "@/app/(app)/events/[id]/plan/decor/actions";
 
 type Photo={id:string;url:string;sort:number};
-export function DecorPhotoManager({eventId,planItemId,photos}:{eventId:string;planItemId:string;photos:Photo[]}){
- const router=useRouter(); const [pending,startTransition]=useTransition(); const [status,setStatus]=useState<string|null>(null);
- async function pick(e:ChangeEvent<HTMLInputElement>){const files=Array.from(e.target.files??[]).slice(0,6);if(!files.length)return;const fd=new FormData();files.forEach(f=>fd.append("photos",f));setStatus("Uploading…");startTransition(async()=>{const r=await uploadDecorPhotos(eventId,planItemId,fd);setStatus(r?.error??"Photos saved ✓");e.target.value="";router.refresh();});}
- function remove(id:string){startTransition(async()=>{await removeDecorPhoto(eventId,planItemId,id);router.refresh();});}
+export function DecorPhotoManager({eventId,planItemId,itemKey,photos}:{eventId:string;planItemId?:string|null;itemKey:string;photos:Photo[]}){
+ const [pending,startTransition]=useTransition(); const [status,setStatus]=useState<string|null>(null); const [currentPlanItemId,setCurrentPlanItemId]=useState(planItemId??null); const [localPhotos,setLocalPhotos]=useState(photos);
+ async function pick(e:ChangeEvent<HTMLInputElement>){const files=Array.from(e.target.files??[]).slice(0,6);if(!files.length)return;const fd=new FormData();files.forEach(f=>fd.append("photos",f));setStatus("Uploading…");startTransition(async()=>{const r=await uploadDecorPhotos(eventId,currentPlanItemId,itemKey,fd);if(r?.error){setStatus(r.error);}else{if(r?.planItemId)setCurrentPlanItemId(r.planItemId);if(r?.photos?.length)setLocalPhotos(prev=>[...prev,...r.photos!]);setStatus("Photos saved ✓");}e.target.value="";});}
+ function remove(photoId:string){if(!currentPlanItemId)return;startTransition(async()=>{await removeDecorPhoto(eventId,currentPlanItemId,photoId);setLocalPhotos(prev=>prev.filter(p=>p.id!==photoId));});}
  return <div className="mt-4 rounded-xl border border-plum-100 bg-plum-50/30 p-3">
-   <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold text-ink-800">Inspiration for this item</p><p className="text-[11px] text-ink-500">These photos stay attached to this request for future vendor inquiries.</p></div>{status&&<span className="text-[10px] font-semibold text-plum-700">{status}</span>}</div>
-   {photos.length>0&&<div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">{photos.map(p=><div key={p.id} className="group relative overflow-hidden rounded-lg"><img src={p.url} alt="Item inspiration" className="aspect-square w-full object-cover"/><button type="button" disabled={pending} onClick={()=>remove(p.id)} className="absolute right-1 top-1 rounded-full bg-white/95 px-1.5 py-0.5 text-[9px] font-bold text-rose-600">×</button></div>)}</div>}
+   <div className="flex items-center justify-between gap-3"><div><p className="text-xs font-bold text-ink-800">Inspiration for this item</p><p className="text-[11px] text-ink-500">Add inspiration as soon as you select this item — no chapter save required.</p></div>{status&&<span className="text-[10px] font-semibold text-plum-700">{status}</span>}</div>
+   {localPhotos.length>0&&<div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">{localPhotos.map(p=><div key={p.id} className="group relative overflow-hidden rounded-lg"><img src={p.url} alt="Item inspiration" className="aspect-square w-full object-cover"/><button type="button" disabled={pending} onClick={()=>remove(p.id)} className="absolute right-1 top-1 rounded-full bg-white/95 px-1.5 py-0.5 text-[9px] font-bold text-rose-600">×</button></div>)}</div>}
    <label className="mt-3 block cursor-pointer rounded-lg border border-dashed border-plum-200 bg-white px-3 py-2 text-center text-xs font-bold text-plum-700 hover:bg-plum-50">＋ Add inspiration photos<input type="file" multiple accept="image/jpeg,image/png,image/webp,image/gif" className="sr-only" onChange={pick} disabled={pending}/></label>
  </div>;
 }

@@ -1,6 +1,6 @@
 import type { CategoryKey } from "@/lib/constants";
 
-export type PlanChoice = "diy" | "hire" | "undecided";
+export type PlanChoice = "diy" | "hire" | "existing" | "undecided";
 
 export type DecorPlanDefinition = {
   key: string;
@@ -11,7 +11,7 @@ export type DecorPlanDefinition = {
 
 export const DECOR_PLAN_ITEMS: DecorPlanDefinition[] = [
   { key: "welcome_sign", label: "Welcome sign", description: "A statement sign to greet guests and introduce the event style.", vendorCategory: "signage" },
-  { key: "focal_backdrop", label: "Focal backdrop", description: "The main photo moment, feature wall or focal installation.", vendorCategory: "backdrops" },
+  { key: "focal_backdrop", label: "Focal backdrop", description: "Plan your feature wall, flower wall, arches, or focal installation.", vendorCategory: "backdrops" },
   { key: "table_setup", label: "Table setup / tablescape", description: "The complete tabletop look — linens, place settings, napkins and styling.", vendorCategory: "dinnerware" },
   { key: "centerpieces", label: "Centerpieces", description: "Florals, candles, bud vases or statement pieces for guest tables.", vendorCategory: "event_styling" },
   { key: "balloons", label: "Balloon decor", description: "Garlands, arches, columns or custom balloon installations.", vendorCategory: "balloons" },
@@ -20,7 +20,7 @@ export const DECOR_PLAN_ITEMS: DecorPlanDefinition[] = [
   { key: "other_custom", label: "Other / custom", description: "Something unique that isn't listed above — tell Fleora what you're planning.", vendorCategory: "event_styling" },
 ];
 
-export type FoodDrinkGroup = "food" | "drinks";
+export type FoodDrinkGroup = "food" | "dessert" | "drinks";
 export type FoodDrinkPlanDefinition = {
   key: string;
   label: string;
@@ -36,7 +36,14 @@ export const FOOD_DRINK_PLAN_ITEMS: FoodDrinkPlanDefinition[] = [
   { key: "potluck", label: "Potluck", description: "Build a shared list of dishes and keep track of who is bringing what.", group: "food", vendorCategory: null, mode: "potluck" },
   { key: "food_truck", label: "Food truck", description: "Bring a mobile food concept directly to your event.", group: "food", vendorCategory: "food_truck", mode: "hire_only" },
   { key: "charcuterie", label: "Charcuterie", description: "Create your own grazing spread or hire a charcuterie vendor.", group: "food", vendorCategory: "charcuterie", mode: "diy_or_hire" },
-  { key: "cake_treats", label: "Cake & treats", description: "Plan the cake, cupcakes, cookies, cake pops or other sweets — handle them yourself or hire a baker / dessert vendor.", group: "food", vendorCategory: "cake", mode: "diy_or_hire" },
+
+  { key: "cake", label: "Cake", description: "Plan your celebration cake — make or source it yourself, or hire a baker.", group: "dessert", vendorCategory: "cake", mode: "diy_or_hire" },
+  { key: "cupcakes", label: "Cupcakes", description: "Add cupcakes to the dessert table or hire a baker to create them.", group: "dessert", vendorCategory: "cupcakes", mode: "diy_or_hire" },
+  { key: "cookies", label: "Cookies", description: "Plan decorated cookies, classic cookies or custom favors for your guests.", group: "dessert", vendorCategory: "cookies", mode: "diy_or_hire" },
+  { key: "cake_pops_dipped_treats", label: "Cake pops & dipped treats", description: "Cake pops, chocolate-covered treats, dipped pretzels, berries and other bite-size sweets.", group: "dessert", vendorCategory: "cake_pops", mode: "diy_or_hire" },
+  { key: "ice_cream_truck", label: "Ice cream truck", description: "Bring an ice cream truck or mobile frozen-treat experience to your event.", group: "dessert", vendorCategory: "food_truck", mode: "hire_only" },
+  { key: "other_dessert", label: "Other dessert", description: "Add another dessert or sweet treat that is not listed above.", group: "dessert", vendorCategory: "sweet_treats", mode: "diy_or_hire" },
+
   { key: "non_alcoholic_drinks", label: "Water, sodas & juice", description: "Choose the non-alcoholic drinks you plan to serve and add them to your shopping list.", group: "drinks", vendorCategory: null, mode: "shopping" },
   { key: "liquor", label: "Liquor", description: "Plan mocktails, beer/wine, cocktails or signature drinks — and decide whether you need a bartender.", group: "drinks", vendorCategory: "bartender", mode: "liquor" },
 ];
@@ -44,6 +51,7 @@ export const FOOD_DRINK_PLAN_ITEMS: FoodDrinkPlanDefinition[] = [
 export function planChoiceLabel(choice: PlanChoice) {
   if (choice === "diy") return "DIY / I’ll handle it";
   if (choice === "hire") return "Hire a vendor";
+  if (choice === "existing") return "I already have someone";
   return "Undecided";
 }
 

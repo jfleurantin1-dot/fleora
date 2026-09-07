@@ -158,7 +158,7 @@ export type EventPlanItem = {
   chapter: string;
   item_key: string;
   label: string;
-  choice: "diy" | "hire" | "undecided";
+  choice: "diy" | "hire" | "existing" | "undecided";
   vendor_category: string | null;
   notes: string | null;
   budget_estimate: number | null;
