@@ -85,15 +85,20 @@ export async function createDirectoryVendor(
     });
   }
 
+  const profilePhoto = String(formData.get("profile_photo") ?? "").trim();
   const photoRaw = String(formData.get("photos") ?? "");
   const urls = photoRaw
     .split(/[\n,]/)
     .map((s) => s.trim())
     .filter((s) => /^https?:\/\//i.test(s));
-  if (urls.length) {
+  const allPhotos = [
+    ...( /^https?:\/\//i.test(profilePhoto) ? [profilePhoto] : [] ),
+    ...urls,
+  ].slice(0, 8);
+  if (allPhotos.length) {
     await supabase
       .from("vendor_photos")
-      .insert(urls.slice(0, 8).map((url, sort) => ({ vendor_id: vendorId, url, sort })));
+      .insert(allPhotos.map((url, sort) => ({ vendor_id: vendorId, url, sort })));
   }
 
   revalidatePath("/admin");

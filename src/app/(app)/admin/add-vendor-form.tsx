@@ -29,6 +29,8 @@ export function AddVendorForm() {
         </div>
         <Field label="Description"><Textarea name="description" rows={3} placeholder="Modern event styling, balloons, backdrops and more…" /></Field>
 
+        <Field label="Profile picture URL" hint="Optional. Paste a direct image URL for the business logo or main profile photo."><Input name="profile_photo" type="url" placeholder="https://…" /></Field>
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Website"><Input name="website" type="url" placeholder="https://…" /></Field>
           <Field label="Instagram"><Input name="instagram" placeholder="@businessname" /></Field>
@@ -60,7 +62,7 @@ export function AddVendorForm() {
           </div>
         </div>
 
-        <Field label="Portfolio photo URLs" hint="Optional for now. Paste up to 8 direct image URLs, one per line.">
+        <Field label="Portfolio photo URLs" hint="Optional. Paste up to 7 additional image URLs, one per line. The profile picture above will appear first.">
           <Textarea name="photos" rows={4} placeholder={"https://…\nhttps://…"} />
         </Field>
 
