@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const items = [
   ["", "Event Home"],
+  ["/summary", "Party Plan Summary"],
   ["/plan", "My Party Plan"],
   ["/guests", "Guests & Invitations"],
   ["/services", "Vendors"],
