@@ -92,3 +92,27 @@ export const ENTERTAINMENT_PLAN_ITEMS: EntertainmentPlanDefinition[] = [
   { key: "event_experiences", label: "Event experiences", description: "Caricature artists, live painting, permanent jewelry, charm bars, cigar rollers and other interactive experiences.", vendorCategory: "custom_service" },
   { key: "other_custom_entertainment", label: "Other / custom entertainment", description: "Add an entertainment idea that is not listed above.", vendorCategory: "custom_service" },
 ];
+
+
+export type VenueLogisticsGroup = "rentals" | "logistics";
+export type VenueLogisticsPlanDefinition = {
+  key: string; label: string; description: string; group: VenueLogisticsGroup; vendorCategory: CategoryKey | null;
+};
+export const VENUE_LOGISTICS_PLAN_ITEMS: VenueLogisticsPlanDefinition[] = [
+  { key:"tables", label:"Tables", description:"Guest, cocktail, buffet or specialty tables you need for the event.", group:"rentals", vendorCategory:"tables" },
+  { key:"chairs", label:"Chairs", description:"Seating for guests, ceremonies, lounges or specialty areas.", group:"rentals", vendorCategory:"chairs" },
+  { key:"linens", label:"Linens", description:"Tablecloths, runners, napkins and other event linens.", group:"rentals", vendorCategory:"linens" },
+  { key:"tent_canopy", label:"Tent / canopy", description:"Weather coverage or a tented event setup for outdoor spaces.", group:"rentals", vendorCategory:"tents" },
+  { key:"dance_floor", label:"Dance floor", description:"Add a dedicated dance floor or specialty floor treatment.", group:"rentals", vendorCategory:"specialty_rentals" },
+  { key:"staging", label:"Staging", description:"A stage or riser for entertainment, speakers or focal moments.", group:"rentals", vendorCategory:"specialty_rentals" },
+  { key:"other_rentals", label:"Other rentals", description:"Add another rental item that your event needs.", group:"rentals", vendorCategory:"specialty_rentals" },
+  { key:"setup_breakdown", label:"Setup / breakdown help", description:"Extra hands for event setup, room flips, cleanup or breakdown.", group:"logistics", vendorCategory:"event_staff" },
+  { key:"delivery_pickup", label:"Delivery / pickup coordination", description:"Keep rental and vendor deliveries, pickups and timing organized.", group:"logistics", vendorCategory:"custom_service" },
+  { key:"parking_valet", label:"Parking / valet", description:"Plan guest parking, valet service or parking instructions.", group:"logistics", vendorCategory:"custom_service" },
+  { key:"guest_transportation", label:"Guest transportation", description:"Shuttles or transportation between hotels, venues or event locations.", group:"logistics", vendorCategory:"custom_service" },
+  { key:"restrooms", label:"Restrooms", description:"Confirm restroom access or arrange portable restroom service when needed.", group:"logistics", vendorCategory:"specialty_rentals" },
+  { key:"power_generator", label:"Power / generator", description:"Plan electrical access, extension needs or backup generator power.", group:"logistics", vendorCategory:"specialty_rentals" },
+  { key:"heating_cooling", label:"Heating / cooling", description:"Add heaters, fans or cooling equipment for guest comfort.", group:"logistics", vendorCategory:"specialty_rentals" },
+  { key:"accessibility", label:"Accessibility needs", description:"Plan accessible entrances, seating, pathways and guest accommodations.", group:"logistics", vendorCategory:null },
+  { key:"permits_requirements", label:"Permits / venue requirements", description:"Track permits, insurance, venue rules, load-in requirements or other restrictions.", group:"logistics", vendorCategory:null },
+];

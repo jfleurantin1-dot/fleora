@@ -48,7 +48,7 @@ export async function saveEntertainmentPlan(eventId: string, fd: FormData) {
     );
 
     refresh(eventId);
-    if (String(fd.get("intent")) === "continue") redirect(`/events/${eventId}/plan`);
+    if (String(fd.get("intent")) === "continue") redirect(`/events/${eventId}/venue-logistics`);
     redirect(`/events/${eventId}/entertainment?saved=1`);
   }
 
@@ -120,7 +120,7 @@ export async function saveEntertainmentPlan(eventId: string, fd: FormData) {
   }
 
   refresh(eventId);
-  if (String(fd.get("intent")) === "continue") redirect(`/events/${eventId}/plan`);
+  if (String(fd.get("intent")) === "continue") redirect(`/events/${eventId}/venue-logistics`);
   redirect(`/events/${eventId}/entertainment?saved=1`);
 }
 

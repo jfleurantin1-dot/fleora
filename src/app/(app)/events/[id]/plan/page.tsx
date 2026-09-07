@@ -26,6 +26,10 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   const serviceNone=serviceAll.some(item=>item.item_key==="no_services");
   const serviceItems=serviceAll.filter(item=>item.item_key!=="no_services");
   const serviceDecided=serviceItems.filter(item=>item.choice!=="undecided").length;
+  const venueItems=(planItems??[]).filter(item=>item.chapter==="venue_logistics");
+  const venueNone=venueItems.some(item=>item.item_key==="no_venue_logistics");
+  const venueSelected=venueItems.filter(item=>item.item_key!=="no_venue_logistics");
+  const venueDecided=venueSelected.filter(item=>item.choice!=="undecided").length;
   const entertainmentItems=(planItems??[]).filter(item=>item.chapter==="entertainment");
   const entertainmentNone=entertainmentItems.some(item=>item.item_key==="no_entertainment");
   const entertainmentSelected=entertainmentItems.filter(item=>item.item_key!=="no_entertainment");
@@ -36,20 +40,22 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
     {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, cake, desserts, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:foodNone?"Complete":foodItems.length?`${foodDecided}/${foodItems.length} decided`:"Plan food & drinks",href:`/events/${event.id}/plan/food-drinks`,live:true},
     {title:"Services",desc:"Photography, videography, photo booths, planning, beauty, staffing and custom services.",icon:<StoreIcon size={23}/>,status:serviceNone?"Complete":serviceItems.length?`${serviceDecided}/${serviceItems.length} decided`:"Plan services",href:`/events/${event.id}/services`,live:true},
     {title:"Entertainment",desc:"DJ, live music, kids entertainment, performers, games, inflatables and interactive experiences.",icon:<MusicIcon size={23}/>,status:entertainmentNone?"Complete":entertainmentSelected.length?`${entertainmentDecided}/${entertainmentSelected.length} decided`:"Plan entertainment",href:`/events/${event.id}/entertainment`,live:true},
-    {title:"Venue & Logistics",desc:"Venue needs, access, parking, setup, cleanup and important notes.",icon:<MapPinIcon size={23}/>,status:"Coming soon",href:"#",live:false},
+    {title:"Venue & Logistics",desc:"Rentals, setup, access, parking, transportation and event-day logistics.",icon:<MapPinIcon size={23}/>,status:venueNone?"Complete":venueSelected.length?`${venueDecided}/${venueSelected.length} decided`:"Plan logistics",href:`/events/${event.id}/venue-logistics`,live:true},
   ];
   const started=(photos??[]).length?1:0;
   const decorProgress=decorNone?1:(decorItems.length ? decorDecided/decorItems.length : 0);
   const foodProgress=foodNone?1:(foodItems.length ? foodDecided/foodItems.length : 0);
   const serviceProgress=serviceNone?1:(serviceItems.length ? serviceDecided/serviceItems.length : 0);
   const entertainmentProgress=entertainmentNone?1:(entertainmentSelected.length?entertainmentDecided/entertainmentSelected.length:0);
-  const pct=Math.round(((started+decorProgress+foodProgress+serviceProgress+entertainmentProgress)/chapters.length)*100);
+  const venueProgress=venueNone?1:(venueSelected.length?venueDecided/venueSelected.length:0);
+  const pct=Math.round(((started+decorProgress+foodProgress+serviceProgress+entertainmentProgress+venueProgress)/chapters.length)*100);
   const complete=(i:number)=>{
     if(i===0) return Boolean(event.name&&event.event_type&&event.event_date);
     if(i===1) return decorNone||(decorItems.length>0&&decorDecided===decorItems.length);
     if(i===2) return foodNone||(foodItems.length>0&&foodDecided===foodItems.length);
     if(i===3) return serviceNone||(serviceItems.length>0&&serviceDecided===serviceItems.length);
     if(i===4) return entertainmentNone||(entertainmentSelected.length>0&&entertainmentDecided===entertainmentSelected.length);
+    if(i===5) return venueNone||(venueSelected.length>0&&venueDecided===venueSelected.length);
     return false;
   };
   return <div className="space-y-7">
