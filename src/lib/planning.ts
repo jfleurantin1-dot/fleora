@@ -45,3 +45,22 @@ export function planChoiceLabel(choice: PlanChoice) {
   if (choice === "hire") return "Hire a vendor";
   return "Undecided";
 }
+
+
+export type ServicePlanDefinition = {
+  key: string;
+  label: string;
+  description: string;
+  vendorCategory: CategoryKey;
+};
+
+export const SERVICE_PLAN_ITEMS: ServicePlanDefinition[] = [
+  { key: "photographer", label: "Photographer", description: "Capture the event, portraits and the moments you do not want to miss.", vendorCategory: "photography" },
+  { key: "videographer", label: "Videographer", description: "Preserve highlights, speeches and candid moments on video.", vendorCategory: "videography" },
+  { key: "photobooth", label: "Photo booth", description: "Give guests an interactive photo experience and take-home memories.", vendorCategory: "photobooth" },
+  { key: "event_planner", label: "Event planner / coordinator", description: "Get help planning, coordinating vendors or managing the event day.", vendorCategory: "event_planner" },
+  { key: "hair", label: "Hair", description: "Book event-day hairstyling for you or your party.", vendorCategory: "hair" },
+  { key: "makeup", label: "Makeup", description: "Book makeup services for you or your party.", vendorCategory: "makeup" },
+  { key: "event_staff", label: "Event staff / servers", description: "Add servers or event staff to help with setup, service and guest needs.", vendorCategory: "event_staff" },
+  { key: "other_custom_service", label: "Other / custom service", description: "Add another service your event needs that is not listed above.", vendorCategory: "custom_service" },
+];

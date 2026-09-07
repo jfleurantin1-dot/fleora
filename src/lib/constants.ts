@@ -7,7 +7,8 @@ export type CategoryGroup =
   | "media"
   | "entertainment"
   | "stationery"
-  | "beauty";
+  | "beauty"
+  | "services";
 
 export type CategoryKey =
   | "venue"
@@ -47,7 +48,10 @@ export type CategoryKey =
   | "stationery"
   | "calligraphy"
   | "hair"
-  | "makeup";
+  | "makeup"
+  | "event_planner"
+  | "event_staff"
+  | "custom_service";
 
 export interface CategoryGroupDef {
   key: CategoryGroup;
@@ -64,6 +68,7 @@ export const CATEGORY_GROUPS: CategoryGroupDef[] = [
   { key: "entertainment", label: "Entertainment" },
   { key: "stationery", label: "Stationery & signage" },
   { key: "beauty", label: "Beauty" },
+  { key: "services", label: "Event services" },
 ];
 
 export interface CategoryDef {
@@ -120,6 +125,10 @@ export const CATEGORIES: CategoryDef[] = [
 
   { key: "hair", group: "beauty", label: "Hair stylist", budgetShare: 0.04 },
   { key: "makeup", group: "beauty", label: "Makeup artist", budgetShare: 0.04 },
+
+  { key: "event_planner", group: "services", label: "Event planner / coordinator", budgetShare: 0.08 },
+  { key: "event_staff", group: "services", label: "Event staff / servers", budgetShare: 0.06 },
+  { key: "custom_service", group: "services", label: "Other event service", budgetShare: 0.04 },
 ];
 
 export const CATEGORY_MAP: Record<string, CategoryDef> = Object.fromEntries(
