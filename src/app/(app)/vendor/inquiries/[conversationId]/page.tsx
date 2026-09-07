@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Badge, ButtonLink, Card, PageHeader } from "@/components/ui";
 import { categoryLabel, EVENT_TYPE_MAP } from "@/lib/constants";
 import { money, shortDate } from "@/lib/format";
+import { DeclineInquiry } from "./decline-inquiry";
 
 export default async function VendorInquiryDetail({params}:{params:{conversationId:string}}){
  const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=createClient();
@@ -25,13 +26,13 @@ export default async function VendorInquiryDetail({params}:{params:{conversation
  const relevant=(planItems??[]).filter(i=>i.choice==="hire"&&i.vendor_category&&myCatSet.has(i.vendor_category));
  const planIds=relevant.map(i=>i.id); const {data:itemPhotos}=planIds.length?await supabase.from("event_plan_item_photos").select("id,url,plan_item_id,sort").in("plan_item_id",planIds).order("sort",{ascending:true}):{data:[] as any[]};
  const photos=[...(itemPhotos??[]),...(moodPhotos??[])].filter((p,i,a)=>a.findIndex(x=>x.url===p.url)===i).slice(0,8);
- const quote=quotes?.[0]; const booking=bookings?.[0]; const eventType=EVENT_TYPE_MAP[String(event?.event_type)]?.label??String(event?.event_type??"Event");
+ const quote=quotes?.[0]; const booking=bookings?.[0]; const inquiryStatus=String((convo as any).vendor_inquiry_status??"active"); const eventType=EVENT_TYPE_MAP[String(event?.event_type)]?.label??String(event?.event_type??"Event");
  const eventColors=typeof event?.colors==="string"?event.colors:"";
  const firstClientMessage=(messages??[]).find(m=>m.sender_id!==vendor.user_id)?.body;
  return <div className="mx-auto max-w-6xl">
   <Link href="/vendor/leads" className="mb-5 inline-flex text-sm font-semibold text-plum-700 hover:underline">← Back to inquiries</Link>
   <PageHeader title={`${eventType} inquiry`} subtitle="Everything the client has shared for this request — in one place."/>
-  <div className="mb-6 flex flex-wrap gap-2">{booking?<Badge tone="green">Booked</Badge>:quote?<Badge tone="plum">Quote {quote.status}</Badge>:<Badge tone="amber">New inquiry</Badge>}{requested.map(c=><Badge key={c} tone="champagne">{categoryLabel(c)}</Badge>)}</div>
+  <div className="mb-6 flex flex-wrap gap-2">{booking?<Badge tone="green">Booked</Badge>:inquiryStatus==="declined"?<Badge tone="rose">Declined</Badge>:quote?<Badge tone="plum">Quote {quote.status}</Badge>:<Badge tone="amber">New inquiry</Badge>}{requested.map(c=><Badge key={c} tone="champagne">{categoryLabel(c)}</Badge>)}</div>
   <div className="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
    <div className="space-y-6">
     <Card padding="lg"><p className="fleora-kicker">Event brief</p><div className="mt-4 grid gap-4 sm:grid-cols-2"><Mini label="Event type" value={eventType}/><Mini label="Date" value={shortDate(event?.event_date)}/><Mini label="Location" value={event?.location??"TBD"}/><Mini label="Guest count" value={String(event?.guest_count??"TBD")}/><Mini label="Overall event budget" value={money(event?.budget)}/><Mini label="Style / vision" value={event?.style??"Not specified"}/></div>{eventColors?<div className="mt-4 border-t border-plum-100 pt-4"><Mini label="Colors" value={eventColors}/></div>:null}</Card>
@@ -40,7 +41,7 @@ export default async function VendorInquiryDetail({params}:{params:{conversation
     <Card padding="lg"><p className="fleora-kicker">Client message</p>{firstClientMessage?<p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-ink-700">{firstClientMessage}</p>:<p className="mt-3 text-sm text-ink-500">Open the conversation to see and respond to the client.</p>}</Card>
    </div>
    <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-    <Card variant="feature" padding="lg"><p className="fleora-kicker">Next step</p><h2 className="mt-1 font-display text-2xl text-ink-900">Turn this inquiry into a booking</h2><p className="mt-2 text-sm leading-relaxed text-ink-600">Ask questions in Messages or send a clear quote when you have enough detail.</p><div className="mt-5 grid gap-2"><ButtonLink href={`/messages/${convo.id}`} variant="secondary">Message client</ButtonLink>{!quote?<ButtonLink href={`/vendor/quote/${convo.id}`}>Create quote →</ButtonLink>:<ButtonLink href={`/vendor/quote/${convo.id}`}>View quote →</ButtonLink>}</div></Card>
+    <Card variant="feature" padding="lg"><p className="fleora-kicker">Next step</p><h2 className="mt-1 font-display text-2xl text-ink-900">Turn this inquiry into a booking</h2><p className="mt-2 text-sm leading-relaxed text-ink-600">Ask questions in Messages or send a clear quote when you have enough detail.</p><div className="mt-5 grid gap-2">{inquiryStatus!=="declined"?<><ButtonLink href={`/messages/${convo.id}?from=inquiry`} variant="secondary">Message client</ButtonLink>{!quote?<ButtonLink href={`/vendor/quote/${convo.id}?from=inquiry`}>Create quote →</ButtonLink>:<ButtonLink href={`/vendor/quote/${convo.id}?from=inquiry`}>View quote →</ButtonLink>}<DeclineInquiry conversationId={convo.id}/></>:<div className="rounded-2xl bg-rose-50 p-4 text-sm text-rose-800"><p className="font-semibold">Inquiry declined</p><p className="mt-1">This inquiry has been moved out of your active opportunities.</p></div>}</div></Card>
     {quote&&<Card padding="lg"><p className="fleora-kicker">Quote status</p><div className="mt-3 flex items-end justify-between gap-3"><div><p className="text-sm text-ink-500">Your quote</p><p className="font-display text-3xl text-ink-900">{money(quote.total)}</p></div><Badge tone={quote.status==="accepted"?"green":quote.status==="declined"?"rose":"plum"}>{quote.status}</Badge></div>{booking&&<div className="mt-4 border-t border-plum-100 pt-4"><p className="text-sm font-semibold text-emerald-700">This inquiry became a booking.</p></div>}</Card>}
    </aside>
   </div>
