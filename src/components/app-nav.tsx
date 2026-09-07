@@ -23,14 +23,20 @@ function active(p:string,h:string){
   if(h==="/vendor/account")return p===h||p.startsWith("/vendor/onboarding")||p.startsWith("/vendor/availability");
   return p===h||p.startsWith(`${h}/`);
 }
-export function AppNav({isVendor,isAdmin}:{isVendor:boolean;isAdmin:boolean}){
-  const p=usePathname();
+function linksFor(isVendor:boolean,isAdmin:boolean){
   const links=[...(isVendor?vendorLinks:clientLinks)];
   if(isAdmin)links.push({href:"/admin",label:"Admin",Icon:UserIcon});
-  return <>
-    <nav className="hidden items-center gap-1 sm:flex">{links.map(({href,label})=><Link key={href} href={href} className={`rounded-lg px-3 py-2 text-[13px] font-medium transition ${active(p,href)?"bg-plum-50 text-plum-800":"text-ink-600 hover:text-plum-800"}`}>{label}</Link>)}</nav>
-    <nav aria-label={isVendor?"Vendor navigation":"Main navigation"} style={{gridTemplateColumns:`repeat(${Math.min(links.length,5)},minmax(0,1fr))`}} className="fixed inset-x-0 bottom-0 z-[60] grid border-t border-[#E8E1ED] bg-white/95 px-2 pb-[max(8px,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-8px_24px_rgba(50,20,95,0.06)] backdrop-blur-xl sm:hidden">
-      {links.slice(0,5).map(({href,label,Icon})=><Link key={href} href={href} className={`flex min-w-0 flex-col items-center gap-0.5 px-1 py-1.5 text-[9px] font-medium ${active(p,href)?"text-plum-700":"text-ink-500"}`}><Icon size={18}/><span className="truncate">{label}</span></Link>)}
-    </nav>
-  </>;
+  return links;
+}
+export function DesktopAppNav({isVendor,isAdmin}:{isVendor:boolean;isAdmin:boolean}){
+  const p=usePathname();
+  const links=linksFor(isVendor,isAdmin);
+  return <nav className="hidden items-center gap-1 sm:flex">{links.map(({href,label})=><Link key={href} href={href} className={`rounded-lg px-3 py-2 text-[13px] font-medium transition ${active(p,href)?"bg-plum-50 text-plum-800":"text-ink-600 hover:text-plum-800"}`}>{label}</Link>)}</nav>;
+}
+export function MobileAppNav({isVendor,isAdmin}:{isVendor:boolean;isAdmin:boolean}){
+  const p=usePathname();
+  const links=linksFor(isVendor,isAdmin).slice(0,5);
+  return <nav aria-label={isVendor?"Vendor navigation":"Main navigation"} style={{gridTemplateColumns:`repeat(${links.length},minmax(0,1fr))`}} className="fixed inset-x-0 bottom-0 z-[70] grid border-t border-[#E8E1ED] bg-white px-2 pb-[max(8px,env(safe-area-inset-bottom))] pt-1.5 shadow-[0_-8px_24px_rgba(50,20,95,0.08)] sm:hidden">
+    {links.map(({href,label,Icon})=><Link key={href} href={href} className={`flex min-w-0 flex-col items-center gap-0.5 px-1 py-1.5 text-[9px] font-medium ${active(p,href)?"text-plum-700":"text-ink-500"}`}><Icon size={18}/><span className="truncate">{label}</span></Link>)}
+  </nav>;
 }
