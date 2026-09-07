@@ -44,6 +44,10 @@ export type CategoryKey =
   | "dj"
   | "musician"
   | "kids_entertainment"
+  | "performer"
+  | "games_activities"
+  | "inflatables"
+  | "event_experience"
   | "face_painter"
   | "stationery"
   | "calligraphy"
@@ -118,6 +122,10 @@ export const CATEGORIES: CategoryDef[] = [
   { key: "dj", group: "entertainment", label: "DJ", budgetShare: 0.08 },
   { key: "musician", group: "entertainment", label: "Musician / live music", budgetShare: 0.08 },
   { key: "kids_entertainment", group: "entertainment", label: "Kids entertainment", budgetShare: 0.05 },
+  { key: "performer", group: "entertainment", label: "Performers", budgetShare: 0.06 },
+  { key: "games_activities", group: "entertainment", label: "Games & activities", budgetShare: 0.05 },
+  { key: "inflatables", group: "entertainment", label: "Bounce houses & inflatables", budgetShare: 0.06 },
+  { key: "event_experience", group: "entertainment", label: "Event experiences", budgetShare: 0.06 },
   { key: "face_painter", group: "entertainment", label: "Face painter", budgetShare: 0.03 },
 
   { key: "stationery", group: "stationery", label: "Invitations & stationery", budgetShare: 0.03 },

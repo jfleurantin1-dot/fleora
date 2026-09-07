@@ -20,20 +20,25 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   const foodDecided=foodItems.filter(item=>item.choice!=="undecided").length;
   const serviceItems=(planItems??[]).filter(item=>item.chapter==="services");
   const serviceDecided=serviceItems.filter(item=>item.choice!=="undecided").length;
+  const entertainmentItems=(planItems??[]).filter(item=>item.chapter==="entertainment");
+  const entertainmentNone=entertainmentItems.some(item=>item.item_key==="no_entertainment");
+  const entertainmentSelected=entertainmentItems.filter(item=>item.item_key!=="no_entertainment");
+  const entertainmentDecided=entertainmentSelected.filter(item=>item.choice!=="undecided").length;
   const chapters=[
     {title:"Event Details & Vision",desc:"Event essentials, theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:"Edit",href:`/events/${event.id}/edit`,live:true},
     {title:"Decor",desc:"Welcome signs, focal backdrops, tablescapes, centerpieces, balloons, favors and custom signage.",icon:<SparkleIcon size={23}/>,status:decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
     {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, cake, desserts, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:foodItems.length?`${foodDecided}/${foodItems.length} decided`:"Plan food & drinks",href:`/events/${event.id}/plan/food-drinks`,live:true},
     {title:"Services",desc:"Photography, videography, photo booths, planning, beauty, staffing and custom services.",icon:<StoreIcon size={23}/>,status:serviceItems.length?`${serviceDecided}/${serviceItems.length} decided`:"Plan services",href:`/events/${event.id}/services`,live:true},
-    {title:"Entertainment",desc:"DJ, photo booth, performers, kids entertainment and activities.",icon:<MusicIcon size={23}/>,status:"Coming soon",href:"#",live:false},
+    {title:"Entertainment",desc:"DJ, live music, kids entertainment, performers, games, inflatables and interactive experiences.",icon:<MusicIcon size={23}/>,status:entertainmentNone?"Complete":entertainmentSelected.length?`${entertainmentDecided}/${entertainmentSelected.length} decided`:"Plan entertainment",href:`/events/${event.id}/entertainment`,live:true},
     {title:"Venue & Logistics",desc:"Venue needs, access, parking, setup, cleanup and important notes.",icon:<MapPinIcon size={23}/>,status:"Coming soon",href:"#",live:false},
   ];
   const started=(photos??[]).length?1:0;
   const decorProgress=decorItems.length ? decorDecided/decorItems.length : 0;
   const foodProgress=foodItems.length ? foodDecided/foodItems.length : 0;
   const serviceProgress=serviceItems.length ? serviceDecided/serviceItems.length : 0;
-  const pct=Math.round(((started+decorProgress+foodProgress+serviceProgress)/chapters.length)*100);
-  const complete=(i:number)=>i===0?Boolean(event.name&&event.event_type&&event.event_date):(i===1?decorItems.length>0&&decorDecided===decorItems.length:(i===2?foodItems.length>0&&foodDecided===foodItems.length:(i===3?serviceItems.length>0&&serviceDecided===serviceItems.length:false)));
+  const entertainmentProgress=entertainmentNone?1:(entertainmentSelected.length?entertainmentDecided/entertainmentSelected.length:0);
+  const pct=Math.round(((started+decorProgress+foodProgress+serviceProgress+entertainmentProgress)/chapters.length)*100);
+  const complete=(i:number)=>i===0?Boolean(event.name&&event.event_type&&event.event_date):(i===1?decorItems.length>0&&decorDecided===decorItems.length:(i===2?foodItems.length>0&&foodDecided===foodItems.length:(i===3?serviceItems.length>0&&serviceDecided===serviceItems.length:(i===4?entertainmentNone||(entertainmentSelected.length>0&&entertainmentDecided===entertainmentSelected.length):false))));
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/>
     <Card variant="feature" className="overflow-hidden bg-gradient-to-br from-plum-50 via-white to-blush-50">
