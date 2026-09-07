@@ -9,7 +9,8 @@ import { money } from "@/lib/format";
 import { categoryLabel } from "@/lib/constants";
 import { CategoryIcon } from "@/components/category-icon";
 import type { VendorMatch } from "@/lib/types";
-import { requestQuote } from "./actions";
+import { requestQuote, requestQuotes } from "./actions";
+import { MultiVendorSelector } from "./multi-vendor-selector";
 
 export default async function MatchesPage({ params }: { params: { id: string; category: string } }) {
   await requireProfile();
@@ -29,7 +30,7 @@ export default async function MatchesPage({ params }: { params: { id: string; ca
 
   return (
     <div className="mx-auto max-w-5xl">
-      <Link href={`/events/${event.id}`} className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-600 transition hover:text-plum-700"><ArrowLeftIcon size={16} /> Back to {event.name}</Link>
+      <Link href={`/events/${event.id}/vendors`} className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-600 transition hover:text-plum-700"><ArrowLeftIcon size={16} /> Back to Find My Vendors</Link>
 
       <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
         <div>
@@ -41,6 +42,8 @@ export default async function MatchesPage({ params }: { params: { id: string; ca
       </div>
 
       {error && <p className="mb-4 rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">Matching error: {error.message}</p>}
+
+      {matches.length > 0 && <MultiVendorSelector vendorIds={matches.filter(m=>!contacted.has(m.vendor_id)).map(m=>m.vendor_id)} action={requestQuotes.bind(null,event.id,params.category)} serviceLabel={categoryLabel(params.category)} />}
 
       {matches.length === 0 ? (
         <Empty title="No matches yet"><p>We don&apos;t have an approved {categoryLabel(params.category).toLowerCase()} vendor for your area yet. Fleora will have more options as the marketplace grows.</p></Empty>
@@ -78,7 +81,7 @@ export default async function MatchesPage({ params }: { params: { id: string; ca
                     <div className="mt-5 flex flex-wrap items-end justify-between gap-4 border-t fleora-divider pt-4">
                       <div><p className="text-[11px] font-semibold uppercase tracking-wide text-ink-400">Starting at</p><p className="mt-0.5 font-semibold text-ink-900">{money(m.starting_price)}</p></div>
                       <div className="flex flex-wrap gap-2">
-                        <ButtonLink href={`/vendors/${m.vendor_id}`} variant="secondary" size="sm">View vendor</ButtonLink>
+                        <ButtonLink href={`/vendors/${m.vendor_id}?eventId=${event.id}&category=${encodeURIComponent(params.category)}`} variant="secondary" size="sm">View vendor</ButtonLink>
                         {contacted.has(m.vendor_id) ? <ButtonLink href="/messages" size="sm">Open chat</ButtonLink> : <form action={send}><Button type="submit" size="sm">Request quote</Button></form>}
                       </div>
                     </div>

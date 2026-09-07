@@ -6,14 +6,21 @@ import { requireProfile } from "@/lib/auth";
 import { Badge, ButtonLink, Card, Stars } from "@/components/ui";
 import { ArrowLeftIcon, MapPinIcon } from "@/components/icons";
 import { money, shortDate } from "@/lib/format";
-import { categoryLabel } from "@/lib/constants";
+import { categoryLabel, EVENT_TYPE_MAP } from "@/lib/constants";
+import { requestQuote } from "@/app/(app)/events/[id]/matches/[category]/actions";
 import { ClaimForm } from "./claim-form";
 
-export default async function VendorProfile({ params }: { params: { id: string } }) {
+export default async function VendorProfile({ params, searchParams }: { params: { id: string }; searchParams?: { eventId?: string; category?: string } }) {
   await requireProfile();
   const supabase = createClient();
   const { data: vendor } = await supabase.from("vendors").select("*").eq("id", params.id).single();
   if (!vendor) notFound();
+
+  const eventId = searchParams?.eventId;
+  const category = searchParams?.category;
+  const { data: contextEvent } = eventId ? await supabase.from("events").select("*").eq("id", eventId).maybeSingle() : { data: null };
+  const hasContext = Boolean(contextEvent && category);
+  const eventTypeLabel = contextEvent ? (EVENT_TYPE_MAP[String(contextEvent.event_type)]?.label ?? String(contextEvent.event_type ?? "Event")) : null;
 
   const [{ data: cats }, { data: photos }, { data: services }, { data: packages }, { data: reviews }] = await Promise.all([
     supabase.from("vendor_categories").select("category").eq("vendor_id", params.id),
@@ -25,7 +32,7 @@ export default async function VendorProfile({ params }: { params: { id: string }
 
   return (
     <div className="mx-auto max-w-5xl">
-      <Link href="/vendors/browse" className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-600 transition hover:text-plum-700"><ArrowLeftIcon size={16} /> Back to Discover</Link>
+      <Link href={hasContext ? `/events/${eventId}/matches/${encodeURIComponent(category!)}` : "/vendors/browse"} className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-600 transition hover:text-plum-700"><ArrowLeftIcon size={16} /> {hasContext ? "Back to Matches" : "Back to Discover"}</Link>
 
       <div className="mb-6 grid gap-2 overflow-hidden rounded-[24px] bg-plum-50 sm:grid-cols-2 sm:grid-rows-2">
         {photos && photos.length > 0 ? (
@@ -70,9 +77,14 @@ export default async function VendorProfile({ params }: { params: { id: string }
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <Card variant="feature" padding="lg">
             <p className="fleora-kicker">Ready to connect?</p>
-            <h2 className="mt-2 font-display text-2xl text-ink-900">Add {vendor.business_name} to your event.</h2>
-            <p className="mt-2 text-sm leading-relaxed text-ink-600">Open an event, choose the service you need, and Fleora will match you with vendors and start the quote request.</p>
-            <ButtonLink href="/events" className="mt-5 w-full">Choose an event</ButtonLink>
+            <h2 className="mt-2 font-display text-2xl text-ink-900">{hasContext ? "Request a quote" : `Add ${vendor.business_name} to your event.`}</h2>
+            {hasContext ? <>
+              <div className="mt-4 rounded-xl bg-plum-50 p-3 text-xs leading-6 text-ink-600"><p className="font-bold text-ink-900">Inquiry summary</p><p>Event type: {eventTypeLabel}</p><p>Service needed: {categoryLabel(category!)}</p><p>Date: {shortDate(contextEvent!.event_date)}</p><p>Location: {contextEvent!.location ?? "TBD"}</p><p>Guests: {contextEvent!.guest_count ?? "TBD"}</p></div>
+              <form action={requestQuote.bind(null,eventId!,category!,vendor.id)} className="mt-4"><label className="text-xs font-bold uppercase tracking-wide text-ink-500">Your message</label><p className="mt-1 text-xs text-ink-500">We started it for you — edit it however you’d like.</p><textarea name="message" rows={6} defaultValue={`Hi! I’d love to get a quote for ${categoryLabel(category!)} for my event. Please let me know about your availability and pricing. Thank you!`} className="mt-2 w-full rounded-xl border border-plum-100 bg-white px-3 py-2.5 text-sm"/><button type="submit" className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-plum-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-plum-700">Send Request</button></form>
+            </> : <>
+              <p className="mt-2 text-sm leading-relaxed text-ink-600">Choose the event you&apos;re planning and Fleora will connect the request to it.</p>
+              <ButtonLink href="/events" className="mt-5 w-full">Choose an event</ButtonLink>
+            </>}
             <ButtonLink href="/messages" variant="secondary" className="mt-2 w-full">Open messages</ButtonLink>
             <p className="mt-4 text-center text-xs text-ink-400">{vendor.response_rate}% response rate</p>
             {!vendor.user_id && (
