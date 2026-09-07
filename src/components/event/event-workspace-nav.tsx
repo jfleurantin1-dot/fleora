@@ -5,7 +5,7 @@ const items = [
   ["/summary", "Party Plan Summary"],
   ["/plan", "My Party Plan"],
   ["/guests", "Guests & Invitations"],
-  ["/services", "Vendors"],
+  ["/vendors", "Vendors"],
   ["/checklist", "Checklist"],
   ["/budget", "Budget"],
   ["/timeline", "Timeline"],
@@ -13,7 +13,7 @@ const items = [
 
 export function EventWorkspaceNav({ eventId, active }: { eventId: string; active: string }) {
   return (
-    <nav aria-label="Event workspace" className="scroll-thin -mx-1 flex gap-1 overflow-x-auto overscroll-x-contain whitespace-nowrap px-1 pb-2">
+    <nav aria-label="Event workspace" className="scroll-thin -mx-1 flex gap-1 overflow-x-auto px-1 pb-2">
       {items.map(([suffix, label]) => {
         const key = suffix || "home";
         const selected = active === key;
