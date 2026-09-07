@@ -36,6 +36,7 @@ export const FOOD_DRINK_PLAN_ITEMS: FoodDrinkPlanDefinition[] = [
   { key: "potluck", label: "Potluck", description: "Build a shared list of dishes and keep track of who is bringing what.", group: "food", vendorCategory: null, mode: "potluck" },
   { key: "food_truck", label: "Food truck", description: "Bring a mobile food concept directly to your event.", group: "food", vendorCategory: "food_truck", mode: "hire_only" },
   { key: "charcuterie", label: "Charcuterie", description: "Create your own grazing spread or hire a charcuterie vendor.", group: "food", vendorCategory: "charcuterie", mode: "diy_or_hire" },
+  { key: "cake_treats", label: "Cake & treats", description: "Plan the cake, cupcakes, cookies, cake pops or other sweets — handle them yourself or hire a baker / dessert vendor.", group: "food", vendorCategory: "dessert", mode: "diy_or_hire" },
   { key: "non_alcoholic_drinks", label: "Water, sodas & juice", description: "Choose the non-alcoholic drinks you plan to serve and add them to your shopping list.", group: "drinks", vendorCategory: null, mode: "shopping" },
   { key: "liquor", label: "Liquor", description: "Plan mocktails, beer/wine, cocktails or signature drinks — and decide whether you need a bartender.", group: "drinks", vendorCategory: "bartender", mode: "liquor" },
 ];

@@ -58,7 +58,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
         <div className="mt-4"><Progress value={progress} /></div>
       </Card>
 
-      <form action={saveWithId} className="space-y-5"><ChapterInteractions skipName="no_decor"/><Card><label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="no_decor" defaultChecked={noDecor} className="mt-1 h-5 w-5 rounded border-plum-300 text-plum-600"/><span><span className="block font-bold text-ink-900">No decor needed</span><span className="mt-1 block text-sm text-ink-500">Skip decor for this event and mark the chapter complete.</span></span></label></Card>
+      <form action={saveWithId} className="space-y-5"><ChapterInteractions skipName="no_decor" hasExistingData={(rows ?? []).some((r) => r.item_key !== "no_decor")}/><Card><label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="no_decor" defaultChecked={noDecor} className="mt-1 h-5 w-5 rounded border-plum-300 text-plum-600"/><span><span className="block font-bold text-ink-900">No decor needed</span><span className="mt-1 block text-sm text-ink-500">Skip decor for this event and mark the chapter complete.</span></span></label></Card>
         <div className="grid gap-4 lg:grid-cols-2">
           {DECOR_PLAN_ITEMS.map((item) => {
             const row = byKey.get(item.key);

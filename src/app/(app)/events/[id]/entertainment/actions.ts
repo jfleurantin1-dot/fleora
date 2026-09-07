@@ -28,6 +28,7 @@ export async function saveEntertainmentPlan(eventId: string, fd: FormData) {
   if (noEntertainment) {
     const oldIds = (old ?? []).map((r) => r.id);
     if (oldIds.length) {
+      await s.from("event_plan_item_photos").delete().in("plan_item_id", oldIds);
       await s.from("event_vendor_needs").delete().in("plan_item_id", oldIds).eq("status", "needed");
       await s.from("event_plan_items").delete().in("id", oldIds);
     }

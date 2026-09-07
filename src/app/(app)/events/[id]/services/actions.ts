@@ -16,7 +16,7 @@ export async function saveServicePlan(eventId:string, fd:FormData){
   const {data:old}=await s.from("event_plan_items").select("id,item_key").eq("event_id",eventId).eq("chapter","services");
   const existing=new Map((old??[]).map(r=>[r.item_key,r]));
   if(fd.get("no_services")==="on"){
-    const ids=(old??[]).map(r=>r.id);if(ids.length){await s.from("event_vendor_needs").delete().in("plan_item_id",ids).eq("status","needed");await s.from("event_plan_items").delete().in("id",ids)}
+    const ids=(old??[]).map(r=>r.id);if(ids.length){await s.from("event_plan_item_photos").delete().in("plan_item_id",ids);await s.from("event_vendor_needs").delete().in("plan_item_id",ids).eq("status","needed");await s.from("event_plan_items").delete().in("id",ids)}
     await s.from("event_plan_items").upsert({event_id:eventId,chapter:"services",item_key:"no_services",label:"No additional services needed",choice:"diy",vendor_category:null,notes:null,updated_at:new Date().toISOString()},{onConflict:"event_id,chapter,item_key"});refresh(eventId);if(String(fd.get("intent"))==="continue")redirect(`/events/${eventId}/plan`);redirect(`/events/${eventId}/services?saved=1`)
   }
   const skipRow=existing.get("no_services");if(skipRow)await s.from("event_plan_items").delete().eq("id",skipRow.id);
