@@ -33,6 +33,8 @@ export type EventRow = {
   event_type: string;
   event_date: string | null;
   location: string | null;
+  location_type: "home" | "venue" | "tbd";
+  needs_venue: boolean;
   latitude: number | null;
   longitude: number | null;
   guest_count: number | null;
@@ -59,6 +61,8 @@ export type Vendor = {
   business_name: string;
   description: string | null;
   location: string | null;
+  location_type: "home" | "venue" | "tbd";
+  needs_venue: boolean;
   latitude: number | null;
   longitude: number | null;
   service_radius_miles: number;
@@ -181,6 +185,10 @@ export type EventPotluckItem = {
   created_at: string;
   updated_at: string;
 };
+
+
+export type EventMenuItem = { id:string; event_id:string; name:string; category:string; notes:string|null; created_at:string; };
+export type EventShoppingItem = { id:string; event_id:string; name:string; category:string; quantity:string|null; source_chapter:string|null; purchased:boolean; created_at:string; };
 
 export type EventVendorNeed = {
   id: string;
@@ -381,6 +389,8 @@ export type Database = {
       event_plan_items: TableDef<EventPlanItem>;
       event_plan_item_photos: TableDef<EventPlanItemPhoto>;
       event_potluck_items: TableDef<EventPotluckItem>;
+      event_menu_items: TableDef<EventMenuItem>;
+      event_shopping_items: TableDef<EventShoppingItem>;
       event_vendor_needs: TableDef<EventVendorNeed>;
       conversations: TableDef<Conversation>;
       messages: TableDef<Message>;

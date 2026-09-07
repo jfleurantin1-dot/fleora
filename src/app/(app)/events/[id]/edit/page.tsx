@@ -35,11 +35,13 @@ export default async function EditEvent({ params, searchParams }: { params: { id
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="block text-sm font-semibold">Event type<Select name="event_type" defaultValue={e.event_type} className="mt-1">{EVENT_TYPES.map((t) => <option key={t.key} value={t.key}>{t.label}</option>)}</Select></label>
             <label className="block text-sm font-semibold">Date<Input name="event_date" type="date" defaultValue={e.event_date ?? ""} className="mt-1" /></label>
-            <label className="block text-sm font-semibold">Location<Input name="location" defaultValue={e.location ?? ""} placeholder="City, State" className="mt-1" /></label>
+            <label className="block text-sm font-semibold">Location type<Select name="location_type" defaultValue={(e as any).location_type ?? "tbd"} className="mt-1"><option value="home">Home</option><option value="venue">Venue</option><option value="tbd">TBD</option></Select></label>
+            <label className="block text-sm font-semibold">Location<Input name="location" defaultValue={e.location ?? ""} placeholder="Address, city/state, or leave blank if TBD" className="mt-1" /></label>
             <label className="block text-sm font-semibold">Guest count<Input name="guest_count" type="number" min={1} defaultValue={e.guest_count ?? ""} className="mt-1" /></label>
             <label className="block text-sm font-semibold">Budget<Input name="budget" type="number" min={0} defaultValue={e.budget ?? ""} className="mt-1" /></label>
             <label className="block text-sm font-semibold">Style<Select name="style" defaultValue={e.style ?? STYLE_OPTIONS[0]} className="mt-1">{STYLE_OPTIONS.map((x) => <option key={x}>{x}</option>)}</Select></label>
           </div>
+          <label className="flex items-center gap-3 rounded-2xl border border-plum-100 bg-plum-50/40 p-4 text-sm font-semibold"><input type="checkbox" name="needs_venue" defaultChecked={Boolean((e as any).needs_venue)} className="h-5 w-5 rounded border-plum-300 text-plum-600"/>I need help finding a venue <span className="font-normal text-ink-500">— add Venue to my Vendor Needs</span></label>
           <label className="block text-sm font-semibold">Color palette<Input name="color_palette" defaultValue={e.color_palette ?? ""} className="mt-1" /></label>
           <div className="flex flex-wrap justify-end gap-2"><Button type="submit" name="intent" value="save" variant="secondary" size="lg">Save & stay</Button><Button type="submit" name="intent" value="continue" size="lg">Save & continue to Decor →</Button></div>
         </form>

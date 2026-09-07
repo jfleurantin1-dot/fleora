@@ -9,6 +9,8 @@ export async function updateEvent(eventId: string, fd: FormData) {
   const s = createClient();
   const location = String(fd.get("location") ?? "").trim() || null;
   const coords = location ? geocodeMa(location) : null;
+  const locationType = String(fd.get("location_type") ?? "tbd");
+  const needsVenue = fd.get("needs_venue") === "on";
 
   await s
     .from("events")
@@ -17,6 +19,8 @@ export async function updateEvent(eventId: string, fd: FormData) {
       event_type: String(fd.get("event_type") ?? "custom"),
       event_date: String(fd.get("event_date") ?? "") || null,
       location,
+      location_type: locationType,
+      needs_venue: needsVenue,
       latitude: coords?.lat ?? null,
       longitude: coords?.lng ?? null,
       guest_count: Number(fd.get("guest_count")) || null,
@@ -25,6 +29,12 @@ export async function updateEvent(eventId: string, fd: FormData) {
       color_palette: String(fd.get("color_palette") ?? "") || null,
     })
     .eq("id", eventId);
+
+  const { data: venueItem } = await s.from("event_plan_items").upsert({ event_id: eventId, chapter: "venue_logistics", item_key: "venue", label: "Venue", choice: needsVenue ? "hire" : "diy", vendor_category: "venue", notes: locationType === "tbd" ? "Location TBD" : null, updated_at: new Date().toISOString() }, { onConflict: "event_id,chapter,item_key" }).select("id").single();
+  if (venueItem) {
+    if (needsVenue) await s.from("event_vendor_needs").upsert({ event_id: eventId, plan_item_id: venueItem.id, category: "venue", label: "Venue", status: "needed", notes: locationType === "tbd" ? "Location TBD" : null, updated_at: new Date().toISOString() }, { onConflict: "plan_item_id" });
+    else await s.from("event_vendor_needs").delete().eq("plan_item_id", venueItem.id).eq("status", "needed");
+  }
 
   revalidatePath(`/events/${eventId}`);
   revalidatePath("/events");

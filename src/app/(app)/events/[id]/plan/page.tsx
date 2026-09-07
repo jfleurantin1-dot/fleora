@@ -2,9 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { Card, Progress } from "@/components/ui";
+import { Card, Progress, Badge } from "@/components/ui";
 import { EventWorkspaceHeader } from "@/components/event/event-workspace-header";
-import { SparkleIcon, ImageFrameIcon, UtensilsIcon, StoreIcon, MusicIcon, MapPinIcon, ChevronRightIcon } from "@/components/icons";
+import { SparkleIcon, ImageFrameIcon, UtensilsIcon, StoreIcon, MusicIcon, MapPinIcon, ChevronRightIcon, CheckIcon } from "@/components/icons";
 
 export default async function PartyPlanPage({ params }: { params: { id: string } }) {
   await requireProfile(); const supabase=createClient();
@@ -19,7 +19,7 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   const foodItems=(planItems??[]).filter(item=>item.chapter==="food_drinks");
   const foodDecided=foodItems.filter(item=>item.choice!=="undecided").length;
   const chapters=[
-    {title:"Event Details & Vision",desc:"Event essentials, theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:(photos??[]).length?"Started":"Start here",href:`/events/${event.id}/edit`,live:true},
+    {title:"Event Details & Vision",desc:"Event essentials, theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:"Edit",href:`/events/${event.id}/edit`,live:true},
     {title:"Decor",desc:"Welcome signs, focal backdrops, tablescapes, centerpieces, balloons, favors and custom signage.",icon:<SparkleIcon size={23}/>,status:decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
     {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, cake, desserts, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:foodItems.length?`${foodDecided}/${foodItems.length} decided`:"Plan food & drinks",href:`/events/${event.id}/plan/food-drinks`,live:true},
     {title:"Services",desc:"Photography, coordination, staffing, cleanup and more.",icon:<StoreIcon size={23}/>,status:(requests??[]).length?"Started":"Plan services",href:`/events/${event.id}/services`,live:true},
@@ -31,6 +31,7 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   const foodProgress=foodItems.length ? foodDecided/foodItems.length : 0;
   const servicesStarted=(requests??[]).length?1:0;
   const pct=Math.round(((started+decorProgress+foodProgress+servicesStarted)/chapters.length)*100);
+  const complete=(i:number)=>i===0?Boolean(event.name&&event.event_type&&event.event_date):(i===1?decorItems.length>0&&decorDecided===decorItems.length:(i===2?foodItems.length>0&&foodDecided===foodItems.length:false));
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/>
     <Card variant="feature" className="overflow-hidden bg-gradient-to-br from-plum-50 via-white to-blush-50">
@@ -41,8 +42,8 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
       {chapters.map((c,i)=><Card key={c.title} variant="interactive" className="flex min-h-[210px] flex-col">
         <div className="flex items-start justify-between gap-3"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-plum-50 text-plum-700">{c.icon}</span><span className="text-xs font-bold text-ink-400">Chapter {i+1}</span></div>
-        <h2 className="mt-4 font-display text-2xl text-ink-900">{c.title}</h2><p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">{c.desc}</p>
-        {c.live?<Link href={c.href} className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-plum-700 hover:underline">{c.status}<ChevronRightIcon size={14}/></Link>:<span className="mt-4 text-xs font-bold uppercase tracking-wide text-ink-400">{c.status}</span>}
+        <div className="mt-4 flex items-center gap-2"><h2 className="font-display text-2xl text-ink-900">{c.title}</h2>{complete(i)&&<Badge tone="green"><span className="inline-flex items-center gap-1"><CheckIcon size={12}/> Complete</span></Badge>}</div><p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">{c.desc}</p>
+        {c.live?<Link href={c.href} className={`mt-4 inline-flex items-center gap-1 text-sm font-bold hover:underline ${complete(i)?"text-sage-700":"text-plum-700"}`}>{i===0?"Edit":complete(i)?"Edit chapter":c.status}<ChevronRightIcon size={14}/></Link>:<span className="mt-4 text-xs font-bold uppercase tracking-wide text-ink-400">{c.status}</span>}
       </Card>)}
     </div>
   </div>;
