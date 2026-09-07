@@ -14,11 +14,17 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
     supabase.from("event_requests").select("id").eq("event_id",params.id),
     supabase.from("event_plan_items").select("chapter,item_key,choice").eq("event_id",params.id),
   ]);
-  const decorItems=(planItems??[]).filter(item=>item.chapter==="decor");
+  const decorAll=(planItems??[]).filter(item=>item.chapter==="decor");
+  const decorNone=decorAll.some(item=>item.item_key==="no_decor");
+  const decorItems=decorAll.filter(item=>item.item_key!=="no_decor");
   const decorDecided=decorItems.filter(item=>item.choice!=="undecided").length;
-  const foodItems=(planItems??[]).filter(item=>item.chapter==="food_drinks");
+  const foodAll=(planItems??[]).filter(item=>item.chapter==="food_drinks");
+  const foodNone=foodAll.some(item=>item.item_key==="skip_food_drinks");
+  const foodItems=foodAll.filter(item=>item.item_key!=="skip_food_drinks");
   const foodDecided=foodItems.filter(item=>item.choice!=="undecided").length;
-  const serviceItems=(planItems??[]).filter(item=>item.chapter==="services");
+  const serviceAll=(planItems??[]).filter(item=>item.chapter==="services");
+  const serviceNone=serviceAll.some(item=>item.item_key==="no_services");
+  const serviceItems=serviceAll.filter(item=>item.item_key!=="no_services");
   const serviceDecided=serviceItems.filter(item=>item.choice!=="undecided").length;
   const entertainmentItems=(planItems??[]).filter(item=>item.chapter==="entertainment");
   const entertainmentNone=entertainmentItems.some(item=>item.item_key==="no_entertainment");
@@ -26,19 +32,26 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   const entertainmentDecided=entertainmentSelected.filter(item=>item.choice!=="undecided").length;
   const chapters=[
     {title:"Event Details & Vision",desc:"Event essentials, theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:"Edit",href:`/events/${event.id}/edit`,live:true},
-    {title:"Decor",desc:"Welcome signs, focal backdrops, tablescapes, centerpieces, balloons, favors and custom signage.",icon:<SparkleIcon size={23}/>,status:decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
-    {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, cake, desserts, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:foodItems.length?`${foodDecided}/${foodItems.length} decided`:"Plan food & drinks",href:`/events/${event.id}/plan/food-drinks`,live:true},
-    {title:"Services",desc:"Photography, videography, photo booths, planning, beauty, staffing and custom services.",icon:<StoreIcon size={23}/>,status:serviceItems.length?`${serviceDecided}/${serviceItems.length} decided`:"Plan services",href:`/events/${event.id}/services`,live:true},
+    {title:"Decor",desc:"Welcome signs, focal backdrops, tablescapes, centerpieces, balloons, favors and custom signage.",icon:<SparkleIcon size={23}/>,status:decorNone?"Complete":decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
+    {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, cake, desserts, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:foodNone?"Complete":foodItems.length?`${foodDecided}/${foodItems.length} decided`:"Plan food & drinks",href:`/events/${event.id}/plan/food-drinks`,live:true},
+    {title:"Services",desc:"Photography, videography, photo booths, planning, beauty, staffing and custom services.",icon:<StoreIcon size={23}/>,status:serviceNone?"Complete":serviceItems.length?`${serviceDecided}/${serviceItems.length} decided`:"Plan services",href:`/events/${event.id}/services`,live:true},
     {title:"Entertainment",desc:"DJ, live music, kids entertainment, performers, games, inflatables and interactive experiences.",icon:<MusicIcon size={23}/>,status:entertainmentNone?"Complete":entertainmentSelected.length?`${entertainmentDecided}/${entertainmentSelected.length} decided`:"Plan entertainment",href:`/events/${event.id}/entertainment`,live:true},
     {title:"Venue & Logistics",desc:"Venue needs, access, parking, setup, cleanup and important notes.",icon:<MapPinIcon size={23}/>,status:"Coming soon",href:"#",live:false},
   ];
   const started=(photos??[]).length?1:0;
-  const decorProgress=decorItems.length ? decorDecided/decorItems.length : 0;
-  const foodProgress=foodItems.length ? foodDecided/foodItems.length : 0;
-  const serviceProgress=serviceItems.length ? serviceDecided/serviceItems.length : 0;
+  const decorProgress=decorNone?1:(decorItems.length ? decorDecided/decorItems.length : 0);
+  const foodProgress=foodNone?1:(foodItems.length ? foodDecided/foodItems.length : 0);
+  const serviceProgress=serviceNone?1:(serviceItems.length ? serviceDecided/serviceItems.length : 0);
   const entertainmentProgress=entertainmentNone?1:(entertainmentSelected.length?entertainmentDecided/entertainmentSelected.length:0);
   const pct=Math.round(((started+decorProgress+foodProgress+serviceProgress+entertainmentProgress)/chapters.length)*100);
-  const complete=(i:number)=>i===0?Boolean(event.name&&event.event_type&&event.event_date):(i===1?decorItems.length>0&&decorDecided===decorItems.length:(i===2?foodItems.length>0&&foodDecided===foodItems.length:(i===3?serviceItems.length>0&&serviceDecided===serviceItems.length:(i===4?entertainmentNone||(entertainmentSelected.length>0&&entertainmentDecided===entertainmentSelected.length):false))));
+  const complete=(i:number)=>{
+    if(i===0) return Boolean(event.name&&event.event_type&&event.event_date);
+    if(i===1) return decorNone||(decorItems.length>0&&decorDecided===decorItems.length);
+    if(i===2) return foodNone||(foodItems.length>0&&foodDecided===foodItems.length);
+    if(i===3) return serviceNone||(serviceItems.length>0&&serviceDecided===serviceItems.length);
+    if(i===4) return entertainmentNone||(entertainmentSelected.length>0&&entertainmentDecided===entertainmentSelected.length);
+    return false;
+  };
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/>
     <Card variant="feature" className="overflow-hidden bg-gradient-to-br from-plum-50 via-white to-blush-50">

@@ -11,6 +11,14 @@ export async function saveDecorPlan(eventId: string, formData: FormData) {
   const supabase = createClient();
   const { data: existingRows } = await supabase.from("event_plan_items").select("id,item_key").eq("event_id", eventId).eq("chapter", "decor");
   const existing = new Map((existingRows ?? []).map((row) => [row.item_key, row]));
+  const skipChapter = formData.get("no_decor") === "on";
+  if (skipChapter) {
+    const ids=(existingRows??[]).map(r=>r.id); if(ids.length){await supabase.from("event_vendor_needs").delete().in("plan_item_id",ids).eq("status","needed");await supabase.from("event_plan_items").delete().in("id",ids)}
+    await supabase.from("event_plan_items").upsert({event_id:eventId,chapter:"decor",item_key:"no_decor",label:"No decor needed",choice:"diy",vendor_category:null,notes:null,updated_at:new Date().toISOString()},{onConflict:"event_id,chapter,item_key"});
+    revalidatePath(`/events/${eventId}/plan`);revalidatePath(`/events/${eventId}/plan/decor`);revalidatePath(`/events/${eventId}/summary`);
+    if(String(formData.get("intent"))==="continue") redirect(`/events/${eventId}/plan/food-drinks`); redirect(`/events/${eventId}/plan/decor?saved=1`);
+  }
+  const skipRow=existing.get("no_decor"); if(skipRow) await supabase.from("event_plan_items").delete().eq("id",skipRow.id);
   const selectedKeys = new Set<string>();
 
   for (const item of DECOR_PLAN_ITEMS) {
@@ -40,7 +48,7 @@ export async function saveDecorPlan(eventId: string, formData: FormData) {
     }
   }
 
-  const removedIds = [...existing.entries()].filter(([key]) => !selectedKeys.has(key)).map(([, row]) => row.id);
+  const removedIds = [...existing.entries()].filter(([key]) => key !== "no_decor" && !selectedKeys.has(key)).map(([, row]) => row.id);
   if (removedIds.length) {
     await supabase.from("event_vendor_needs").delete().in("plan_item_id", removedIds).eq("status", "needed");
     await supabase.from("event_plan_items").delete().in("id", removedIds);

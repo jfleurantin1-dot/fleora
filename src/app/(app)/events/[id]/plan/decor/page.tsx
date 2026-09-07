@@ -9,6 +9,7 @@ import { categoryLabel } from "@/lib/constants";
 import { ChevronRightIcon, SparkleIcon } from "@/components/icons";
 import { saveDecorPlan } from "./actions";
 import { DecorPhotoManager } from "@/components/event/decor-photo-manager";
+import { ChapterInteractions } from "@/components/event/chapter-interactions";
 
 export default async function DecorPlanPage({ params, searchParams }: { params: { id: string }; searchParams?: { saved?: string } }) {
   await requireProfile();
@@ -23,9 +24,10 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
   ]);
 
   const byKey = new Map((rows ?? []).map((row) => [row.item_key, row]));
-  const selectedCount = byKey.size;
-  const decidedCount = (rows ?? []).filter((row) => row.choice !== "undecided").length;
-  const progress = selectedCount ? Math.round((decidedCount / selectedCount) * 100) : 0;
+  const noDecor = byKey.has("no_decor");
+  const selectedCount = (rows ?? []).filter(r=>r.item_key!=="no_decor").length;
+  const decidedCount = (rows ?? []).filter((row) => row.item_key!=="no_decor" && row.choice !== "undecided").length;
+  const progress = noDecor ? 100 : selectedCount ? Math.round((decidedCount / selectedCount) * 100) : 0;
   const saveWithId = saveDecorPlan.bind(null, params.id);
   const photosByItem = new Map<string, any[]>();
   for (const photo of itemPhotos ?? []) photosByItem.set(photo.plan_item_id, [...(photosByItem.get(photo.plan_item_id) ?? []), photo]);
@@ -56,7 +58,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
         <div className="mt-4"><Progress value={progress} /></div>
       </Card>
 
-      <form action={saveWithId} className="space-y-5">
+      <form action={saveWithId} className="space-y-5"><ChapterInteractions skipName="no_decor"/><Card><label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="no_decor" defaultChecked={noDecor} className="mt-1 h-5 w-5 rounded border-plum-300 text-plum-600"/><span><span className="block font-bold text-ink-900">No decor needed</span><span className="mt-1 block text-sm text-ink-500">Skip decor for this event and mark the chapter complete.</span></span></label></Card>
         <div className="grid gap-4 lg:grid-cols-2">
           {DECOR_PLAN_ITEMS.map((item) => {
             const row = byKey.get(item.key);
@@ -71,7 +73,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
                   </span>
                 </label>
 
-                <div className="mt-5 border-t fleora-divider pt-4">
+                <div data-plan-details-for={item.key} className="mt-5 border-t fleora-divider pt-4">
                   <p className="mb-2 text-xs font-bold uppercase tracking-wide text-ink-400">How will you handle it?</p>
                   <div className="grid gap-2 sm:grid-cols-3">
                     {(["diy", "hire", "undecided"] as PlanChoice[]).map((option) => (
