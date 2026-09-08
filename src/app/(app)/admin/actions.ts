@@ -1,7 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient, createClient } from "@/lib/supabase/server";
+import { sendFleoraEmail } from "@/lib/email";
 import { getProfile } from "@/lib/auth";
 import type { VendorStatus } from "@/lib/types";
 import { CATEGORIES } from "@/lib/constants";
@@ -135,6 +136,47 @@ export async function reviewVendorClaim(
     .eq("id", claimId);
   if (error) throw new Error(error.message);
 
+  const admin = createAdminClient();
+  const { data: vendorDetails } = await admin
+    .from("vendors")
+    .select("business_name")
+    .eq("id", vendorId)
+    .single();
+  const businessName = String(vendorDetails?.business_name ?? "your business");
+  const approved = decision === "approved";
+
+  await admin.from("notifications").insert({
+    user_id: claimantId,
+    kind: "vendor_claim",
+    title: approved ? "Your business profile is approved 🎉" : "Update on your business claim",
+    body: approved
+      ? `${businessName} is now claimed by your Fleora account. You can edit your profile and start receiving inquiries.`
+      : `Your claim for ${businessName} wasn’t approved. You can review the listing or contact Fleora if you believe this was a mistake.`,
+    href: approved ? "/vendor/dashboard" : `/vendors/${vendorId}`,
+  });
+
+  try {
+    const { data: authData } = await admin.auth.admin.getUserById(claimantId);
+    const claimantEmail = authData.user?.email;
+    if (claimantEmail) {
+      await sendFleoraEmail({
+        to: claimantEmail,
+        subject: approved
+          ? `${businessName} has been approved on Fleora`
+          : `Update on your Fleora claim for ${businessName}`,
+        heading: approved ? "Your Fleora business profile is approved 🎉" : "Your business claim was not approved",
+        body: approved
+          ? `${businessName} is now connected to your Fleora vendor account. You can edit your profile, manage availability, and receive client inquiries.`
+          : `We weren’t able to approve your claim for ${businessName}. If you believe this decision was made in error, you can review the business listing and contact Fleora for help.`,
+        ctaLabel: approved ? "Go to vendor dashboard" : "View business listing",
+        ctaHref: approved ? "/vendor/dashboard" : `/vendors/${vendorId}`,
+      });
+    }
+  } catch (emailError) {
+    console.error("Could not send vendor claim decision email", emailError);
+  }
+
+  revalidatePath("/notifications");
   revalidatePath("/admin");
   revalidatePath(`/vendors/${vendorId}`);
   revalidatePath("/vendor/dashboard");
