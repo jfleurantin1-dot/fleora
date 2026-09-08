@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/client";
 
 const BUCKET = "vendor-photos";
 const MAX_MB = 10;
-const MAX_PHOTOS = 12;
 
 /**
  * Uploads portfolio images directly to Supabase Storage. The ordered public
@@ -16,6 +15,7 @@ const MAX_PHOTOS = 12;
 export function PhotoUploader({ userId, initial }: { userId: string; initial: string[] }) {
   const [urls, setUrls] = useState<string[]>(initial);
   const [busy, setBusy] = useState(false);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
@@ -30,10 +30,6 @@ export function PhotoUploader({ userId, initial }: { userId: string; initial: st
     const added: string[] = [];
 
     for (const file of files) {
-      if (urls.length + added.length >= MAX_PHOTOS) {
-        setError(`You can add up to ${MAX_PHOTOS} photos.`);
-        break;
-      }
       if (!file.type.startsWith("image/")) {
         setError("Please choose image files only.");
         continue;
@@ -71,6 +67,17 @@ export function PhotoUploader({ userId, initial }: { userId: string; initial: st
     });
   }
 
+  function dropOn(index: number) {
+    if (dragIndex == null || dragIndex === index) { setDragIndex(null); return; }
+    setUrls((current) => {
+      const next = [...current];
+      const [picked] = next.splice(dragIndex, 1);
+      next.splice(index, 0, picked);
+      return next;
+    });
+    setDragIndex(null);
+  }
+
   function makeCover(index: number) {
     if (index === 0) return;
     setUrls((current) => {
@@ -98,11 +105,11 @@ export function PhotoUploader({ userId, initial }: { userId: string; initial: st
       {urls.length > 0 && (
         <>
           <div className="rounded-xl bg-plum-50 px-3 py-2 text-xs text-plum-700">
-            <strong>Your first photo is your cover image.</strong> Reorder photos or choose “Make cover,” then save your profile.
+            <strong>Your first photo is your cover image.</strong> Drag photos into the order you want, or choose “Make cover,” then save your profile.
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {urls.map((url, index) => (
-              <div key={url} className="overflow-hidden rounded-2xl border border-[#E9E3E7] bg-white shadow-sm">
+              <div key={url} draggable onDragStart={() => setDragIndex(index)} onDragOver={(e) => e.preventDefault()} onDrop={() => dropOn(index)} onDragEnd={() => setDragIndex(null)} className={`cursor-grab overflow-hidden rounded-2xl border bg-white shadow-sm active:cursor-grabbing ${dragIndex===index?"border-plum-400 opacity-60":"border-[#E9E3E7]"}`}>
                 <div className="relative aspect-square overflow-hidden bg-plum-50">
                   <Image src={url} alt={`Portfolio photo ${index + 1}`} fill sizes="180px" className="object-cover" />
                   {index === 0 && (
@@ -137,7 +144,7 @@ export function PhotoUploader({ userId, initial }: { userId: string; initial: st
           {busy ? "Uploading…" : urls.length ? "Add more photos" : "Upload portfolio photos"}
           <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="hidden" onChange={onFiles} disabled={busy} />
         </label>
-        <p className="mt-2 text-xs text-ink-400">JPG, PNG, WEBP or GIF · up to {MAX_MB}MB each · {MAX_PHOTOS} photos max</p>
+        <p className="mt-2 text-xs text-ink-400">JPG, PNG, WEBP or GIF · up to {MAX_MB}MB each · add as many portfolio photos as you need</p>
       </div>
 
       {error && <p className="rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>}

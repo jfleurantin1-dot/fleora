@@ -9,12 +9,15 @@ import { money, shortDate, timeRange } from "@/lib/format";
 import { categoryLabel, EVENT_TYPE_MAP } from "@/lib/constants";
 import { requestQuote } from "@/app/(app)/events/[id]/matches/[category]/actions";
 import { ClaimForm } from "./claim-form";
+import { messageVendor } from "./network-actions";
 
 export default async function VendorProfile({ params, searchParams }: { params: { id: string }; searchParams?: { eventId?: string; category?: string } }) {
-  await requireProfile();
+  const profile = await requireProfile();
   const supabase = createClient();
   const { data: vendor } = await supabase.from("vendors").select("*").eq("id", params.id).single();
   if (!vendor) notFound();
+  const isOwnVendor = profile.account_type === "vendor" && vendor.user_id === profile.id;
+  const isVendorViewer = profile.account_type === "vendor";
 
   const eventId = searchParams?.eventId;
   const category = searchParams?.category;
@@ -34,16 +37,10 @@ export default async function VendorProfile({ params, searchParams }: { params: 
     <div className="mx-auto max-w-5xl">
       <Link href={hasContext ? `/events/${eventId}/matches/${encodeURIComponent(category!)}` : "/vendors/browse"} className="mb-5 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-600 transition hover:text-plum-700"><ArrowLeftIcon size={16} /> {hasContext ? "Back to Matches" : "Back to Discover"}</Link>
 
-      <div className="mb-6 grid gap-2 overflow-hidden rounded-[24px] bg-plum-50 sm:grid-cols-2 sm:grid-rows-2">
-        {photos && photos.length > 0 ? (
-          <>
-            <div className="relative min-h-72 sm:row-span-2"><Image src={photos[0].url} alt={vendor.business_name} fill sizes="50vw" className="object-cover" /></div>
-            {photos.slice(1, 3).map((p) => <div key={p.id} className="relative min-h-36"><Image src={p.url} alt="" fill sizes="50vw" className="object-cover" /></div>)}
-            {photos.length === 1 && <div className="grid min-h-72 place-items-center bg-gradient-to-br from-blush-100 to-plum-100 sm:row-span-2"><span className="font-display text-6xl text-plum-300">F</span></div>}
-          </>
-        ) : (
-          <div className="col-span-full grid min-h-72 place-items-center bg-gradient-to-br from-blush-100 to-plum-100"><span className="font-display text-7xl text-plum-300">F</span></div>
-        )}
+      {isOwnVendor && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-plum-100 bg-plum-50 px-4 py-3"><div><p className="text-sm font-bold text-plum-800">Profile Preview</p><p className="text-xs text-ink-600">This is how clients see your Fleora storefront.</p></div><ButtonLink href="/vendor/onboarding" variant="secondary" size="sm">Edit profile</ButtonLink></div>}
+
+      <div className="mb-6 grid gap-2 overflow-hidden rounded-[24px] bg-plum-50 sm:grid-cols-3">
+        {photos && photos.length > 0 ? photos.slice(0,3).map((p,index) => <div key={p.id} className="relative min-h-72 sm:min-h-[360px]"><Image src={p.url} alt={index===0?vendor.business_name:`${vendor.business_name} portfolio photo ${index+1}`} fill sizes="(max-width:640px) 100vw,33vw" className="object-cover" /></div>) : <div className="col-span-full grid min-h-72 place-items-center bg-gradient-to-br from-blush-100 to-plum-100"><span className="font-display text-7xl text-plum-300">F</span></div>}
       </div>
 
       <div className="grid gap-7 lg:grid-cols-[1fr_320px]">
@@ -76,24 +73,15 @@ export default async function VendorProfile({ params, searchParams }: { params: 
 
         <aside className="lg:sticky lg:top-24 lg:self-start">
           <Card variant="feature" padding="lg">
-            <p className="fleora-kicker">Ready to connect?</p>
-            <h2 className="mt-2 font-display text-2xl text-ink-900">{hasContext ? "Request a quote" : `Add ${vendor.business_name} to your event.`}</h2>
-            {hasContext ? <>
-              <div className="mt-4 rounded-xl bg-plum-50 p-3 text-xs leading-6 text-ink-600"><p className="font-bold text-ink-900">Inquiry summary</p><p>Event type: {eventTypeLabel}</p><p>Service needed: {categoryLabel(category!)}</p><p>Date: {shortDate(contextEvent!.event_date)}</p><p>Time: {timeRange((contextEvent as any).event_start_time,(contextEvent as any).event_end_time)}</p><p>Location: {contextEvent!.location ?? "TBD"}</p><p>Guests: {contextEvent!.guest_count ?? "TBD"}</p></div>
-              <form action={requestQuote.bind(null,eventId!,category!,vendor.id)} className="mt-4"><label className="text-xs font-bold uppercase tracking-wide text-ink-500">Your message</label><p className="mt-1 text-xs text-ink-500">This is your personal note to the vendor. Fleora shares the event details separately.</p><textarea name="message" rows={6} defaultValue={`Hi! I’d love to get a quote for ${categoryLabel(category!)} for my event. Please let me know about your availability and pricing. Thank you!`} className="mt-2 w-full rounded-xl border border-plum-100 bg-white px-3 py-2.5 text-sm"/><button type="submit" className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-plum-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-plum-700">Send Request</button></form>
+            {isOwnVendor ? <>
+              <p className="fleora-kicker">Your storefront</p><h2 className="mt-2 font-display text-2xl text-ink-900">Looking good.</h2><p className="mt-2 text-sm leading-relaxed text-ink-600">Client actions are hidden while you preview your own profile.</p><ButtonLink href="/vendor/onboarding" className="mt-5 w-full">Edit profile</ButtonLink>
+            </> : isVendorViewer ? <>
+              <p className="fleora-kicker">Vendor Network</p><h2 className="mt-2 font-display text-2xl text-ink-900">Connect with {vendor.business_name}</h2><p className="mt-2 text-sm leading-relaxed text-ink-600">Send a private vendor-to-vendor message for referrals, collaborations or networking.</p>{vendor.user_id ? <form action={messageVendor.bind(null,vendor.id)}><button type="submit" className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-plum-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-plum-700">Message Vendor</button></form> : <p className="mt-4 rounded-xl bg-ivory-100 p-3 text-xs text-ink-500">This listing has not been claimed yet, so messaging is not available.</p>}
             </> : <>
-              <p className="mt-2 text-sm leading-relaxed text-ink-600">Choose the event you&apos;re planning and Fleora will connect the request to it.</p>
-              <ButtonLink href="/events" className="mt-5 w-full">Choose an event</ButtonLink>
+              <p className="fleora-kicker">Ready to connect?</p><h2 className="mt-2 font-display text-2xl text-ink-900">{hasContext ? "Request a quote" : `Add ${vendor.business_name} to your event.`}</h2>
+              {hasContext ? <><div className="mt-4 rounded-xl bg-plum-50 p-3 text-xs leading-6 text-ink-600"><p className="font-bold text-ink-900">Inquiry summary</p><p>Event type: {eventTypeLabel}</p><p>Service needed: {categoryLabel(category!)}</p><p>Date: {shortDate(contextEvent!.event_date)}</p><p>Time: {timeRange((contextEvent as any).event_start_time,(contextEvent as any).event_end_time)}</p><p>Location: {contextEvent!.location ?? "TBD"}</p><p>Guests: {contextEvent!.guest_count ?? "TBD"}</p></div><form action={requestQuote.bind(null,eventId!,category!,vendor.id)} className="mt-4"><label className="text-xs font-bold uppercase tracking-wide text-ink-500">Your message</label><p className="mt-1 text-xs text-ink-500">This is your personal note to the vendor. Fleora shares the event details separately.</p><textarea name="message" rows={6} defaultValue={`Hi! I’d love to get a quote for ${categoryLabel(category!)} for my event. Please let me know about your availability and pricing. Thank you!`} className="mt-2 w-full rounded-xl border border-plum-100 bg-white px-3 py-2.5 text-sm"/><button type="submit" className="mt-3 inline-flex w-full items-center justify-center rounded-full bg-plum-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-plum-700">Send Request</button></form></> : <><p className="mt-2 text-sm leading-relaxed text-ink-600">Choose the event you&apos;re planning and Fleora will connect the request to it.</p><ButtonLink href="/events" className="mt-5 w-full">Choose an event</ButtonLink></>}<ButtonLink href="/messages" variant="secondary" className="mt-2 w-full">Open messages</ButtonLink><p className="mt-4 text-center text-xs text-ink-400">{vendor.response_rate}% response rate</p>
             </>}
-            <ButtonLink href="/messages" variant="secondary" className="mt-2 w-full">Open messages</ButtonLink>
-            <p className="mt-4 text-center text-xs text-ink-400">{vendor.response_rate}% response rate</p>
-            {!vendor.user_id && (
-              <div className="mt-5 border-t fleora-divider pt-5">
-                <p className="text-sm font-semibold text-ink-900">Is this your business?</p>
-                <p className="mt-1 mb-3 text-xs leading-relaxed text-ink-500">Claim the complimentary Fleora listing to manage your photos, pricing, availability, inquiries and quotes.</p>
-                <ClaimForm vendorId={vendor.id} />
-              </div>
-            )}
+            {!vendor.user_id && !isVendorViewer && <div className="mt-5 border-t fleora-divider pt-5"><p className="text-sm font-semibold text-ink-900">Is this your business?</p><p className="mt-1 mb-3 text-xs leading-relaxed text-ink-500">Claim the complimentary Fleora listing to manage your photos, pricing, availability, inquiries and quotes.</p><ClaimForm vendorId={vendor.id} /></div>}
           </Card>
         </aside>
       </div>

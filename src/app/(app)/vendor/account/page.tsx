@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/auth";
 import { ButtonLink, Card, PageHeader } from "@/components/ui";
-import { BellIcon, CalendarIcon, UserIcon } from "@/components/icons";
+import { BellIcon, CalendarIcon, UserIcon, SearchIcon } from "@/components/icons";
 
 export default async function VendorAccountPage(){
   const profile=await requireProfile();
@@ -15,6 +15,7 @@ export default async function VendorAccountPage(){
         <ButtonLink href="/vendor/onboarding" className="mt-5">Edit my profile</ButtonLink>
       </Card>
       <Card padding="none">
+        <Link href="/vendors/browse" className="flex items-center gap-3 border-b border-plum-100 px-5 py-4 text-sm font-semibold text-ink-700 hover:bg-plum-50"><SearchIcon size={18}/><span>Discover Vendors</span></Link>
         <Link href="/notifications" className="flex items-center gap-3 border-b border-plum-100 px-5 py-4 text-sm font-semibold text-ink-700 hover:bg-plum-50"><BellIcon size={18}/><span>Notifications</span></Link>
         <Link href="/vendor/availability" className="flex items-center gap-3 px-5 py-4 text-sm font-semibold text-ink-700 hover:bg-plum-50"><CalendarIcon size={18}/><span>Manage availability</span></Link>
       </Card>

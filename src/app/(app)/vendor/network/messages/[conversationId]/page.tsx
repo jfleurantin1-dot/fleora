@@ -1,0 +1,14 @@
+import Link from "next/link";
+import {notFound} from "next/navigation";
+import {requireVendor} from "@/lib/auth";
+import {createClient} from "@/lib/supabase/server";
+import {Card} from "@/components/ui";
+import {timeAgo} from "@/lib/format";
+import {sendVendorNetworkMessage} from "./actions";
+export default async function VendorNetworkThread({params}:{params:{conversationId:string}}){
+ const {profile,vendor}=await requireVendor(); if(!vendor)notFound(); const s=createClient();
+ const {data:c}=await (s.from("vendor_network_conversations") as any).select("*").eq("id",params.conversationId).single(); if(!c)notFound();
+ const otherId=c.vendor_a_id===vendor.id?c.vendor_b_id:c.vendor_a_id;
+ const [{data:other},{data:messages}]=await Promise.all([s.from("vendors").select("id,business_name,location").eq("id",otherId).single(),(s.from("vendor_network_messages") as any).select("*").eq("conversation_id",params.conversationId).order("created_at")]);
+ return <div className="mx-auto max-w-3xl"><Link href="/messages" className="mb-5 inline-flex text-sm font-semibold text-plum-700 hover:underline">← Messages</Link><Card variant="feature" className="mb-4"><p className="fleora-kicker">Vendor Network</p><div className="mt-1 flex items-center justify-between gap-3"><div><h1 className="font-display text-3xl text-ink-900">{other?.business_name??"Vendor"}</h1><p className="mt-1 text-sm text-ink-500">{other?.location??"Fleora vendor"}</p></div><Link href={`/vendors/${otherId}`} className="text-sm font-semibold text-plum-700">View profile →</Link></div></Card><div className="overflow-hidden rounded-[22px] border border-[#E9E3E7] bg-white shadow-fleora"><div className="scroll-thin max-h-[56vh] space-y-4 overflow-y-auto bg-gradient-to-b from-white to-ivory-50 p-4 sm:p-6">{(messages??[]).map((m:any)=>{const mine=m.sender_id===profile.id;return <div key={m.id} className={`flex ${mine?"justify-end":"justify-start"}`}><div className={`max-w-[82%] whitespace-pre-wrap rounded-[18px] px-4 py-3 text-sm leading-relaxed shadow-sm ${mine?"rounded-br-md bg-plum-500 text-white":"rounded-bl-md border border-[#E9E3E7] bg-white text-ink-700"}`}>{m.body}<div className={`mt-1.5 text-[10px] ${mine?"text-plum-100":"text-ink-400"}`}>{timeAgo(m.created_at)}</div></div></div>})}{!(messages??[]).length&&<p className="py-10 text-center text-sm text-ink-400">Start a conversation with this vendor.</p>}</div><form action={sendVendorNetworkMessage.bind(null,params.conversationId)} className="flex gap-2 border-t border-plum-100 p-3 sm:p-4"><textarea name="body" required rows={2} placeholder="Message this vendor…" className="min-h-[48px] flex-1 resize-none rounded-xl border border-plum-100 px-3 py-2.5 text-sm"/><button className="self-end rounded-full bg-plum-600 px-5 py-3 text-sm font-bold text-white hover:bg-plum-700">Send</button></form></div></div>;
+}
