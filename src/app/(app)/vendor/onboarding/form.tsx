@@ -104,7 +104,7 @@ export function VendorForm({
                     className="h-4 w-4 rounded border-plum-300 text-plum-600"
                   />
                   <span>
-                    <><CategoryIcon category={c.key} size={22} /> {c.label}</>
+                    <><CategoryIcon category={c.key} size={22} /><span><span className="block">{c.label}</span>{c.helper&&<span className="mt-0.5 block text-[11px] font-normal leading-snug text-ink-500">{c.helper}</span>}</span></>
                   </span>
                 </label>
               ))}

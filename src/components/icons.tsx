@@ -91,3 +91,6 @@ export function PaintIcon(props: IconProps){return <IconBase {...props}><path d=
 export function MicrophoneIcon(props: IconProps){return <IconBase {...props}><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3m-4 0h8"/></IconBase>}
 export function PenIcon(props: IconProps){return <IconBase {...props}><path d="m4 20 4-1 11-11-3-3L5 16l-1 4ZM14 7l3 3"/></IconBase>}
 export function MakeupIcon(props: IconProps){return <IconBase {...props}><path d="M8 3h5v9H8zM7 12h7v9H7zM17 4l2 2-4 7-2-2 4-7Z"/></IconBase>}
+
+export function CupIcon(props: IconProps){return <IconBase {...props}><path d="M6 8h11l-1 11H8L6 8Z"/><path d="M9 8 11 3h5M17 10h1a3 3 0 0 1 0 6h-2"/></IconBase>}
+export function IceCreamTruckIcon(props: IconProps){return <IconBase {...props}><path d="M3 8h10v9H3zM13 11h4l4 3v3h-8z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 8c0-2 1.5-3 3-3s3 1 3 3M7 5c0-1.5 1-2.5 2-2.5S11 3.5 11 5"/></IconBase>}

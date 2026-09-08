@@ -12,6 +12,7 @@ export type CategoryGroup =
 
 export type CategoryKey =
   | "venue"
+  | "outdoor_venue"
   | "event_styling"
   | "balloons"
   | "backdrops"
@@ -37,6 +38,7 @@ export type CategoryKey =
   | "cookies"
   | "cake_pops"
   | "sweet_treats"
+  | "ice_cream_truck"
   | "photography"
   | "videography"
   | "content_creator"
@@ -54,6 +56,7 @@ export type CategoryKey =
   | "hair"
   | "makeup"
   | "event_planner"
+  | "mc_event_host"
   | "event_staff"
   | "custom_service";
 
@@ -65,6 +68,7 @@ export interface CategoryGroupDef {
 export const CATEGORY_GROUPS: CategoryGroupDef[] = [
   { key: "venue", label: "Venues" },
   { key: "decor", label: "Decor & styling" },
+  { key: "services", label: "Event services" },
   { key: "rentals", label: "Rentals" },
   { key: "food", label: "Food & drinks" },
   { key: "dessert", label: "Desserts" },
@@ -72,7 +76,6 @@ export const CATEGORY_GROUPS: CategoryGroupDef[] = [
   { key: "entertainment", label: "Entertainment" },
   { key: "stationery", label: "Stationery & signage" },
   { key: "beauty", label: "Beauty" },
-  { key: "services", label: "Event services" },
 ];
 
 export interface CategoryDef {
@@ -80,10 +83,12 @@ export interface CategoryDef {
   group: CategoryGroup;
   label: string;
   budgetShare: number;
+  helper?: string;
 }
 
 export const CATEGORIES: CategoryDef[] = [
   { key: "venue", group: "venue", label: "Venue", budgetShare: 0.28 },
+  { key: "outdoor_venue", group: "venue", label: "Outdoor venue", budgetShare: 0.22 },
 
   { key: "event_styling", group: "decor", label: "Event stylist", budgetShare: 0.1 },
   { key: "balloons", group: "decor", label: "Balloon artist", budgetShare: 0.06 },
@@ -105,7 +110,7 @@ export const CATEGORIES: CategoryDef[] = [
   { key: "catering", group: "food", label: "Catering", budgetShare: 0.3 },
   { key: "charcuterie", group: "food", label: "Charcuterie", budgetShare: 0.06 },
   { key: "bartender", group: "food", label: "Bartender", budgetShare: 0.06 },
-  { key: "mobile_bar", group: "food", label: "Mobile bar", budgetShare: 0.07 },
+  { key: "mobile_bar", group: "food", label: "Mobile bar (non-alcoholic)", budgetShare: 0.07, helper: "Lemonade carts, coffee carts, specialty drink stations & more" },
   { key: "food_truck", group: "food", label: "Food truck", budgetShare: 0.16 },
 
   { key: "cake", group: "dessert", label: "Cake", budgetShare: 0.05 },
@@ -113,6 +118,7 @@ export const CATEGORIES: CategoryDef[] = [
   { key: "cookies", group: "dessert", label: "Cookies", budgetShare: 0.025 },
   { key: "cake_pops", group: "dessert", label: "Cake pops", budgetShare: 0.02 },
   { key: "sweet_treats", group: "dessert", label: "Other sweet treats", budgetShare: 0.03 },
+  { key: "ice_cream_truck", group: "dessert", label: "Ice cream truck", budgetShare: 0.06 },
 
   { key: "photography", group: "media", label: "Photographer", budgetShare: 0.09 },
   { key: "videography", group: "media", label: "Videographer", budgetShare: 0.07 },
@@ -135,6 +141,7 @@ export const CATEGORIES: CategoryDef[] = [
   { key: "makeup", group: "beauty", label: "Makeup artist", budgetShare: 0.04 },
 
   { key: "event_planner", group: "services", label: "Event planner / coordinator", budgetShare: 0.08 },
+  { key: "mc_event_host", group: "services", label: "MC / Event host", budgetShare: 0.05 },
   { key: "event_staff", group: "services", label: "Event staff / servers", budgetShare: 0.06 },
   { key: "custom_service", group: "services", label: "Other event service", budgetShare: 0.04 },
 ];
