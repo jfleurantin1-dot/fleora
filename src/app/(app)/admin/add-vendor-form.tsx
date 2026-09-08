@@ -5,13 +5,14 @@ import { useFormState, useFormStatus } from "react-dom";
 import { createDirectoryVendor, type AdminVendorState } from "./actions";
 import { Button, Card, Field, FormError, Input, Textarea } from "@/components/ui";
 import { CATEGORY_GROUPS, categoriesInGroup } from "@/lib/constants";
+import { PhotoUploader } from "@/components/vendor/photo-uploader";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return <Button type="submit" disabled={pending}>{pending ? "Adding vendor…" : "Add vendor to Fleora"}</Button>;
 }
 
-export function AddVendorForm() {
+export function AddVendorForm({ adminUserId }: { adminUserId: string }) {
   const [state, action] = useFormState<AdminVendorState, FormData>(createDirectoryVendor, {});
 
   return (
@@ -29,7 +30,6 @@ export function AddVendorForm() {
         </div>
         <Field label="Description"><Textarea name="description" rows={3} placeholder="Modern event styling, balloons, backdrops and more…" /></Field>
 
-        <Field label="Profile picture URL" hint="Optional. Paste a direct image URL for the business logo or main profile photo."><Input name="profile_photo" type="url" placeholder="https://…" /></Field>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Website"><Input name="website" type="url" placeholder="https://…" /></Field>
@@ -62,9 +62,11 @@ export function AddVendorForm() {
           </div>
         </div>
 
-        <Field label="Portfolio photo URLs" hint="Optional. Paste up to 7 additional image URLs, one per line. The profile picture above will appear first.">
-          <Textarea name="photos" rows={4} placeholder={"https://…\nhttps://…"} />
-        </Field>
+        <div>
+          <p className="mb-2 text-sm font-semibold text-ink-900">Business photos</p>
+          <p className="mb-3 text-xs text-ink-500">Upload photos directly. The first photo becomes the storefront cover, and you can drag to rearrange them.</p>
+          <PhotoUploader userId={adminUserId} initial={[]} />
+        </div>
 
         <FormError message={state.error} />
         {state.ok && <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">Vendor added and published. You can add another one now.</p>}

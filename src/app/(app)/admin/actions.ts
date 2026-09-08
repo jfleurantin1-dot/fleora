@@ -86,20 +86,10 @@ export async function createDirectoryVendor(
     });
   }
 
-  const profilePhoto = String(formData.get("profile_photo") ?? "").trim();
   const photoRaw = String(formData.get("photos") ?? "");
-  const urls = photoRaw
-    .split(/[\n,]/)
-    .map((s) => s.trim())
-    .filter((s) => /^https?:\/\//i.test(s));
-  const allPhotos = [
-    ...( /^https?:\/\//i.test(profilePhoto) ? [profilePhoto] : [] ),
-    ...urls,
-  ].slice(0, 8);
+  const allPhotos = photoRaw.split("\n").map((s) => s.trim()).filter((s) => /^https?:\/\//i.test(s));
   if (allPhotos.length) {
-    await supabase
-      .from("vendor_photos")
-      .insert(allPhotos.map((url, sort) => ({ vendor_id: vendorId, url, sort })));
+    await supabase.from("vendor_photos").insert(allPhotos.map((url, sort) => ({ vendor_id: vendorId, url, sort })));
   }
 
   revalidatePath("/admin");
@@ -180,4 +170,45 @@ export async function reviewVendorClaim(
   revalidatePath("/admin");
   revalidatePath(`/vendors/${vendorId}`);
   revalidatePath("/vendor/dashboard");
+}
+
+
+export async function updateDirectoryVendor(vendorId: string, formData: FormData) {
+  await assertAdmin();
+  const supabase = createClient();
+  const businessName = String(formData.get("business_name") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim() || null;
+  const location = String(formData.get("location") ?? "").trim() || null;
+  const website = String(formData.get("website") ?? "").trim() || null;
+  const instagram = String(formData.get("instagram") ?? "").trim() || null;
+  const contactEmail = String(formData.get("contact_email") ?? "").trim() || null;
+  const contactPhone = String(formData.get("contact_phone") ?? "").trim() || null;
+  const radius = Math.min(150, Math.max(5, Number(formData.get("service_radius_miles")) || 25));
+  const selected = new Set(formData.getAll("category").map(String));
+  const validKeys = new Set(CATEGORIES.map((c) => c.key));
+  const categories = [...selected].filter((c) => validKeys.has(c as never));
+  if (!businessName) throw new Error("Enter the vendor's business name.");
+  if (!categories.length) throw new Error("Choose at least one service category.");
+  const coords = location ? geocodeMa(location) : null;
+  const { error } = await supabase.from("vendors").update({
+    business_name: businessName, description, location, latitude: coords?.lat ?? null, longitude: coords?.lng ?? null,
+    service_radius_miles: radius, website, instagram, contact_email: contactEmail, contact_phone: contactPhone,
+  }).eq("id", vendorId);
+  if (error) throw new Error(error.message);
+
+  await supabase.from("vendor_categories").delete().eq("vendor_id", vendorId);
+  const { error: catError } = await supabase.from("vendor_categories").insert(categories.map((category) => ({ vendor_id: vendorId, category })));
+  if (catError) throw new Error(catError.message);
+
+  const urls = String(formData.get("photos") ?? "").split("\n").map((x) => x.trim()).filter((x) => /^https?:\/\//i.test(x));
+  await supabase.from("vendor_photos").delete().eq("vendor_id", vendorId);
+  if (urls.length) {
+    const { error: photoError } = await supabase.from("vendor_photos").insert(urls.map((url, sort) => ({ vendor_id: vendorId, url, sort })));
+    if (photoError) throw new Error(photoError.message);
+  }
+
+  revalidatePath("/admin");
+  revalidatePath(`/admin/vendors/${vendorId}/edit`);
+  revalidatePath(`/vendors/${vendorId}`);
+  revalidatePath("/vendors/browse");
 }

@@ -8,6 +8,7 @@ import { StoreIcon, UserIcon, CalendarIcon, CardIcon, WalletIcon, SearchIcon } f
 import { categoryLabel } from "@/lib/constants";
 import { setVendorStatus, reviewVendorClaim } from "./actions";
 import { AddVendorForm } from "./add-vendor-form";
+import { CopyClaimLink } from "./copy-claim-link";
 
 export default async function AdminPage() {
   const profile = await requireProfile("/admin");
@@ -69,7 +70,7 @@ export default async function AdminPage() {
       </div>
 
       <section id="add-vendor" className="scroll-mt-24">
-        <AddVendorForm />
+        <AddVendorForm adminUserId={profile.id} />
       </section>
 
       <section id="claim-requests" className="scroll-mt-24">
@@ -133,6 +134,8 @@ export default async function AdminPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Link href={`/vendors/${v.id}`} className="inline-flex min-h-9 items-center rounded-xl border border-plum-200 bg-white px-3 py-1.5 text-sm font-semibold text-plum-700">View profile</Link>
+                <Link href={`/admin/vendors/${v.id}/edit`} className="inline-flex min-h-9 items-center rounded-xl border border-plum-200 bg-white px-3 py-1.5 text-sm font-semibold text-plum-700">Edit business</Link>
+                {!v.user_id && <CopyClaimLink vendorId={v.id} />}
                 {v.status !== "approved" ? <form action={setVendorStatus.bind(null, v.id, "approved")}><Button type="submit" size="sm" variant="secondary">Approve</Button></form> : <form action={setVendorStatus.bind(null, v.id, "suspended")}><Button type="submit" size="sm" variant="secondary">Suspend</Button></form>}
               </div>
             </Card>
