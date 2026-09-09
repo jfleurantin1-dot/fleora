@@ -39,8 +39,11 @@ export default async function VendorProfile({ params, searchParams }: { params: 
 
       {isOwnVendor && <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-plum-100 bg-plum-50 px-4 py-3"><div><p className="text-sm font-bold text-plum-800">Profile Preview</p><p className="text-xs text-ink-600">This is how clients see your Fleora storefront.</p></div><ButtonLink href="/vendor/onboarding" variant="secondary" size="sm">Edit profile</ButtonLink></div>}
 
-      <div className="mb-6 grid gap-2 overflow-hidden rounded-[24px] bg-plum-50 sm:grid-cols-3">
-        {photos && photos.length > 0 ? photos.slice(0,3).map((p,index) => <div key={p.id} className="relative min-h-72 sm:min-h-[360px]"><Image src={p.url} alt={index===0?vendor.business_name:`${vendor.business_name} portfolio photo ${index+1}`} fill sizes="(max-width:640px) 100vw,33vw" className="object-cover" /></div>) : <div className="col-span-full grid min-h-72 place-items-center bg-gradient-to-br from-blush-100 to-plum-100"><span className="font-display text-7xl text-plum-300">F</span></div>}
+      <div className="mb-6">
+        <div className="grid gap-2 overflow-hidden rounded-[24px] bg-plum-50 sm:grid-cols-3">
+          {photos && photos.length > 0 ? photos.slice(0,3).map((p,index) => <div key={p.id} className="relative min-h-72 sm:min-h-[360px]"><Image src={p.url} alt={index===0?vendor.business_name:`${vendor.business_name} portfolio photo ${index+1}`} fill sizes="(max-width:640px) 100vw,33vw" className="object-cover" /></div>) : <div className="col-span-full grid min-h-72 place-items-center bg-gradient-to-br from-blush-100 to-plum-100"><span className="font-display text-7xl text-plum-300">F</span></div>}
+        </div>
+        {photos && photos.length > 3 && <div className="mt-3 flex justify-end"><a href="#all-photos" className="inline-flex min-h-10 items-center justify-center rounded-full border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm transition hover:bg-plum-50">View all {photos.length} photos</a></div>}
       </div>
 
       <div className="grid gap-7 lg:grid-cols-[1fr_320px]">
@@ -53,6 +56,8 @@ export default async function VendorProfile({ params, searchParams }: { params: 
             </div>
             <Badge tone="champagne">Fleora marketplace</Badge>
           </div>
+
+          {photos && photos.length > 3 && <section id="all-photos" className="scroll-mt-24 border-b fleora-divider py-7"><div className="flex items-end justify-between gap-3"><div><p className="fleora-kicker">Portfolio</p><h2 className="font-display text-2xl text-ink-900">All photos</h2></div><span className="text-sm text-ink-500">{photos.length} photos</span></div><div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{photos.map((p,index) => <div key={p.id} className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-plum-50"><Image src={p.url} alt={`${vendor.business_name} portfolio photo ${index+1}`} fill sizes="(max-width:640px) 100vw,(max-width:1024px) 50vw,33vw" className="object-cover" /></div>)}</div></section>}
 
           {vendor.description && <section className="py-7"><p className="fleora-kicker mb-2">About</p><p className="max-w-3xl text-sm leading-7 text-ink-600">{vendor.description}</p><div className="mt-4 flex flex-wrap gap-2">{(cats ?? []).map((c) => <Badge key={c.category} tone="slate">{categoryLabel(c.category)}</Badge>)}</div></section>}
 
