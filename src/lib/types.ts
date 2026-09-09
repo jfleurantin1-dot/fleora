@@ -10,7 +10,7 @@
 
 export type AccountType = "client" | "vendor" | "admin";
 export type EventStatus = "planning" | "active" | "completed" | "cancelled";
-export type VendorStatus = "pending" | "approved" | "suspended";
+export type VendorStatus = "pending" | "approved" | "suspended" | "deleted";
 export type RequestStatus = "open" | "quoted" | "booked" | "closed";
 export type QuoteStatus = "sent" | "accepted" | "declined" | "expired";
 export type BookingStatus = "pending_deposit" | "confirmed" | "completed" | "cancelled";
