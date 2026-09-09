@@ -96,6 +96,20 @@ export type VendorClaim = {
   reviewed_at: string | null;
 };
 
+
+export type VendorAdminAction = {
+  id: string;
+  vendor_id: string | null;
+  vendor_user_id: string | null;
+  business_name_snapshot: string;
+  previous_status: string | null;
+  action: "suspended" | "deleted";
+  reason: string;
+  admin_id: string;
+  vendor_snapshot: Record<string, unknown> | null;
+  created_at: string;
+};
+
 export type VendorCategory = {
   vendor_id: string;
   category: string;
@@ -378,6 +392,7 @@ export type Database = {
       event_inspiration_photos: TableDef<EventInspirationPhoto>;
       vendors: TableDef<Vendor>;
       vendor_claims: TableDef<VendorClaim>;
+      vendor_admin_actions: TableDef<VendorAdminAction>;
       vendor_categories: TableDef<VendorCategory>;
       vendor_photos: TableDef<VendorPhoto>;
       vendor_unavailable_dates: TableDef<VendorUnavailableDate>;
