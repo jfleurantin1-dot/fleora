@@ -14,7 +14,43 @@ async function assertAdmin() {
   return profile;
 }
 
-export async function setVendorStatus(vendorId: string, status: VendorStatus) {
+export async function moderateVendor(vendorId: string, action: "suspended" | "deleted", rawReason: string): Promise<{ ok?: boolean; error?: string }> {
+  const admin = await assertAdmin();
+  const reason = rawReason.trim();
+  if (reason.length < 5) return { error: "A reason of at least 5 characters is required." };
+
+  const supabase = createClient();
+  const { data: vendor, error: vendorError } = await supabase
+    .from("vendors")
+    .select("id,user_id,business_name,status,location,contact_email,contact_phone")
+    .eq("id", vendorId)
+    .single();
+  if (vendorError || !vendor) return { error: vendorError?.message ?? "Vendor not found." };
+
+  const { error: logError } = await supabase.from("vendor_admin_actions").insert({
+    vendor_id: vendorId,
+    vendor_user_id: vendor.user_id,
+    business_name_snapshot: vendor.business_name,
+    previous_status: vendor.status,
+    action,
+    reason,
+    admin_id: admin.id,
+    vendor_snapshot: vendor,
+  });
+  if (logError) return { error: logError.message };
+
+  const { error: updateError } = await supabase.from("vendors").update({ status: action }).eq("id", vendorId);
+  if (updateError) return { error: updateError.message };
+
+  revalidatePath("/admin");
+  revalidatePath("/admin/deleted-vendors");
+  revalidatePath("/vendors/browse");
+  revalidatePath(`/vendors/${vendorId}`);
+  revalidatePath("/vendor/dashboard");
+  return { ok: true };
+}
+
+export async function setVendorStatus(vendorId: string, status: Extract<VendorStatus, "pending" | "approved">) {
   await assertAdmin();
   const supabase = createClient();
   await supabase.from("vendors").update({ status }).eq("id", vendorId);

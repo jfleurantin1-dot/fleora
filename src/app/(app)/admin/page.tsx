@@ -7,6 +7,7 @@ import { money, shortDate } from "@/lib/format";
 import { StoreIcon, UserIcon, CalendarIcon, CardIcon, WalletIcon, SearchIcon } from "@/components/icons";
 import { categoryLabel } from "@/lib/constants";
 import { setVendorStatus, reviewVendorClaim } from "./actions";
+import { AdminVendorModerationActions } from "./admin-vendor-moderation-actions";
 import { AddVendorForm } from "./add-vendor-form";
 import { CopyClaimLink } from "./copy-claim-link";
 
@@ -38,8 +39,9 @@ export default async function AdminPage() {
     : { data: [] as { id: string; first_name: string | null; last_name: string | null; phone: string | null }[] };
 
   const vendorList = vendors ?? [];
-  const pending = vendorList.filter((v) => v.status === "pending");
-  const unclaimed = vendorList.filter((v) => !v.user_id);
+  const liveVendors = vendorList.filter((v) => v.status !== "deleted");
+  const pending = liveVendors.filter((v) => v.status === "pending");
+  const unclaimed = liveVendors.filter((v) => !v.user_id);
   const pendingClaims = claimRows.filter((c) => c.status === "pending");
   const gmv = (bookings ?? []).filter((b) => b.status !== "cancelled").reduce((s, b) => s + Number(b.total), 0);
 
@@ -57,11 +59,11 @@ export default async function AdminPage() {
       <PageHeader
         title="Fleora vendor directory"
         subtitle="Seed the Massachusetts marketplace, review claims, and manage vendor quality before client launch."
-        action={<div className="flex flex-wrap gap-2"><Link href="/admin/revenue" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm">View Fleora revenue</Link><a href="#add-vendor" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-plum-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-plum-600">+ Add vendor</a></div>}
+        action={<div className="flex flex-wrap gap-2"><Link href="/admin/deleted-vendors" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm">Deleted accounts report</Link><Link href="/admin/revenue" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm">View Fleora revenue</Link><a href="#add-vendor" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-plum-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-plum-600">+ Add vendor</a></div>}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <StatCard label="All vendors" value={vendorList.length} icon={<StoreIcon size={20} />} />
+        <StatCard label="All vendors" value={liveVendors.length} icon={<StoreIcon size={20} />} />
         <StatCard label="Unclaimed" value={unclaimed.length} icon={<SearchIcon size={20} />} />
         <StatCard label="Claim requests" value={pendingClaims.length} icon={<UserIcon size={20} />} />
         <StatCard label="Events" value={(events ?? []).length} icon={<CalendarIcon size={20} />} />
@@ -114,7 +116,7 @@ export default async function AdminPage() {
                 <div><p className="font-medium text-ink-900">{v.business_name}</p><p className="text-sm text-ink-500">{v.location ?? "No location"}</p></div>
                 <div className="flex gap-2">
                   <form action={setVendorStatus.bind(null, v.id, "approved")}><Button type="submit" size="sm">Approve</Button></form>
-                  <form action={setVendorStatus.bind(null, v.id, "suspended")}><Button type="submit" size="sm" variant="secondary">Reject</Button></form>
+                  <AdminVendorModerationActions vendorId={v.id} businessName={v.business_name} />
                 </div>
               </Card>
             ))}
@@ -125,7 +127,7 @@ export default async function AdminPage() {
       <section>
         <div className="mb-3"><p className="fleora-kicker">Marketplace supply</p><h2 className="font-display text-2xl text-ink-900">All vendors</h2><p className="mt-1 text-sm text-ink-500">Admin-created listings are published immediately and marked unclaimed until the owner is approved.</p></div>
         <div className="space-y-3">
-          {vendorList.map((v) => (
+          {liveVendors.map((v) => (
             <Card key={v.id} className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
               <div>
                 <div className="flex flex-wrap items-center gap-2"><Link href={`/vendors/${v.id}`} className="font-semibold text-ink-900 hover:text-plum-700">{v.business_name}</Link>{!v.user_id && <Badge tone="champagne">Unclaimed</Badge>}{v.verified && <Badge tone="plum">Verified</Badge>}<Badge tone={v.status === "approved" ? "green" : v.status === "pending" ? "amber" : "rose"}>{v.status}</Badge></div>
@@ -136,7 +138,7 @@ export default async function AdminPage() {
                 <Link href={`/vendors/${v.id}`} className="inline-flex min-h-9 items-center rounded-xl border border-plum-200 bg-white px-3 py-1.5 text-sm font-semibold text-plum-700">View profile</Link>
                 <Link href={`/admin/vendors/${v.id}/edit`} className="inline-flex min-h-9 items-center rounded-xl border border-plum-200 bg-white px-3 py-1.5 text-sm font-semibold text-plum-700">Edit business</Link>
                 {!v.user_id && <CopyClaimLink vendorId={v.id} />}
-                {v.status !== "approved" ? <form action={setVendorStatus.bind(null, v.id, "approved")}><Button type="submit" size="sm" variant="secondary">Approve</Button></form> : <form action={setVendorStatus.bind(null, v.id, "suspended")}><Button type="submit" size="sm" variant="secondary">Suspend</Button></form>}
+                {v.status !== "approved" && v.status !== "deleted" ? <form action={setVendorStatus.bind(null, v.id, "approved")}><Button type="submit" size="sm" variant="secondary">Approve</Button></form> : null}{v.status !== "deleted" && <AdminVendorModerationActions vendorId={v.id} businessName={v.business_name} showSuspend={v.status === "approved"} />}
               </div>
             </Card>
           ))}
