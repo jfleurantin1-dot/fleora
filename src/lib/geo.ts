@@ -1,7 +1,8 @@
 /**
- * Tiny stand-in geocoder for the MVP. Maps common Greater Boston town names
- * to coordinates so the matching function can score distance. Replace with a
- * real geocoding call (Google Maps / Mapbox) before expanding markets.
+ * ZIP-first geocoding for Fleora.
+ * Uses Zippopotam.us (no API key required) to turn a US ZIP code into
+ * coordinates plus a friendly City, ST label. Falls back to the legacy
+ * Greater Boston town map when ZIP lookup is unavailable.
  */
 const TOWNS: Record<string, [number, number]> = {
   boston: [42.3601, -71.0589],
@@ -25,8 +26,72 @@ const TOWNS: Record<string, [number, number]> = {
   "new bedford": [41.6362, -70.9342],
 };
 
-export function geocodeMa(location: string): { lat: number; lng: number } {
-  const key = location.trim().toLowerCase().replace(/,.*/, "").trim();
+export function normalizeUsZip(value: string) {
+  const match = value.trim().match(/\b(\d{5})(?:-\d{4})?\b/);
+  return match?.[1] ?? null;
+}
+
+export async function geocodeZip(
+  postalCode: string
+): Promise<{ lat: number; lng: number; label: string } | null> {
+  const zip = normalizeUsZip(postalCode);
+  if (!zip) return null;
+
+  try {
+    const response = await fetch(
+      `https://api.zippopotam.us/us/${zip}`,
+      {
+        cache: "force-cache",
+        next: { revalidate: 60 * 60 * 24 * 30 },
+      }
+    );
+
+    if (!response.ok) return null;
+
+    const data = (await response.json()) as {
+      places?: Array<{
+        "place name"?: string;
+        "state abbreviation"?: string;
+        latitude?: string;
+        longitude?: string;
+      }>;
+    };
+
+    const place = data.places?.[0];
+
+    if (!place) return null;
+
+    const lat = Number(place.latitude);
+    const lng = Number(place.longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+    const city = place["place name"] ?? zip;
+    const state = place["state abbreviation"] ?? "";
+
+    return {
+      lat,
+      lng,
+      label: `${city}${state ? `, ${state}` : ""}`,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function geocodeMa(
+  location: string
+): { lat: number; lng: number } {
+  const key = location
+    .trim()
+    .toLowerCase()
+    .replace(/,.*/, "")
+    .trim();
+
   const hit = TOWNS[key] ?? TOWNS.boston;
-  return { lat: hit[0], lng: hit[1] };
+
+  return {
+    lat: hit[0],
+    lng: hit[1],
+  };
 }
