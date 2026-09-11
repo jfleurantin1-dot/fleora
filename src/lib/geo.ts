@@ -1,178 +1,131 @@
-export type CategoryGroup =
-  | "venue"
-  | "services"
-  | "decor"
-  | "stationery"
-  | "rentals"
-  | "food"
-  | "dessert"
-  | "media"
-  | "entertainment"
-  | "beauty";
+/**
+ * ZIP-first geocoding for Fleora.
+ * Uses Zippopotam.us (no API key required) to turn a US ZIP code into
+ * coordinates plus a friendly City, ST label.
+ *
+ * Keeps the legacy Greater Boston town lookup for existing Fleora
+ * features that still call geocodeMa().
+ */
 
-export type CategoryKey =
-  | "venue"
-  | "outdoor_venue"
-  | "event_planner"
-  | "day_of_coordinator"
-  | "event_styling"
-  | "transportation"
-  | "event_staff"
-  | "custom_service"
-  | "backdrops"
-  | "balloons"
-  | "florals"
-  | "flower_walls"
-  | "props"
-  | "signage"
-  | "stationery"
-  | "calligraphy"
-  | "chairs"
-  | "tables"
-  | "linens"
-  | "lounge_furniture"
-  | "tents"
-  | "dinnerware"
-  | "specialty_rentals"
-  | "private_chef"
-  | "catering"
-  | "charcuterie"
-  | "bartender"
-  | "mobile_bar"
-  | "food_truck"
-  | "cake"
-  | "cupcakes"
-  | "cookies"
-  | "cake_pops"
-  | "sweet_treats"
-  | "ice_cream_truck"
-  | "photography"
-  | "videography"
-  | "content_creator"
-  | "photobooth"
-  | "dj"
-  | "mc_event_host"
-  | "musician"
-  | "kids_entertainment"
-  | "performer"
-  | "games_activities"
-  | "inflatables"
-  | "event_experience"
-  | "face_painter"
-  | "hair"
-  | "makeup";
+const TOWNS: Record<string, [number, number]> = {
+  boston: [42.3601, -71.0589],
+  brockton: [42.0834, -71.0184],
+  quincy: [42.2529, -71.0023],
+  cambridge: [42.3736, -71.1097],
+  somerville: [42.3876, -71.0995],
+  newton: [42.337, -71.2092],
+  framingham: [42.2793, -71.4162],
+  worcester: [42.2626, -71.8023],
+  lowell: [42.6334, -71.3162],
+  providence: [41.824, -71.4128],
+  avon: [42.1307, -71.0417],
+  randolph: [42.1626, -71.0414],
+  stoughton: [42.125, -71.1023],
+  dedham: [42.2418, -71.1662],
+  braintree: [42.2223, -71.0018],
+  weymouth: [42.2181, -70.9398],
+  plymouth: [41.9584, -70.6673],
+  "fall river": [41.7015, -71.155],
+  "new bedford": [41.6362, -70.9342],
+};
 
-export interface CategoryGroupDef {
-  key: CategoryGroup;
-  label: string;
+/**
+ * Takes ZIP codes such as:
+ * 02301
+ * 02301-1234
+ *
+ * and returns the standard 5-digit ZIP.
+ */
+export function normalizeUsZip(value: string) {
+  const match = value.trim().match(/\b(\d{5})(?:-\d{4})?\b/);
+
+  return match?.[1] ?? null;
 }
 
-export const CATEGORY_GROUPS: CategoryGroupDef[] = [
-  { key: "venue", label: "Venue" },
-  { key: "services", label: "Event services" },
-  { key: "decor", label: "Decor" },
-  { key: "stationery", label: "Stationery & signage" },
-  { key: "rentals", label: "Rentals" },
-  { key: "food", label: "Food & drink" },
-  { key: "dessert", label: "Desserts" },
-  { key: "media", label: "Photo & video" },
-  { key: "entertainment", label: "Entertainment" },
-  { key: "beauty", label: "Beauty" },
-];
+/**
+ * Converts a US ZIP code into latitude, longitude,
+ * and a friendly City, ST label.
+ */
+export async function geocodeZip(
+  postalCode: string
+): Promise<{ lat: number; lng: number; label: string } | null> {
+  const zip = normalizeUsZip(postalCode);
 
-export interface CategoryDef {
-  key: CategoryKey;
-  group: CategoryGroup;
-  label: string;
-  budgetShare: number;
-  helper?: string;
+  if (!zip) {
+    return null;
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.zippopotam.us/us/${zip}`,
+      {
+        cache: "force-cache",
+        next: {
+          revalidate: 60 * 60 * 24 * 30,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const data = (await response.json()) as {
+      places?: Array<{
+        "place name"?: string;
+        "state abbreviation"?: string;
+        latitude?: string;
+        longitude?: string;
+      }>;
+    };
+
+    const place = data.places?.[0];
+
+    if (!place) {
+      return null;
+    }
+
+    const lat = Number(place.latitude);
+    const lng = Number(place.longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return null;
+    }
+
+    const city = place["place name"] ?? zip;
+    const state = place["state abbreviation"] ?? "";
+
+    return {
+      lat,
+      lng,
+      label: `${city}${state ? `, ${state}` : ""}`,
+    };
+  } catch {
+    return null;
+  }
 }
 
-export const CATEGORIES: CategoryDef[] = [
-  // VENUE
-  { key: "venue", group: "venue", label: "Venue", budgetShare: 0.28 },
-  { key: "outdoor_venue", group: "venue", label: "Outdoor venue", budgetShare: 0.22 },
+/**
+ * Legacy Fleora location lookup.
+ *
+ * IMPORTANT:
+ * Existing parts of Fleora still import geocodeMa(),
+ * so this function must remain exported until those
+ * areas are migrated completely to ZIP-based geocoding.
+ */
+export function geocodeMa(
+  location: string
+): { lat: number; lng: number } {
+  const key = location
+    .trim()
+    .toLowerCase()
+    .replace(/,.*/, "")
+    .trim();
 
-  // EVENT SERVICES
-  { key: "event_planner", group: "services", label: "Event planner / coordinator", budgetShare: 0.08 },
-  { key: "day_of_coordinator", group: "services", label: "Day-of event coordinator", budgetShare: 0.07 },
-  { key: "event_styling", group: "services", label: "Event stylist", budgetShare: 0.1 },
-  {
-    key: "transportation",
-    group: "services",
-    label: "Transportation",
-    budgetShare: 0.08,
-    helper: "Limos, party buses, cars & event transportation",
-  },
-  { key: "event_staff", group: "services", label: "Event staff / servers", budgetShare: 0.06 },
-  { key: "custom_service", group: "services", label: "Other event service", budgetShare: 0.04 },
+  const hit = TOWNS[key] ?? TOWNS.boston;
 
-  // DECOR
-  { key: "backdrops", group: "decor", label: "Backdrops", budgetShare: 0.05 },
-  { key: "balloons", group: "decor", label: "Balloon artist", budgetShare: 0.06 },
-  { key: "florals", group: "decor", label: "Florals / florist", budgetShare: 0.08 },
-  { key: "flower_walls", group: "decor", label: "Flower walls", budgetShare: 0.06 },
-  { key: "props", group: "decor", label: "Props & decor rentals", budgetShare: 0.05 },
-  { key: "signage", group: "decor", label: "Event signage", budgetShare: 0.03 },
-
-  // STATIONERY & SIGNAGE
-  { key: "stationery", group: "stationery", label: "Invitations & stationery", budgetShare: 0.03 },
-  { key: "calligraphy", group: "stationery", label: "Calligraphy", budgetShare: 0.02 },
-
-  // RENTALS
-  { key: "chairs", group: "rentals", label: "Chairs", budgetShare: 0.04 },
-  { key: "tables", group: "rentals", label: "Tables", budgetShare: 0.04 },
-  { key: "linens", group: "rentals", label: "Linens", budgetShare: 0.03 },
-  { key: "lounge_furniture", group: "rentals", label: "Lounge furniture", budgetShare: 0.06 },
-  { key: "tents", group: "rentals", label: "Tents", budgetShare: 0.1 },
-  { key: "dinnerware", group: "rentals", label: "Dinnerware & tabletop", budgetShare: 0.04 },
-  { key: "specialty_rentals", group: "rentals", label: "Specialty rentals", budgetShare: 0.05 },
-
-  // FOOD & DRINK
-  { key: "private_chef", group: "food", label: "Private chef", budgetShare: 0.3 },
-  { key: "catering", group: "food", label: "Catering", budgetShare: 0.3 },
-  { key: "charcuterie", group: "food", label: "Charcuterie", budgetShare: 0.06 },
-  {
-    key: "mobile_bar",
-    group: "food",
-    label: "Mobile drink cart",
-    budgetShare: 0.07,
-    helper: "Lemonade carts, coffee carts, specialty drink carts & more",
-  },
-  {
-    key: "bartender",
-    group: "food",
-    label: "Mobile bar / bartender",
-    budgetShare: 0.06,
-  },
-  { key: "food_truck", group: "food", label: "Food truck", budgetShare: 0.16 },
-
-  // DESSERTS
-  { key: "cake", group: "dessert", label: "Cake", budgetShare: 0.05 },
-  { key: "cupcakes", group: "dessert", label: "Cupcakes", budgetShare: 0.03 },
-  { key: "cookies", group: "dessert", label: "Cookies", budgetShare: 0.025 },
-  { key: "cake_pops", group: "dessert", label: "Cake pops", budgetShare: 0.02 },
-  { key: "sweet_treats", group: "dessert", label: "Other sweet treats", budgetShare: 0.03 },
-  { key: "ice_cream_truck", group: "dessert", label: "Ice cream truck", budgetShare: 0.06 },
-
-  // PHOTO & VIDEO
-  { key: "photography", group: "media", label: "Photographer", budgetShare: 0.09 },
-  { key: "videography", group: "media", label: "Videographer", budgetShare: 0.07 },
-  { key: "content_creator", group: "media", label: "Event content creator", budgetShare: 0.05 },
-  { key: "photobooth", group: "media", label: "Photo booth", budgetShare: 0.04 },
-
-  // ENTERTAINMENT
-  { key: "dj", group: "entertainment", label: "DJ", budgetShare: 0.08 },
-  { key: "mc_event_host", group: "entertainment", label: "MC / Event host", budgetShare: 0.05 },
-  { key: "musician", group: "entertainment", label: "Musician / live music", budgetShare: 0.08 },
-  { key: "kids_entertainment", group: "entertainment", label: "Kids entertainment", budgetShare: 0.05 },
-  { key: "performer", group: "entertainment", label: "Performers", budgetShare: 0.06 },
-  { key: "games_activities", group: "entertainment", label: "Games & activities", budgetShare: 0.05 },
-  { key: "inflatables", group: "entertainment", label: "Bounce houses & inflatables", budgetShare: 0.06 },
-  { key: "event_experience", group: "entertainment", label: "Event experiences", budgetShare: 0.06 },
-  { key: "face_painter", group: "entertainment", label: "Face painter", budgetShare: 0.03 },
-
-  // BEAUTY
-  { key: "hair", group: "beauty", label: "Hair stylist", budgetShare: 0.04 },
-  { key: "makeup", group: "beauty", label: "Makeup artist", budgetShare: 0.04 },
-];
+  return {
+    lat: hit[0],
+    lng: hit[1],
+  };
+}
