@@ -13,7 +13,16 @@
 .button:active { transform:scale(.98); }
 .hero { max-width:1440px; margin:auto; display:grid; grid-template-columns:1fr 1.1fr; background:var(--soft); }
 .heroCopy { padding:70px 40px 76px; align-self:center; }
-.hero h1 { font-size:clamp(38px,4.25vw,61px); letter-spacing:-.052em; line-height:1.12; font-weight:500; }
+.hero h1 { font-size:clamp(36px,3.65vw,53px); letter-spacing:-.045em; line-height:1.14; font-weight:500; }
+.lilacWord { color:#8962b8; }
+.vendorButton { background:#fff; border:1px solid #cbb6e5; }
+.actions { flex-wrap:wrap; }
+.marketplaceIntro { padding-top:36px; }
+.marketplaceStrip { background:var(--soft); border-radius:12px; padding:32px; }
+.marketplaceLabel { font-size:15px; font-weight:600; margin-bottom:8px; color:#654785; }
+.marketplaceDescription { max-width:800px; margin-top:16px; color:var(--muted); line-height:1.7; }
+.marketplaceStrip .number { background:#e7daf9; }
+@media(max-width:767px) { .marketplaceStrip { padding:24px 20px; } }
 .heroCopy>p { max-width:440px; font-size:19px; line-height:1.6; margin-top:24px; color:#424250; }
 .actions { margin-top:32px; font-size:14px; }
 .textLink { display:inline-flex; align-items:center; gap:16px; min-height:44px; }

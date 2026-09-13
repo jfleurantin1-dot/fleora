@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand-logo";
-import { CakeIcon, GiftIcon, UtensilsIcon, HeartIcon, BuildingIcon, SparkleIcon, CheckIcon } from "@/components/icons";
+import { CakeIcon, GiftIcon, UtensilsIcon, HeartIcon, BuildingIcon, SparkleIcon } from "@/components/icons";
 import { getProfile } from "@/lib/auth";
 import styles from "./landing.module.css";
 
@@ -40,13 +40,12 @@ export default async function Landing() {
       <main id="main-content">
         <section className={styles.hero} aria-labelledby="hero-title">
           <div className={styles.heroCopy}>
-            <h1 id="hero-title">More celebrating.<br />Less planning.</h1>
-            <p>Find your vendors, organize the details, and bring your event together.</p>
-            <div className={styles.actions}><Link href={appDest} className={styles.button}>{cta}</Link><Link href="/signup?as=vendor" className={styles.textLink}>Vendor sign up <span aria-hidden="true">→</span></Link></div>
+            <h1 id="hero-title">Plan the party.<br /><em>Find the <span className={styles.lilacWord}>people</span></em> to bring it to life.</h1>
+            <p>Fleora combines a party-planning workspace with a trusted local vendor marketplace — so you can organize every detail, find the right vendors, compare quotes, book, and pay in one place.</p>
+            <div className={styles.actions}><Link href={appDest} className={styles.button}>{cta}</Link><Link href="/signup?as=vendor" className={`${styles.button} ${styles.vendorButton}`}>Vendor sign up</Link></div>
           </div>
           <div className={styles.heroPhoto}>
             <Image src="/images/landing/celebration.jpg" alt="Friends celebrating together around a garden dinner table" fill priority sizes="(max-width: 767px) 100vw, 55vw" className={styles.cover} />
-            <div className={styles.miniPlan} aria-label="Example event checklist"><strong>My event</strong>{["Venue", "Catering", "Guest list"].map((item, i) => <div key={item}><span className={i < 2 ? styles.checked : styles.unchecked}>{i < 2 && <CheckIcon size={12} />}</span>{item}</div>)}</div>
           </div>
         </section>
         <section id="how" className={`${styles.container} ${styles.how}`} aria-labelledby="how-title">
@@ -59,6 +58,18 @@ export default async function Landing() {
             <Image src="/images/landing/planner.jpg" alt="Sample Fleora event planner showing a birthday dinner checklist, guest summary, and vendor navigation" width={1902} height={827} sizes="(max-width: 767px) 100vw, 1200px" />
             <figcaption>Sample planner preview. Customer access is coming soon.</figcaption>
           </figure>
+        </section>
+        <section className={`${styles.container} ${styles.marketplaceIntro}`} aria-labelledby="marketplace-intro-title">
+          <div className={styles.marketplaceStrip}>
+            <p className={styles.marketplaceLabel}>The Fleora Marketplace</p>
+            <h2 id="marketplace-intro-title">Vendor directory</h2>
+            <p className={styles.marketplaceDescription}>Search local event professionals, keep inquiries organized, compare quotes, build your event team, and manage payments without bouncing between apps and DMs.</p>
+            <ol className={styles.steps}>{[
+              ["Discover local vendors", "Search by what your event actually needs."],
+              ["Inquire & compare", "Keep conversations and quotes together."],
+              ["Book & pay", "Manage vendor payments through Fleora."],
+            ].map(([title, text], i) => <li key={title}><span className={styles.number}>0{i + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol>
+          </div>
         </section>
         <section id="marketplace" className={`${styles.container} ${styles.marketplace}`} aria-labelledby="vendor-title">
           <div className={styles.sectionHeading}><div><h2 id="vendor-title">Find the people who bring it to life.</h2><p>Explore the Fleora vendor directory.{!profile && " Join the waitlist for customer access."}</p></div><Link href={directoryDest} className={styles.button}>{profile ? "Explore vendors" : "Get directory access"}</Link></div>
