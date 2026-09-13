@@ -387,6 +387,7 @@ type TableDef<Row> = {
 export type Database = {
   public: {
     Tables: {
+      customer_waitlist: TableDef<{ id: string; first_name: string; email: string; postal_code: string; event_type: string | null; event_date: string | null; source: string; status: string; created_at: string }>;
       profiles: TableDef<Profile>;
       events: TableDef<EventRow>;
       event_inspiration_photos: TableDef<EventInspirationPhoto>;

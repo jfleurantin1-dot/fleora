@@ -35,7 +35,7 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
             <div className="grid grid-cols-2 gap-2 rounded-2xl bg-ivory-100 p-1.5">
               {(["client", "vendor"] as const).map((t) => <button key={t} type="button" onClick={() => setAccountType(t)} className={`rounded-xl px-3 py-3 text-sm font-semibold transition ${accountType===t ? "bg-white text-plum-700 shadow-sm" : "text-ink-500 hover:text-plum-700"}`}>{t === "client" ? "Planning an event" : "I’m a vendor"}</button>)}
             </div>
-            <form action={formAction} className="space-y-4">
+            {!isVendor ? <div className="space-y-4 text-center"><p>Customer access is coming soon. Join the waitlist and we’ll email you when Fleora opens.</p><Link href="/waitlist" className="inline-block rounded-xl bg-plum-700 px-6 py-3 font-semibold text-white">Join the Waitlist →</Link></div> : <form action={formAction} className="space-y-4">
               <input type="hidden" name="account_type" value={accountType} />
               <div className="grid grid-cols-2 gap-3"><Field label="First name"><Input name="first_name" required /></Field><Field label="Last name"><Input name="last_name" /></Field></div>
               <Field label="Email"><Input name="email" type="email" autoComplete="email" required /></Field>
@@ -44,7 +44,7 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
               <Field label="Confirm password"><Input name="confirm_password" type="password" autoComplete="new-password" required minLength={6} /></Field>
               <FormError message={state.error} />
               <Submit isVendor={isVendor} />
-            </form>
+            </form>}
             <p className="text-center text-sm text-ink-600">Already have an account? <Link href="/login" className="font-semibold text-plum-700 hover:underline">Log in</Link></p>
           </Card>
         </div>

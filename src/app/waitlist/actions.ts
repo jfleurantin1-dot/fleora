@@ -1,6 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 import { normalizeUsZip } from "@/lib/geo";
 import { sendFleoraEmail } from "@/lib/email";
 
@@ -20,7 +20,7 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
   if (!/^\S+@\S+\.\S+$/.test(email)) return { error: "Enter a valid email address." };
   if (!zip) return { error: "Enter a valid 5-digit ZIP code." };
 
-  const supabase = createClient();
+  const supabase = createAdminClient();
   const { error } = await supabase.from("customer_waitlist").insert({
     first_name: firstName,
     email,
@@ -29,12 +29,12 @@ export async function joinWaitlist(_prev: WaitlistState, formData: FormData): Pr
     event_date: eventDate,
     source: "website",
     status: "waiting",
-  } as any);
+  });
 
   // Someone who joins twice is still successfully on the list.
   if (error && error.code !== "23505") return { error: "We couldn’t add you right now. Please try again." };
 
-  await sendFleoraEmail({
+  if (!error) await sendFleoraEmail({
     to: email,
     subject: "You’re on the Fleora waitlist ✨",
     heading: `You’re on the list, ${firstName}.`,
