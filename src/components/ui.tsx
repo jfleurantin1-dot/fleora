@@ -146,6 +146,9 @@ export function Stars({
   count?: number | null;
 }) {
   const r = Number(rating ?? 0) || 0;
+  if (count === 0) {
+    return <span className="inline-flex items-center rounded-full bg-blush-50 px-2.5 py-1 text-xs font-semibold text-[#9B5065]">New to Fleora</span>;
+  }
   return (
     <span className="inline-flex items-center gap-1.5 text-sm">
       <span className="text-champagne-600" aria-hidden>★</span>

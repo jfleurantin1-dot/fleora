@@ -5,7 +5,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { useState } from "react";
 import { saveVendorProfile, type VendorOnboardingState } from "./actions";
 import { Button, ButtonLink, Card, Field, Input, Textarea, Select, FormError } from "@/components/ui";
-import { CATEGORY_GROUPS, categoriesInGroup } from "@/lib/constants";
+import { CATEGORY_GROUPS, EVENT_TYPES, categoriesInGroup } from "@/lib/constants";
 import { PhotoUploader } from "@/components/vendor/photo-uploader";
 import { PlusIcon } from "@/components/icons";
 import type { Package, Service, Vendor } from "@/lib/types";
@@ -38,6 +38,7 @@ export function VendorForm({
   const catSet = new Set(categories);
   const [serviceCount, setServiceCount] = useState(Math.max(4, Math.min(12, services.length || 0)));
   const [packageCount, setPackageCount] = useState(Math.max(3, Math.min(12, packages.length || 0)));
+  const [faqCount, setFaqCount] = useState(Math.max(2, Math.min(6, vendor?.faqs?.length || 0)));
 
   return (
     <form action={formAction} className="space-y-6">
@@ -66,6 +67,13 @@ export function VendorForm({
       </Card>
 
       <Card className="space-y-4">
+        <div><p className="fleora-kicker">Best-fit events</p><h2 className="mt-1 font-display text-2xl text-ink-900">What do you love to work on?</h2><p className="mt-1 text-sm text-ink-600">These choices help Fleora show your business to the right clients.</p></div>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {EVENT_TYPES.map((eventType) => <label key={eventType.key} className="flex cursor-pointer items-center gap-2 rounded-xl border border-[#E9E3E7] bg-white px-3 py-2.5 text-sm text-ink-700 transition hover:border-plum-200 hover:bg-plum-50"><input type="checkbox" name="event_type" value={eventType.key} defaultChecked={vendor?.event_types?.includes(eventType.key)} className="h-4 w-4 rounded border-plum-300 text-plum-600"/><span>{eventType.label}</span></label>)}
+        </div>
+      </Card>
+
+      <Card className="space-y-4">
         <div><p className="fleora-kicker">Storefront details</p><h2 className="mt-1 font-display text-2xl text-ink-900">Help clients find you everywhere</h2><p className="mt-1 text-sm text-ink-600">You can type a website like <strong>mybusiness.com</strong> or an Instagram handle like <strong>@mybusiness</strong>. Fleora will format the links for you.</p></div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Website">
@@ -85,6 +93,12 @@ export function VendorForm({
 
       <Card className="space-y-4">
         <div><p className="fleora-kicker">Step 2</p><h2 className="mt-1 font-display text-2xl text-ink-900">Services you offer</h2><p className="mt-1 text-sm text-ink-600">Choose every category you want to be matched for.</p></div>
+        <Field label="Primary specialty" hint="This is the first service clients see on your profile.">
+          <Select name="primary_category" defaultValue={vendor?.primary_category ?? categories[0] ?? ""}>
+            <option value="">Choose your primary specialty…</option>
+            {CATEGORY_GROUPS.map((group) => <optgroup key={group.key} label={group.label}>{categoriesInGroup(group.key).map((c) => <option key={c.key} value={c.key}>{c.label}</option>)}</optgroup>)}
+          </Select>
+        </Field>
         {CATEGORY_GROUPS.map((group) => (
           <div key={group.key}>
             <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-plum-500">
@@ -118,14 +132,14 @@ export function VendorForm({
         {Array.from({length:serviceCount},(_,i)=>i).map((i) => {
           const s = services[i];
           return (
-            <div key={i} className="grid grid-cols-12 gap-2">
+            <div key={i} className="grid grid-cols-12 gap-2 rounded-2xl border border-[#E9E3E7] bg-white p-3">
               <Input
                 name={`svc_name_${i}`}
                 placeholder="Service name"
                 defaultValue={s?.name ?? ""}
-                className="col-span-5"
+                className="col-span-12 sm:col-span-5"
               />
-              <Select name={`svc_cat_${i}`} defaultValue={s?.category ?? ""} className="col-span-4">
+              <Select name={`svc_cat_${i}`} defaultValue={s?.category ?? ""} className="col-span-8 sm:col-span-4">
                 <option value="">Category…</option>
                 {CATEGORY_GROUPS.map((group) => (
                   <optgroup key={group.key} label={group.label}>
@@ -143,12 +157,33 @@ export function VendorForm({
                 min={0}
                 placeholder="$"
                 defaultValue={s?.starting_price ?? ""}
-                className="col-span-3"
+                className="col-span-4 sm:col-span-3"
               />
+              <Input name={`svc_desc_${i}`} placeholder="Short description of what is included" defaultValue={s?.description ?? ""} className="col-span-12" />
             </div>
           );
         })}
         {serviceCount<12&&<button type="button" onClick={()=>setServiceCount(c=>Math.min(12,c+1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={22}/> Add service</button>}
+      </Card>
+
+      <Card className="space-y-4">
+        <div><p className="fleora-kicker">Booking details</p><h2 className="mt-1 font-display text-2xl text-ink-900">Set clear expectations</h2><p className="mt-1 text-sm text-ink-600">Short, plain-language answers help clients decide whether you are a fit.</p></div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Typical booking lead time"><Input name="booking_lead_time" defaultValue={vendor?.booking_lead_time ?? ""} placeholder="For example, 4–6 weeks" /></Field>
+          <Field label="Availability notes"><Input name="availability_notes" defaultValue={vendor?.availability_notes ?? ""} placeholder="For example, weekends and evenings" /></Field>
+          <Field label="Setup, delivery, or pickup" hint="Tell clients what is included and what requires an extra fee."><Textarea name="setup_delivery_notes" rows={3} defaultValue={vendor?.setup_delivery_notes ?? ""} /></Field>
+          <Field label="Travel fees"><Textarea name="travel_fee_policy" rows={3} defaultValue={vendor?.travel_fee_policy ?? ""} placeholder="For example, travel included within 20 miles" /></Field>
+          <Field label="Deposit policy"><Textarea name="deposit_policy" rows={3} defaultValue={vendor?.deposit_policy ?? ""} placeholder="For example, 30% deposit to reserve the date" /></Field>
+          <Field label="Cancellation policy"><Textarea name="cancellation_policy" rows={3} defaultValue={vendor?.cancellation_policy ?? ""} /></Field>
+          <Field label="Dietary accommodations" hint="Useful for caterers, bakers, bars, and food experiences."><Textarea name="dietary_accommodations" rows={3} defaultValue={vendor?.dietary_accommodations ?? ""} placeholder="Allergies, vegan, halal, kosher, gluten-free…" /></Field>
+          <Field label="Accessibility notes"><Textarea name="accessibility_notes" rows={3} defaultValue={vendor?.accessibility_notes ?? ""} placeholder="Accessible setup, communication, or service options" /></Field>
+        </div>
+      </Card>
+
+      <Card className="space-y-3">
+        <div><p className="fleora-kicker">Frequently asked questions</p><h2 className="mt-1 font-display text-2xl text-ink-900">Answer questions before they become messages</h2><p className="mt-1 text-sm text-ink-600">Add the questions clients ask you most often.</p></div>
+        {Array.from({ length: faqCount }, (_, i) => i).map((i) => <div key={i} className="grid gap-2 rounded-2xl border border-[#E9E3E7] bg-white p-3"><Input name={`faq_question_${i}`} defaultValue={vendor?.faqs?.[i]?.question ?? ""} placeholder="Question"/><Textarea name={`faq_answer_${i}`} rows={2} defaultValue={vendor?.faqs?.[i]?.answer ?? ""} placeholder="Answer"/></div>)}
+        {faqCount < 6 && <button type="button" onClick={() => setFaqCount((count) => Math.min(6, count + 1))} className="inline-flex items-center gap-2 rounded-xl border border-plum-200 bg-plum-50 px-3 py-2 text-sm font-semibold text-plum-700"><PlusIcon size={22}/> Add FAQ</button>}
       </Card>
 
       <Card className="space-y-3">

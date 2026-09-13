@@ -88,6 +88,7 @@ export default async function AdminPage() {
                   <div>
                     <div className="flex flex-wrap items-center gap-2"><p className="font-semibold text-ink-900">{vendor?.business_name ?? "Vendor profile"}</p><Badge tone="amber">Claim requested</Badge></div>
                     <p className="mt-1 text-sm text-ink-600">{claimantName}{claimant?.phone ? ` · ${claimant.phone}` : ""}</p>
+                    <div className="mt-2 flex flex-wrap gap-2 text-xs"><Badge tone="slate">{claim.relationship?.replaceAll("_"," ") ?? "Role not supplied"}</Badge>{claim.business_email&&<a href={`mailto:${claim.business_email}`} className="font-semibold text-plum-700">{claim.business_email}</a>}{claim.proof_url&&<a href={claim.proof_url} target="_blank" rel="noreferrer" className="font-semibold text-plum-700">Open verification link ↗</a>}</div>
                     {claim.note && <p className="mt-2 rounded-xl bg-ivory-100 px-3 py-2 text-sm text-ink-600">“{claim.note}”</p>}
                     <p className="mt-2 text-xs text-ink-400">Requested {shortDate(claim.created_at)}</p>
                   </div>

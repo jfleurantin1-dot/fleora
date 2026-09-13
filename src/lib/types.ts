@@ -75,6 +75,17 @@ export type Vendor = {
   instagram: string | null;
   contact_email: string | null;
   contact_phone: string | null;
+  primary_category: string | null;
+  event_types: string[];
+  booking_lead_time: string | null;
+  availability_notes: string | null;
+  setup_delivery_notes: string | null;
+  dietary_accommodations: string | null;
+  accessibility_notes: string | null;
+  deposit_policy: string | null;
+  cancellation_policy: string | null;
+  travel_fee_policy: string | null;
+  faqs: VendorFaq[];
   source: string;
   created_at: string;
   stripe_account_id: string | null;
@@ -86,11 +97,16 @@ export type Vendor = {
   stripe_last_synced_at: string | null;
 };
 
+export type VendorFaq = { question: string; answer: string };
+
 export type VendorClaim = {
   id: string;
   vendor_id: string;
   claimant_id: string;
   note: string | null;
+  relationship: string | null;
+  business_email: string | null;
+  proof_url: string | null;
   status: "pending" | "approved" | "rejected";
   created_at: string;
   reviewed_at: string | null;

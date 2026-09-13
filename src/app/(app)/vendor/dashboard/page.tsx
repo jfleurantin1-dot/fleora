@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Badge, ButtonLink, Empty, PageHeader, Progress, SectionHeader, StatCard, Stars, Card } from "@/components/ui";
 import { money, shortDate } from "@/lib/format";
 import { categoryLabel } from "@/lib/constants";
+import { vendorProfileCompletion } from "@/lib/vendor-profile";
 
 export default async function VendorDashboard(){
  const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=createClient(); const today=new Date().toISOString().slice(0,10);
@@ -20,15 +21,7 @@ export default async function VendorDashboard(){
  ]);
  type EventBrief=NonNullable<typeof events>[number]; const eventMap=new Map<string,EventBrief>(); for(const e of events??[]) eventMap.set(e.id,e);
  const quotedEventIds=new Set((quotes??[]).map(q=>q.event_id)); const newLeads=(convos??[]).filter((c:any)=>!quotedEventIds.has(c.event_id)&&c.vendor_inquiry_status!=="declined"&&c.client_inquiry_status!=="cancelled"); const activeBookings=(bookings??[]).filter(b=>b.status!=="cancelled"); const upcoming=activeBookings.filter(b=>{const d=eventMap.get(b.event_id)?.event_date;return d&&d>=today}); const upcomingRevenue=upcoming.reduce((s,b)=>s+Number(b.total),0);
- const checks=[
-  {label:"Business description",done:Boolean(vendor.description),detail:"Tell clients what makes you different."},
-  {label:"Service area",done:Boolean(vendor.location),detail:"Add your home base and coverage area."},
-  {label:"Service categories",done:Boolean(categories?.length),detail:"Choose everything clients can hire you for."},
-  {label:"Portfolio photos",done:Boolean(photos?.length),detail:"Show your best event work."},
-  {label:"Services & pricing",done:Boolean(services?.length),detail:"Give clients a starting point for budget."},
-  {label:"Website or Instagram",done:Boolean(vendor.website||vendor.instagram),detail:"Add a place clients can see more of your work."},
- ];
- const complete=checks.filter(c=>c.done).length; const completion=Math.round((complete/checks.length)*100);
+ const {checks,percentage:completion}=vendorProfileCompletion(vendor,{categories:categories?.length??0,photos:photos?.length??0,services:services?.length??0,packages:packages?.length??0});
  return <div>
   <PageHeader title={`Welcome, ${vendor.business_name}`} subtitle="Your Fleora business command center — leads, bookings, profile strength and next steps in one place." action={<ButtonLink href="/vendor/onboarding" variant="secondary" size="sm">Edit profile</ButtonLink>}/>
   <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><StatCard label="New inquiries" value={newLeads.length} meta="Need a response" icon="✉"/><StatCard label="Upcoming events" value={upcoming.length} meta="Active bookings" icon="◫"/><StatCard label="Upcoming revenue" value={money(upcomingRevenue)} meta="From active bookings" icon="$"/><StatCard label="Rating" value={<Stars rating={vendor.rating} count={vendor.review_count}/>} meta="Client feedback" icon="★"/></div>
