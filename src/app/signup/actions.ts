@@ -16,6 +16,8 @@ export async function signup(_prev: SignupState, formData: FormData): Promise<Si
   const confirmPassword = String(formData.get("confirm_password") ?? "");
   const accountType = String(formData.get("account_type") ?? "client");
 
+  if (accountType !== "vendor") redirect("/waitlist");
+
   if (!firstName || !email || !phone || password.length < 6) {
     return { error: "Fill in your name, email, phone number, and a password of at least 6 characters." };
   }

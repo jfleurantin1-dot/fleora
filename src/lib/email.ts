@@ -18,7 +18,7 @@ function escapeHtml(value: string) {
 }
 
 function appUrl() {
-  return (process.env.NEXT_PUBLIC_APP_URL ?? "https://fleora.vercel.app").replace(/\/$/, "");
+  return (process.env.NEXT_PUBLIC_APP_URL ?? "https://fleoraevents.com").replace(/\/$/, "");
 }
 
 export function absoluteFleoraUrl(path: string) {

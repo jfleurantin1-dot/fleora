@@ -47,8 +47,8 @@ export default async function Landing() {
     ? profile.account_type === "vendor"
       ? "/vendor/dashboard"
       : "/dashboard"
-    : "/signup";
-  const marketplaceDest = profile && profile.account_type !== "vendor" ? "/vendors/browse" : "/signup";
+    : "/waitlist";
+  const marketplaceDest = profile && profile.account_type !== "vendor" ? "/vendors/browse" : "/waitlist";
 
   return (
     <main className="min-h-screen bg-[#FCFBFD] text-[#281642]">
@@ -66,7 +66,7 @@ export default async function Landing() {
           ) : (
             <>
               <ButtonLink href="/login" variant="secondary" size="sm">Log In</ButtonLink>
-              <ButtonLink href="/signup" size="sm">Get Started</ButtonLink>
+              <ButtonLink href="/waitlist" size="sm">Join the Waitlist</ButtonLink>
             </>
           )}
         </div>
@@ -75,7 +75,7 @@ export default async function Landing() {
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-16 pt-10 sm:px-6 lg:grid-cols-[1.05fr_.95fr] lg:pb-24 lg:pt-20">
         <div className="max-w-3xl">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-plum-100 bg-plum-50 px-4 py-2 text-xs font-semibold uppercase tracking-[.16em] text-plum-700">
-            <SparkleIcon size={15} /> Plan it. Find it. Book it.
+            <SparkleIcon size={15} /> Customer access coming soon
           </div>
           <h1 className="font-display text-5xl leading-[.96] tracking-[-.03em] sm:text-7xl">
             Plan the party.<br />
@@ -86,8 +86,8 @@ export default async function Landing() {
             Fleora combines a party-planning workspace with a trusted local vendor marketplace — so you can organize every detail, find the right vendors, compare quotes, book, and pay in one place.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href={appDest} size="lg" className="min-w-48">Start an Event →</ButtonLink>
-            <ButtonLink href={marketplaceDest} variant="secondary" size="lg" className="min-w-48">Find Vendors</ButtonLink>
+            <ButtonLink href={appDest} size="lg" className="min-w-48">{profile ? "Start an Event →" : "Join the Waitlist →"}</ButtonLink>
+            <ButtonLink href={profile ? marketplaceDest : "#marketplace"} variant="secondary" size="lg" className="min-w-48">{profile ? "Find Vendors" : "See How It Works"}</ButtonLink>
           </div>
           <p className="mt-4 text-xs text-ink-500">Planning a birthday, shower, graduation, dinner party, celebration — or anything in between.</p>
         </div>
@@ -161,7 +161,7 @@ export default async function Landing() {
             <p className="mt-5 leading-relaxed text-ink-600">
               Search local event professionals, keep inquiries organized, compare quotes, build your event team, and manage payments without bouncing between apps and DMs.
             </p>
-            <ButtonLink href={marketplaceDest} size="lg" className="mt-7">Explore Vendors →</ButtonLink>
+            <ButtonLink href={marketplaceDest} size="lg" className="mt-7">{profile ? "Explore Vendors →" : "Get Early Access →"}</ButtonLink>
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
             {MARKETPLACE_STEPS.map(({ Icon, title, text }, index) => (
@@ -198,7 +198,7 @@ export default async function Landing() {
             <p className="mt-5 leading-relaxed text-ink-600">
               Build your vision, organize guests, plan decor, food, services and entertainment, then turn the pieces you need help with into vendor searches — without starting over.
             </p>
-            <ButtonLink href={appDest} size="lg" className="mt-7">Start Planning →</ButtonLink>
+            <ButtonLink href={appDest} size="lg" className="mt-7">{profile ? "Start Planning →" : "Join the Waitlist →"}</ButtonLink>
           </div>
         </div>
       </section>
@@ -237,7 +237,7 @@ export default async function Landing() {
             <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#D8C0E6]">Planning an event?</p>
             <h2 className="mt-3 font-display text-4xl">Your party starts here.</h2>
             <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/70">Create your event, build your plan and find the vendors who can bring it together.</p>
-            <ButtonLink href={appDest} size="lg" className="mt-7">Create My Event →</ButtonLink>
+            <ButtonLink href={appDest} size="lg" className="mt-7">{profile ? "Create My Event →" : "Join the Waitlist →"}</ButtonLink>
           </div>
           <div className="border-t border-white/10 bg-white/[.06] p-7 sm:p-10 lg:border-l lg:border-t-0 lg:p-12">
             <p className="text-xs font-semibold uppercase tracking-[.18em] text-[#D8C0E6]">Are you an event vendor?</p>
