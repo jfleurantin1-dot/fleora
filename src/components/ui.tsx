@@ -5,12 +5,12 @@ import type { ComponentProps, ReactNode } from "react";
 type Variant = "primary" | "secondary" | "ghost" | "magic" | "danger";
 const variants: Record<Variant, string> = {
   primary:
-    "bg-gradient-to-r from-plum-500 to-plum-600 text-white shadow-sm hover:-translate-y-0.5 hover:bg-plum-600 hover:shadow-fleora disabled:translate-y-0 disabled:opacity-60",
+    "bg-brand text-brand-ink hover:bg-brand-hover disabled:opacity-60",
   secondary:
-    "border border-plum-200 bg-white text-plum-700 shadow-sm hover:-translate-y-0.5 hover:border-plum-300 hover:bg-plum-50",
+    "border border-plum-200 bg-white text-ink-900 hover:border-plum-300 hover:bg-plum-50",
   ghost: "text-plum-700 hover:bg-plum-50",
   magic:
-    "border border-blush-300 bg-gradient-to-br from-blush-50 via-blush-100 to-plum-100 text-plum-700 shadow-sm hover:-translate-y-0.5 hover:shadow-fleora",
+    "border border-plum-200 bg-brand-soft text-ink-900 hover:bg-brand",
   danger: "bg-rose-600 text-white hover:bg-rose-700",
 };
 const sizes = {
@@ -19,7 +19,7 @@ const sizes = {
   lg: "min-h-[52px] px-6 py-3 text-base",
 };
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-[10px] font-medium transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-plum-300 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-plum-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
 
 export function Button({
   variant = "primary",
@@ -68,14 +68,14 @@ export function Card({
     as,
     {
       id,
-      className: `rounded-[14px] border ${cardVariants[variant]} ${paddingClass} ${className}`,
+      className: `rounded-xl border ${cardVariants[variant]} ${paddingClass} ${className}`,
     },
     children,
   );
 }
 
 const inputCls =
-  "min-h-12 w-full rounded-[10px] border border-[#E8E1ED] bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm placeholder:text-ink-400 transition focus:border-plum-300 focus:outline-none focus:ring-4 focus:ring-plum-50";
+  "min-h-12 w-full rounded-lg border border-plum-300 bg-white px-4 py-2.5 text-sm text-ink-900 shadow-sm placeholder:text-ink-400 transition focus:border-plum-600 focus:outline-none focus:ring-2 focus:ring-plum-200";
 
 export function Field({
   label,
@@ -169,7 +169,7 @@ export function Progress({ value }: { value: number }) {
   return (
     <div className="h-2 w-full overflow-hidden rounded-full bg-plum-100">
       <div
-        className="h-full rounded-full bg-gradient-to-r from-plum-400 to-plum-600 transition-all duration-500"
+        className="h-full rounded-full bg-plum-400 transition-all duration-500"
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
       />
     </div>
@@ -180,7 +180,7 @@ export function PageHeader({ title, subtitle, action }: { title: string; subtitl
   return (
     <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
       <div className="max-w-2xl">
-        <h1 className="font-display text-3xl leading-[1.08] text-ink-900 sm:text-4xl">{title}</h1>
+        <h1 className="font-display text-3xl font-medium leading-tight text-ink-900 sm:text-4xl">{title}</h1>
         {subtitle && <p className="mt-2 text-sm leading-relaxed text-ink-600 sm:text-[15px]">{subtitle}</p>}
       </div>
       {action}

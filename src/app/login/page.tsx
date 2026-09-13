@@ -15,13 +15,11 @@ export default function LoginPage({ searchParams }: { searchParams: { next?: str
   const [state, formAction] = useFormState<AuthState, FormData>(login, {});
   return (
     <main className="relative min-h-screen overflow-hidden bg-ivory-50">
-      <div className="absolute -left-24 top-10 h-72 w-72 rounded-full bg-blush-100/60 blur-3xl" />
-      <div className="absolute -right-24 bottom-10 h-80 w-80 rounded-full bg-plum-100/70 blur-3xl" />
       <div className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-6 py-12 lg:grid-cols-[1.05fr_.95fr] lg:px-8">
-        <section className="hidden lg:block">
+        <section className="hidden rounded-xl bg-brand-soft p-8 lg:block">
           <BrandLogo />
           <p className="mt-10 fleora-kicker">Welcome home</p>
-          <h1 className="mt-3 max-w-xl font-display text-6xl leading-[.98] text-ink-900">Your celebration, all in one beautiful place.</h1>
+          <h1 className="mt-3 max-w-xl font-display text-5xl leading-[1.12] text-ink-900">Your celebration, all in one beautiful place.</h1>
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-ink-600">Pick up where you left off, manage your vendors, and keep every detail moving.</p>
         </section>
         <div className="mx-auto w-full max-w-md">
