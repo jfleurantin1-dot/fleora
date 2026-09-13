@@ -17,7 +17,12 @@
 .lilacWord { color:#8962b8; }
 .vendorButton { background:#fff; border:1px solid #cbb6e5; }
 .actions { flex-wrap:wrap; }
-.marketplaceIntro { padding-top:36px; }
+.marketplaceIntro { padding-top:36px; scroll-margin-top:24px; }
+.marketplaceStrip > h2,.marketplaceLabel,.marketplaceDescription { text-align:center; }
+.marketplaceDescription { margin-inline:auto; }
+.marketplaceStrip .vendorGrid { margin-top:30px; }
+.marketplaceStrip .vendorCard { background:white; }
+.directoryAction { margin-top:24px; text-align:center; }
 .marketplaceStrip { background:var(--soft); border-radius:12px; padding:32px; }
 .marketplaceLabel { font-size:15px; font-weight:600; margin-bottom:8px; color:#654785; }
 .marketplaceDescription { max-width:800px; margin-top:16px; color:var(--muted); line-height:1.7; }
@@ -57,7 +62,7 @@
 .vendorCard>span { display:flex; justify-content:space-between; padding:12px 14px; font-size:16px; font-weight:500; }
 .vendorCard:hover>span { background:var(--soft); }
 .celebrations { padding-top:24px; }.occasionStrip { padding:22px 26px; background:var(--soft); border-radius:10px; }
-.occasionStrip h2 { font-size:23px; }.occasionStrip ul { display:grid; grid-template-columns:repeat(6,1fr); margin-top:20px; }
+.occasionStrip h2 { font-size:23px; text-align:center; }.occasionStrip ul { display:grid; grid-template-columns:repeat(6,1fr); margin-top:20px; }
 .occasionStrip li { display:flex; flex-direction:column; align-items:center; gap:10px; font-size:12px; text-align:center; color:#37304a; padding:0 10px; }.occasionStrip li+li { border-left:1px solid #ded4ed; }
 .ctaSection { padding-top:16px; }.ctaStrip { display:flex; align-items:center; justify-content:space-between; gap:24px; background:var(--soft); border-radius:10px; padding:28px 30px; }.ctaStrip h2 { font-size:27px; }.ctaStrip p { margin-top:8px; }.ctaActions { text-align:right; flex-shrink:0; }.ctaActions p { font-size:11px; }.ctaActions p a { text-decoration:underline; }
 .footer { padding-top:28px; padding-bottom:32px; display:flex; justify-content:space-between; align-items:center; gap:24px; }.footer nav { display:flex; gap:26px; font-size:12px; color:var(--muted); }

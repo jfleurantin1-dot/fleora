@@ -59,7 +59,7 @@ export default async function Landing() {
             <figcaption>Sample planner preview. Customer access is coming soon.</figcaption>
           </figure>
         </section>
-        <section className={`${styles.container} ${styles.marketplaceIntro}`} aria-labelledby="marketplace-intro-title">
+        <section id="marketplace" className={`${styles.container} ${styles.marketplaceIntro}`} aria-labelledby="marketplace-intro-title">
           <div className={styles.marketplaceStrip}>
             <p className={styles.marketplaceLabel}>The Fleora Marketplace</p>
             <h2 id="marketplace-intro-title">Vendor directory</h2>
@@ -69,11 +69,9 @@ export default async function Landing() {
               ["Inquire & compare", "Keep conversations and quotes together."],
               ["Book & pay", "Manage vendor payments through Fleora."],
             ].map(([title, text], i) => <li key={title}><span className={styles.number}>0{i + 1}</span><div><h3>{title}</h3><p>{text}</p></div></li>)}</ol>
-          </div>
-        </section>
-        <section id="marketplace" className={`${styles.container} ${styles.marketplace}`} aria-labelledby="vendor-title">
-          <div className={styles.sectionHeading}><div><h2 id="vendor-title">Find the people who bring it to life.</h2><p>Explore the Fleora vendor directory.{!profile && " Join the waitlist for customer access."}</p></div><Link href={directoryDest} className={styles.button}>{profile ? "Explore vendors" : "Get directory access"}</Link></div>
           <div className={styles.vendorGrid}>{vendors.map((v,i) => <Link key={v.category} href={profile ? `/vendors/browse?category=${v.category}` : "/waitlist"} className={styles.vendorCard} aria-label={profile ? `Explore ${v.label.toLowerCase()} vendors` : `${v.label}: join the waitlist for access`}><div className={styles.vendorImage}><div className={styles.vendorSheet} style={{left:`-${i * 100}%`}}><Image src="/images/landing/vendors.jpg" alt={v.alt} fill sizes="(max-width: 767px) 200vw, 100vw" /></div></div><span>{v.label}<span aria-hidden="true">↗</span></span></Link>)}</div>
+            <div className={styles.directoryAction}><Link href={directoryDest} className={styles.button}>{profile ? "Explore vendors" : "Get directory access"}</Link></div>
+          </div>
         </section>
         <section className={`${styles.container} ${styles.celebrations}`} aria-labelledby="celebrations-title"><div className={styles.occasionStrip}><h2 id="celebrations-title">Plan any kind of celebration</h2><ul>{occasions.map(({Icon,label}) => <li key={label}><Icon size={27} /><span>{label}</span></li>)}</ul></div></section>
         <section className={`${styles.container} ${styles.ctaSection}`} aria-labelledby="cta-title"><div className={styles.ctaStrip}><div><h2 id="cta-title">Your next celebration starts with Fleora.</h2><p>{profile ? "Bring your plans and your people together." : "Join the waitlist for customer launch updates."}</p></div><div className={styles.ctaActions}><Link href={appDest} className={styles.button}>{cta}</Link><p>Are you a vendor? <Link href="/signup?as=vendor">List your business <span aria-hidden="true">→</span></Link></p></div></div></section>
