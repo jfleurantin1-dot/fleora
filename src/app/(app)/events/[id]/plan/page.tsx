@@ -60,7 +60,7 @@ export default async function PartyPlanPage({ params }: { params: { id: string }
   };
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/>
-    <Card variant="feature" className="overflow-hidden bg-gradient-to-br from-plum-50 via-white to-blush-50">
+    <Card variant="feature" className="overflow-hidden bg-brand-soft">
       <p className="fleora-kicker">Dream it → plan it</p><h1 className="mt-2 font-display text-4xl text-ink-900">Build your party, chapter by chapter.</h1>
       <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-600">Tell Fleora what you want to DIY, what you already have, and what you want to hire. Your choices will eventually become shopping items, tasks and vendor needs automatically.</p>
       <div className="mt-6 max-w-xl"><div className="mb-2 flex justify-between text-xs font-semibold text-ink-500"><span>Party Plan progress</span><span>{pct}%</span></div><Progress value={pct}/></div>

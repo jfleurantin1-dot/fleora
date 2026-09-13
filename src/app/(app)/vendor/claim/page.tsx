@@ -71,7 +71,7 @@ export default async function ClaimBusinessPage({
               className="w-full bg-transparent text-sm text-ink-900 outline-none placeholder:text-ink-400"
             />
           </label>
-          <button className="min-h-12 rounded-xl bg-plum-500 px-6 text-sm font-semibold text-white shadow-sm transition hover:bg-plum-600">
+          <button className="min-h-12 rounded-xl bg-brand px-6 text-sm font-semibold text-brand-ink shadow-sm transition hover:bg-brand-hover">
             Search
           </button>
         </form>

@@ -94,7 +94,7 @@ export default async function RevenuePage() {
           )}
           <p className="mt-5 text-xs leading-relaxed text-ink-500">This Stripe balance is different from “Fleora fees earned.” Stripe processing costs, refunds, disputes, and settlement timing can change the amount actually available for payout.</p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <a href={stripeBalanceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-xl bg-plum-600 px-4 text-sm font-semibold text-white">Open Stripe balance</a>
+            <a href={stripeBalanceUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-xl bg-brand px-4 text-sm font-semibold text-brand-ink">Open Stripe balance</a>
             <a href={stripePayoutUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700">Manage bank & payouts</a>
           </div>
         </Card>

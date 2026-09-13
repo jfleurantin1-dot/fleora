@@ -19,13 +19,11 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
   const [password, setPassword] = useState("");
   return (
     <main className="relative min-h-screen overflow-hidden bg-ivory-50">
-      <div className="absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-blush-100/60 blur-3xl" />
-      <div className="absolute -right-16 top-0 h-80 w-80 rounded-full bg-plum-100/60 blur-3xl" />
       <div className="relative mx-auto grid min-h-screen max-w-6xl items-center gap-12 px-6 py-12 lg:grid-cols-[.9fr_1.1fr] lg:px-8">
-        <section className="hidden lg:block">
+        <section className="hidden rounded-xl bg-brand-soft p-8 lg:block">
           <BrandLogo />
           <p className="mt-10 fleora-kicker">Create your space</p>
-          <h1 className="mt-3 max-w-xl font-display text-6xl leading-[.98] text-ink-900">Plan beautifully. Grow beautifully.</h1>
+          <h1 className="mt-3 max-w-xl font-display text-5xl leading-[1.12] text-ink-900">Plan beautifully. Grow beautifully.</h1>
           <p className="mt-5 max-w-lg text-lg leading-relaxed text-ink-600">Whether you’re planning a celebration or running an event business, Fleora keeps the experience thoughtful and organized.</p>
         </section>
         <div className="mx-auto w-full max-w-lg">
@@ -35,7 +33,7 @@ export default function SignupPage({ searchParams }: { searchParams: { as?: stri
             <div className="grid grid-cols-2 gap-2 rounded-2xl bg-ivory-100 p-1.5">
               {(["client", "vendor"] as const).map((t) => <button key={t} type="button" onClick={() => setAccountType(t)} className={`rounded-xl px-3 py-3 text-sm font-semibold transition ${accountType===t ? "bg-white text-plum-700 shadow-sm" : "text-ink-500 hover:text-plum-700"}`}>{t === "client" ? "Planning an event" : "I’m a vendor"}</button>)}
             </div>
-            {!isVendor ? <div className="space-y-4 text-center"><p>Customer access is coming soon. Join the waitlist and we’ll email you when Fleora opens.</p><Link href="/waitlist" className="inline-block rounded-xl bg-plum-700 px-6 py-3 font-semibold text-white">Join the Waitlist →</Link></div> : <form action={formAction} className="space-y-4">
+            {!isVendor ? <div className="space-y-4 text-center"><p>Customer access is coming soon. Join the waitlist and we’ll email you when Fleora opens.</p><Link href="/waitlist" className="inline-block rounded-xl bg-brand px-6 py-3 font-semibold text-brand-ink">Join the Waitlist →</Link></div> : <form action={formAction} className="space-y-4">
               <input type="hidden" name="account_type" value={accountType} />
               <div className="grid grid-cols-2 gap-3"><Field label="First name"><Input name="first_name" required /></Field><Field label="Last name"><Input name="last_name" /></Field></div>
               <Field label="Email"><Input name="email" type="email" autoComplete="email" required /></Field>

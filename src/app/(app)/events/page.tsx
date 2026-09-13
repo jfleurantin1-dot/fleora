@@ -38,7 +38,7 @@ export default async function EventsPage() {
             <Card key={e.id} variant="interactive" padding="none" className={`overflow-hidden ${e.status === "cancelled" ? "opacity-80" : ""}`}>
               <EventMoodCover photos={(inspirationPhotos ?? []).filter((p) => p.event_id === e.id)} href={`/events/${e.id}`} className="h-44 w-full" />
               <Link href={`/events/${e.id}`} className="block">
-                <div className="bg-gradient-to-br from-blush-50 via-ivory-50 to-plum-50 p-5">
+                <div className="bg-brand-soft p-5">
                   <div className="flex items-start justify-between gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-plum-600 shadow-sm"><CalendarIcon size={18} /></span><Badge tone={tone}>{e.status}</Badge></div>
                   <h2 className="mt-6 font-display text-2xl text-ink-900">{e.name}</h2>
                   <p className="mt-1 text-sm text-ink-600">{shortDate(e.event_date)} · {e.location ?? "Location TBD"}</p>

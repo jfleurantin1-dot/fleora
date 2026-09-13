@@ -56,7 +56,7 @@ export default function NewEventPage() {
           </button>
           <div className="flex items-center gap-2">
             {[1, 2, 3].map((n) => (
-              <span key={n} className={`h-1.5 rounded-full transition-all ${n <= step ? "w-10 bg-plum-500" : "w-6 bg-plum-100"}`} />
+              <span key={n} className={`h-1.5 rounded-full transition-all ${n <= step ? "w-10 bg-brand" : "w-6 bg-plum-100"}`} />
             ))}
           </div>
           <span className="w-10 text-right text-xs font-semibold text-ink-400">{step}/3</span>

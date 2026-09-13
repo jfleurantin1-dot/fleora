@@ -111,7 +111,7 @@ export function InspirationBoard({ eventId, eventName, eventStyle, colorPalette,
               {colorPalette && <Badge tone="champagne">{colorPalette}</Badge>}
             </div>
           </div>
-          <div className="rounded-[24px] border border-plum-100 bg-gradient-to-br from-blush-50 via-white to-plum-50 p-5 shadow-fleora">
+          <div className="rounded-[24px] border border-plum-100 bg-brand-soft p-5 shadow-fleora">
             <div className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-plum-600 shadow-sm"><SparkleIcon /></span><div><p className="font-bold text-ink-900">Build This Look</p><p className="text-xs text-ink-500">Photo-to-plan experience</p></div></div>
             <p className="mt-4 text-sm leading-relaxed text-ink-600">The interface is live now. Automatic computer-vision detection will plug into this same flow in the AI integration step.</p>
           </div>
@@ -153,7 +153,7 @@ export function InspirationBoard({ eventId, eventName, eventStyle, colorPalette,
                 <div className="mt-4 space-y-2">
                   {plan.map((part) => <div key={part.name} className="flex items-center justify-between rounded-xl bg-white px-3 py-2.5 text-sm shadow-sm"><span className="font-semibold text-ink-800">✓ {part.name}</span><span className="text-xs text-plum-600">{part.priority}</span></div>)}
                 </div>
-                <a href={`/events/${eventId}/services`} className="mt-4 inline-flex min-h-12 items-center justify-center rounded-xl bg-plum-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-plum-600">Find vendors for this look →</a>
+                <a href={`/events/${eventId}/services`} className="mt-4 inline-flex min-h-12 items-center justify-center rounded-xl bg-brand px-4 py-2.5 text-sm font-semibold text-brand-ink shadow-sm transition hover:bg-brand-hover">Find vendors for this look →</a>
               </div>
             </div>
           ) : (

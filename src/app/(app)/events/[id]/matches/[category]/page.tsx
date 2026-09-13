@@ -54,7 +54,7 @@ export default async function MatchesPage({ params }: { params: { id: string; ca
             return (
               <Card as="li" key={m.vendor_id} variant="interactive" padding="none" className="overflow-hidden">
                 <div className="grid sm:grid-cols-[220px_1fr]">
-                  <div className="relative min-h-52 bg-gradient-to-br from-blush-100 to-plum-100 sm:min-h-full">
+                  <div className="relative min-h-52 bg-brand-soft sm:min-h-full">
                     {m.hero_photo ? <Image src={m.hero_photo} alt={m.business_name} fill sizes="220px" className="object-cover" /> : <div className="grid h-full min-h-52 place-items-center font-display text-5xl text-plum-300">F</div>}
                     {index === 0 && <div className="absolute left-3 top-3"><Badge tone="champagne">Best match</Badge></div>}
                   </div>

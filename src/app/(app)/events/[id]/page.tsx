@@ -156,7 +156,7 @@ export default async function EventPage({
       )}
 
       {openQuotes.length > 0 && (
-        <Card variant="feature" padding="lg" className="border-plum-200 bg-gradient-to-r from-plum-50 via-white to-blush-50">
+        <Card variant="feature" padding="lg" className="border-plum-200 bg-brand-soft">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-blush-100 text-plum-700"><MessageIcon size={25} /></span>

@@ -10,7 +10,7 @@ export default async function AppLayout({children}:{children:React.ReactNode}){
   const isVendor=profile.account_type==="vendor";
   const isAdmin=profile.account_type==="admin";
   const name=`${profile.first_name??""} ${profile.last_name??""}`.trim()||"Fleora member";
-  return <div className="min-h-screen bg-[#FCFBFD] pb-24 sm:pb-0">
+  return <div className="min-h-screen bg-white pb-24 sm:pb-0">
     <header className="sticky top-0 z-50 border-b border-[#EDE7F1] bg-white/95 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-8">
         <div className="flex min-w-0 items-center gap-8">

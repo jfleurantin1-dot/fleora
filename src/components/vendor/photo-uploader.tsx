@@ -140,7 +140,7 @@ export function PhotoUploader({ userId, initial }: { userId: string; initial: st
       )}
 
       <div>
-        <label className={`inline-flex cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white ${busy ? "bg-plum-400" : "bg-plum-600 hover:bg-plum-700"}`}>
+        <label className={`inline-flex cursor-pointer items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-brand-ink ${busy ? "bg-brand opacity-60" : "bg-brand hover:bg-brand-hover"}`}>
           {busy ? "Uploading…" : urls.length ? "Add more photos" : "Upload portfolio photos"}
           <input ref={inputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple className="hidden" onChange={onFiles} disabled={busy} />
         </label>

@@ -58,7 +58,7 @@ export default async function AdminPage() {
       <PageHeader
         title="Fleora vendor directory"
         subtitle="Seed the Massachusetts marketplace, review claims, and manage vendor quality before client launch."
-        action={<div className="flex flex-wrap gap-2"><Link href="/admin/deleted-vendors" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm">Deleted accounts report</Link><Link href="/admin/revenue" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm">View Fleora revenue</Link><Link href="/admin/add-vendor" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-plum-500 px-4 text-sm font-semibold text-white shadow-sm hover:bg-plum-600">+ Add vendor</Link></div>}
+        action={<div className="flex flex-wrap gap-2"><Link href="/admin/deleted-vendors" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm">Deleted accounts report</Link><Link href="/admin/revenue" className="inline-flex min-h-12 items-center justify-center rounded-xl border border-plum-200 bg-white px-4 text-sm font-semibold text-plum-700 shadow-sm">View Fleora revenue</Link><Link href="/admin/add-vendor" className="inline-flex min-h-12 items-center justify-center rounded-xl bg-brand px-4 text-sm font-semibold text-brand-ink shadow-sm hover:bg-brand-hover">+ Add vendor</Link></div>}
       />
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">

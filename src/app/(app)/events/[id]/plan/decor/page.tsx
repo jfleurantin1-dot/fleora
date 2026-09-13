@@ -47,7 +47,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
 
       {searchParams?.saved === "1" && <Card className="border-sage-200 bg-sage-50/70"><p className="text-sm font-semibold text-ink-900">Decor plan saved. Your vendor needs have been updated too. ✓</p></Card>}
 
-      <Card variant="feature" className="bg-gradient-to-br from-plum-50 via-white to-blush-50">
+      <Card variant="feature" className="bg-brand-soft">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="fleora-kicker">Decor progress</p>
