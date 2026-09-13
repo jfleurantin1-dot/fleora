@@ -167,6 +167,7 @@ export type Package = {
 
 
 export type EventPlanItem = {
+  diy_products: import("./decor-products").DecorProduct[];
   id: string;
   event_id: string;
   chapter: string;

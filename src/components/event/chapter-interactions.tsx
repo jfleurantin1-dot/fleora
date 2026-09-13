@@ -18,6 +18,7 @@ export function ChapterInteractions({ skipName, hasExistingData = false }: { ski
           const wanted = el.dataset.choiceValue;
           const radio = form.querySelector<HTMLInputElement>(`input[name="choice__${key}"]:checked`);
           el.hidden = skipChecked || !input.checked || radio?.value !== wanted;
+          if (el instanceof HTMLFieldSetElement) el.disabled = el.hidden;
         });
       }
       document.querySelectorAll<HTMLElement>(`[data-skip-message-for="${skipName}"]`).forEach((el)=>el.hidden=!skipChecked);

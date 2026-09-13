@@ -9,9 +9,10 @@ import { categoryLabel } from "@/lib/constants";
 import { ChevronRightIcon, SparkleIcon } from "@/components/icons";
 import { saveDecorPlan } from "./actions";
 import { DecorPhotoManager } from "@/components/event/decor-photo-manager";
+import { DecorCollage, DecorDiyProducts, DecorDiyProvider } from "@/components/event/decor-diy-products";
 import { ChapterInteractions } from "@/components/event/chapter-interactions";
 
-export default async function DecorPlanPage({ params, searchParams }: { params: { id: string }; searchParams?: { saved?: string } }) {
+export default async function DecorPlanPage({ params, searchParams }: { params: { id: string }; searchParams?: { saved?: string; error?: string } }) {
   await requireProfile();
   const supabase = createClient();
   const { data: event } = await supabase.from("events").select("*").eq("id", params.id).single();
@@ -58,6 +59,8 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
         <div className="mt-4"><Progress value={progress} /></div>
       </Card>
 
+      {searchParams?.error && <Card><p role="alert" className="text-sm text-rose-700">{searchParams.error}</p></Card>}
+      <DecorDiyProvider initial={Object.fromEntries((rows ?? []).map(row=>[row.item_key,row.diy_products ?? []]))}>
       <form action={saveWithId} className="space-y-5"><ChapterInteractions skipName="no_decor" hasExistingData={(rows ?? []).some((r) => r.item_key !== "no_decor")}/><Card><label className="flex cursor-pointer items-start gap-3"><input type="checkbox" name="no_decor" defaultChecked={noDecor} className="mt-1 h-5 w-5 rounded border-plum-300 text-plum-600"/><span><span className="block font-bold text-ink-900">No decor needed</span><span className="mt-1 block text-sm text-ink-500">Skip decor for this event and mark the chapter complete.</span></span></label></Card>
         <div className="grid gap-4 lg:grid-cols-2">
           {DECOR_PLAN_ITEMS.map((item) => {
@@ -86,6 +89,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
                   {item.vendorCategory && <p className="mt-2 text-[11px] text-ink-400">Hire option → {categoryLabel(item.vendorCategory)} vendor need</p>}
                   {item.key === "other_custom" && <input name="custom_label__other_custom" defaultValue={row?.label === item.label ? "" : row?.label ?? ""} placeholder="What are you planning? e.g. Champagne wall" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />}
                   <textarea name={`notes__${item.key}`} defaultValue={row?.notes ?? ""} rows={2} placeholder="Optional notes — size, quantity, style, ideas…" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />
+                  <DecorDiyProducts eventId={event.id} itemKey={item.key} />
                   <DecorPhotoManager eventId={event.id} planItemId={row?.id ?? null} itemKey={item.key} photos={row ? photosByItem.get(row.id) ?? [] : []} />
                 </div>
               </Card>
@@ -93,14 +97,16 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
           })}
         </div>
 
+        <DecorCollage initialActive={(rows ?? []).map(row=>row.item_key)} initialDiy={(rows ?? []).filter(row=>row.choice==="diy").map(row=>row.item_key)} photos={(itemPhotos ?? []).map(photo=>({...photo,itemKey:(rows ?? []).find(row=>row.id===photo.plan_item_id)?.item_key ?? ""}))}/>
         <Card variant="feature" className="sticky bottom-4 z-20 flex flex-wrap items-center justify-between gap-3 border-plum-100 bg-white/95 backdrop-blur">
           <div>
             <p className="text-sm font-bold text-ink-900">You can change this anytime.</p>
-            <p className="text-xs text-ink-500">DIY choices will later feed Shopping + Checklist. Hire choices become Vendor Needs now.</p>
+            <p className="text-xs text-ink-500">Your DIY links and item details save with this plan. Hire choices become Vendor Needs.</p>
           </div>
           <div className="flex flex-wrap gap-2"><Button type="submit" name="intent" value="save" variant="secondary" size="lg">Save & stay</Button><Button type="submit" name="intent" value="continue" size="lg">Save & continue →</Button></div>
         </Card>
       </form>
+      </DecorDiyProvider>
 
       {(needs ?? []).length > 0 && <Card variant="feature">
         <div className="flex items-center gap-3"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-plum-50 text-plum-700"><SparkleIcon size={18}/></span><div><p className="fleora-kicker">Vendor Needs</p><h2 className="font-display text-2xl text-ink-900">Fleora knows what you need help with.</h2></div></div>
