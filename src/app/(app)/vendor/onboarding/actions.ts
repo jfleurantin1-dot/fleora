@@ -40,6 +40,25 @@ export async function saveVendorProfile(
   const contactEmail = String(formData.get("contact_email") ?? "").trim() || null;
   const contactPhone = String(formData.get("contact_phone") ?? "").trim() || null;
   const categories = formData.getAll("category").map(String);
+  const requestedPrimaryCategory = String(formData.get("primary_category") ?? "").trim();
+  const primaryCategory = categories.includes(requestedPrimaryCategory) ? requestedPrimaryCategory : categories[0] ?? null;
+  const eventTypes = formData.getAll("event_type").map(String);
+  const profileDetails = {
+    primary_category: primaryCategory,
+    event_types: eventTypes,
+    booking_lead_time: String(formData.get("booking_lead_time") ?? "").trim() || null,
+    availability_notes: String(formData.get("availability_notes") ?? "").trim() || null,
+    setup_delivery_notes: String(formData.get("setup_delivery_notes") ?? "").trim() || null,
+    dietary_accommodations: String(formData.get("dietary_accommodations") ?? "").trim() || null,
+    accessibility_notes: String(formData.get("accessibility_notes") ?? "").trim() || null,
+    deposit_policy: String(formData.get("deposit_policy") ?? "").trim() || null,
+    cancellation_policy: String(formData.get("cancellation_policy") ?? "").trim() || null,
+    travel_fee_policy: String(formData.get("travel_fee_policy") ?? "").trim() || null,
+    faqs: Array.from({ length: 6 }, (_, i) => ({
+      question: String(formData.get(`faq_question_${i}`) ?? "").trim(),
+      answer: String(formData.get(`faq_answer_${i}`) ?? "").trim(),
+    })).filter((faq) => faq.question && faq.answer),
+  };
 
   if (!businessName) return { error: "Enter your business name." };
   if (categories.length === 0) return { error: "Pick at least one service category." };
@@ -68,6 +87,7 @@ export async function saveVendorProfile(
         instagram,
         contact_email: contactEmail,
         contact_phone: contactPhone,
+        ...profileDetails,
       })
       .eq("id", vendorId);
   } else {
@@ -85,6 +105,7 @@ export async function saveVendorProfile(
         instagram,
         contact_email: contactEmail,
         contact_phone: contactPhone,
+        ...profileDetails,
         status: "pending",
       })
       .select("id")
@@ -101,12 +122,13 @@ export async function saveVendorProfile(
 
   // Replace services (up to 4 rows from the form).
   await supabase.from("services").delete().eq("vendor_id", vendorId);
-  const svc: { vendor_id: string; category: string; name: string; starting_price: number | null }[] = [];
+  const svc: { vendor_id: string; category: string; name: string; description: string | null; starting_price: number | null }[] = [];
   for (let i = 0; i < 12; i++) {
     const name = String(formData.get(`svc_name_${i}`) ?? "").trim();
     const category = String(formData.get(`svc_cat_${i}`) ?? "").trim();
+    const description = String(formData.get(`svc_desc_${i}`) ?? "").trim() || null;
     const price = Number(formData.get(`svc_price_${i}`)) || null;
-    if (name && category) svc.push({ vendor_id: vendorId, category, name, starting_price: price });
+    if (name && category) svc.push({ vendor_id: vendorId, category, name, description, starting_price: price });
   }
   if (svc.length) await supabase.from("services").insert(svc);
 

@@ -24,11 +24,21 @@ export async function requestVendorClaim(
   if (vendor.user_id) return { error: "This business profile has already been claimed." };
 
   const note = String(formData.get("note") ?? "").trim() || null;
+  const relationship = String(formData.get("relationship") ?? "").trim();
+  const businessEmail = String(formData.get("business_email") ?? "").trim() || null;
+  const proofUrl = String(formData.get("proof_url") ?? "").trim() || null;
+  if (!relationship) return { error: "Tell us your role at the business." };
+  if (!businessEmail && !proofUrl) return { error: "Add a business email or a link that helps verify ownership." };
+  if (businessEmail && !/^\S+@\S+\.\S+$/.test(businessEmail)) return { error: "Enter a valid business email." };
+  if (proofUrl && !/^https?:\/\//i.test(proofUrl)) return { error: "Verification links must start with http:// or https://." };
   const { error } = await supabase.from("vendor_claims").upsert(
     {
       vendor_id: vendorId,
       claimant_id: profile.id,
       note,
+      relationship,
+      business_email: businessEmail,
+      proof_url: proofUrl,
       status: "pending",
       reviewed_at: null,
     },
