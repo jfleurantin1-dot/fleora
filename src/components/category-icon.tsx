@@ -1,7 +1,7 @@
 import {
   BeautyIcon, BuildingIcon, CakeIcon, CameraIcon, CardIcon, ChairIcon, ChefHatIcon,
   CocktailIcon, CookieIcon, FlowerIcon, GiftIcon, ImageFrameIcon, MakeupIcon, MusicIcon,
-  PaintIcon, PhoneCameraIcon, SignIcon, SofaIcon, TableIcon, TentIcon, TruckIcon,
+  PaintIcon, PhoneCameraIcon, SignIcon, SofaIcon, SparkleIcon, TableIcon, TentIcon, TruckIcon,
   UtensilsIcon, VideoIcon, BalloonIcon, MicrophoneIcon, PenIcon, CupIcon, IceCreamTruckIcon, UsersIcon, CalendarIcon
 } from "@/components/icons";
 import type { ComponentType, SVGProps } from "react";
@@ -9,7 +9,7 @@ import type { ComponentType, SVGProps } from "react";
 type IconComponent = ComponentType<SVGProps<SVGSVGElement> & {size?:number}>;
 const icons: Record<string, IconComponent> = {
   venue: BuildingIcon, outdoor_venue: TentIcon, event_styling: PaintIcon, balloons: BalloonIcon, backdrops: ImageFrameIcon,
-  florals: FlowerIcon, flower_walls: FlowerIcon, props: GiftIcon, signage: SignIcon,
+  florals: FlowerIcon, flower_walls: FlowerIcon, props: GiftIcon, signage: SignIcon, event_lighting: SparkleIcon,
   chairs: ChairIcon, tables: TableIcon, linens: TableIcon, lounge_furniture: SofaIcon, tents: TentIcon,
   dinnerware: UtensilsIcon, specialty_rentals: GiftIcon, private_chef: ChefHatIcon, catering: ChefHatIcon,
   charcuterie: UtensilsIcon, bartender: CocktailIcon, mobile_bar: CupIcon, food_truck: TruckIcon,
