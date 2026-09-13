@@ -33,7 +33,7 @@ export default async function Landing() {
       <header className={styles.header}>
         <BrandLogo compact />
         <nav aria-label="Main navigation" className={styles.nav}>
-          <a href="#how">How it works</a><a href="#marketplace">Vendor directory</a><Link href="/signup?as=vendor">For vendors</Link>
+          <a href="#how">How it works</a><a href="#marketplace">Vendor directory</a><Link href="/signup?as=vendor">Vendor sign up</Link>
         </nav>
         <div className={styles.headerActions}>{!profile && <Link href="/login" className={styles.login}>Log in</Link>}<Link href={appDest} className={styles.button}>{cta}</Link></div>
       </header>
@@ -42,7 +42,7 @@ export default async function Landing() {
           <div className={styles.heroCopy}>
             <h1 id="hero-title">More celebrating.<br />Less planning.</h1>
             <p>Find your vendors, organize the details, and bring your event together.</p>
-            <div className={styles.actions}><Link href={appDest} className={styles.button}>{cta}</Link><Link href="/signup?as=vendor" className={styles.textLink}>For vendors <span aria-hidden="true">→</span></Link></div>
+            <div className={styles.actions}><Link href={appDest} className={styles.button}>{cta}</Link><Link href="/signup?as=vendor" className={styles.textLink}>Vendor sign up <span aria-hidden="true">→</span></Link></div>
           </div>
           <div className={styles.heroPhoto}>
             <Image src="/images/landing/celebration.jpg" alt="Friends celebrating together around a garden dinner table" fill priority sizes="(max-width: 767px) 100vw, 55vw" className={styles.cover} />
@@ -67,7 +67,7 @@ export default async function Landing() {
         <section className={`${styles.container} ${styles.celebrations}`} aria-labelledby="celebrations-title"><div className={styles.occasionStrip}><h2 id="celebrations-title">Plan any kind of celebration</h2><ul>{occasions.map(({Icon,label}) => <li key={label}><Icon size={27} /><span>{label}</span></li>)}</ul></div></section>
         <section className={`${styles.container} ${styles.ctaSection}`} aria-labelledby="cta-title"><div className={styles.ctaStrip}><div><h2 id="cta-title">Your next celebration starts with Fleora.</h2><p>{profile ? "Bring your plans and your people together." : "Join the waitlist for customer launch updates."}</p></div><div className={styles.ctaActions}><Link href={appDest} className={styles.button}>{cta}</Link><p>Are you a vendor? <Link href="/signup?as=vendor">List your business <span aria-hidden="true">→</span></Link></p></div></div></section>
       </main>
-      <footer className={`${styles.container} ${styles.footer}`}><BrandLogo compact /><nav aria-label="Footer navigation"><a href="#how">How it works</a><a href="#marketplace">Vendor directory</a><Link href="/signup?as=vendor">For vendors</Link><Link href="/login">Log in</Link></nav></footer>
+      <footer className={`${styles.container} ${styles.footer}`}><BrandLogo compact /><nav aria-label="Footer navigation"><a href="#how">How it works</a><a href="#marketplace">Vendor directory</a><Link href="/signup?as=vendor">Vendor sign up</Link><Link href="/login">Log in</Link></nav></footer>
     </div>
   );
 }
