@@ -20,6 +20,7 @@ export type CategoryKey =
   | "flower_walls"
   | "props"
   | "signage"
+  | "event_lighting"
   | "chairs"
   | "tables"
   | "linens"
@@ -97,6 +98,7 @@ export const CATEGORIES: CategoryDef[] = [
   { key: "flower_walls", group: "decor", label: "Flower walls", budgetShare: 0.06 },
   { key: "props", group: "decor", label: "Props & decor rentals", budgetShare: 0.05 },
   { key: "signage", group: "decor", label: "Event signage", budgetShare: 0.03 },
+  { key: "event_lighting", group: "decor", label: "Event lighting", budgetShare: 0.06 },
 
   { key: "chairs", group: "rentals", label: "Chairs", budgetShare: 0.04 },
   { key: "tables", group: "rentals", label: "Tables", budgetShare: 0.04 },
@@ -164,14 +166,14 @@ export interface EventTypeDef {
 
 export const EVENT_TYPES: EventTypeDef[] = [
   { key: "birthday", label: "Birthday", suggested: ["venue", "catering", "cake", "cupcakes", "balloons", "backdrops", "photography", "dj"] },
-  { key: "wedding", label: "Wedding", suggested: ["venue", "catering", "cake", "florals", "flower_walls", "backdrops", "photography", "videography", "dj", "bartender", "chairs", "tables", "linens"] },
+  { key: "wedding", label: "Wedding", suggested: ["venue", "catering", "cake", "florals", "flower_walls", "backdrops", "event_lighting", "photography", "videography", "dj", "bartender", "chairs", "tables", "linens"] },
   { key: "baby_shower", label: "Baby shower", suggested: ["venue", "catering", "cake", "cupcakes", "balloons", "florals", "photography"] },
   { key: "bridal_shower", label: "Bridal shower", suggested: ["venue", "catering", "cake", "charcuterie", "florals", "backdrops", "photography"] },
   { key: "graduation", label: "Graduation", suggested: ["catering", "cake", "cookies", "balloons", "photography", "dj"] },
   { key: "engagement", label: "Engagement", suggested: ["venue", "catering", "charcuterie", "florals", "backdrops", "photography", "bartender"] },
   { key: "anniversary", label: "Anniversary", suggested: ["venue", "catering", "cake", "florals", "photography", "dj"] },
-  { key: "corporate", label: "Corporate event", suggested: ["venue", "catering", "bartender", "photography", "dj", "chairs", "tables"] },
-  { key: "holiday", label: "Holiday party", suggested: ["venue", "catering", "charcuterie", "bartender", "dj", "photobooth", "balloons"] },
+  { key: "corporate", label: "Corporate event", suggested: ["venue", "catering", "bartender", "event_lighting", "photography", "dj", "chairs", "tables"] },
+  { key: "holiday", label: "Holiday party", suggested: ["venue", "catering", "charcuterie", "bartender", "event_lighting", "dj", "photobooth", "balloons"] },
   { key: "custom", label: "Something else", suggested: ["venue", "catering", "cake", "balloons", "photography"] },
 ];
 
