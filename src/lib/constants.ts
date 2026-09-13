@@ -166,6 +166,7 @@ export interface EventTypeDef {
 
 export const EVENT_TYPES: EventTypeDef[] = [
   { key: "birthday", label: "Birthday", suggested: ["venue", "catering", "cake", "cupcakes", "balloons", "backdrops", "photography", "dj"] },
+  { key: "kids_party", label: "Kids’ party", suggested: ["venue", "catering", "cake", "cupcakes", "balloons", "backdrops", "kids_entertainment", "face_painter", "games_activities", "inflatables", "photography"] },
   { key: "wedding", label: "Wedding", suggested: ["venue", "catering", "cake", "florals", "flower_walls", "backdrops", "event_lighting", "photography", "videography", "dj", "bartender", "chairs", "tables", "linens"] },
   { key: "baby_shower", label: "Baby shower", suggested: ["venue", "catering", "cake", "cupcakes", "balloons", "florals", "photography"] },
   { key: "bridal_shower", label: "Bridal shower", suggested: ["venue", "catering", "cake", "charcuterie", "florals", "backdrops", "photography"] },
