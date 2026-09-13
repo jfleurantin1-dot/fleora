@@ -56,7 +56,7 @@ export function DecorDiyProducts({eventId,itemKey}:{eventId:string;itemKey:strin
       <label className="block text-xs font-semibold">Product link {index+1}<input aria-label={`Product link ${index+1}`} type="url" value={item.url} placeholder="https://www.amazon.com/…" maxLength={2048} onChange={e=>update(item.id,{url:e.target.value,name:"",retailer:"",price:"",image:""})} className={field}/></label>
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <button type="button" disabled={!!pending || !item.url} onClick={()=>fill(item)} className={action}>{pending===item.id?"Finding details…":"Auto-fill details"}</button>
-        <button type="button" onClick={()=>setExpanded(v=>({...v,[item.id]:!v[item.id]}))} className="px-2 py-2.5 text-xs font-semibold text-plum-700" aria-expanded={!!expanded[item.id]}>Edit details</button>
+        <button type="button" onClick={()=>setExpanded(v=>({...v,[item.id]:true}))} className="px-2 py-2.5 text-xs font-semibold text-plum-700">Edit details</button>
         {(products.length>0) && <button type="button" disabled={pending===item.id} onClick={()=>store.setProducts(itemKey,products.filter(p=>p.id!==item.id))} aria-label={`Remove item ${index+1}`} className="ml-auto px-2 py-2.5 text-xs text-ink-600">Remove</button>}
       </div>
       {messages[item.id] && <p role="status" className="mt-2 text-xs leading-relaxed text-ink-600">{messages[item.id]}</p>}
