@@ -45,7 +45,7 @@ export default async function Landing() {
             <div className={styles.actions}><Link href={appDest} className={styles.button}>{cta}</Link><Link href="/signup?as=vendor" className={`${styles.button} ${styles.vendorButton}`}>Vendor sign up</Link></div>
           </div>
           <div className={styles.heroPhoto}>
-            <Image src="/images/landing/celebration-empty.jpg" alt="A bright modern event space prepared for a colorful celebration" fill priority sizes="(max-width: 767px) 100vw, 55vw" className={styles.cover} />
+            <Image src="/images/landing/celebration-empty.jpg" alt="An elegant sunlit dinner table prepared for a celebration" fill priority sizes="(max-width: 767px) 100vw, 55vw" className={styles.cover} />
           </div>
         </section>
         <section id="how" className={`${styles.container} ${styles.how}`} aria-labelledby="how-title">
