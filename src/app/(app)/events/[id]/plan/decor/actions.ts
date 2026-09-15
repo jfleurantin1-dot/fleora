@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DECOR_PLAN_ITEMS, type PlanChoice } from "@/lib/planning";
-import { normalizeProducts, type DecorProduct } from "@/lib/decor-products";
 
 const VALID_CHOICES = new Set<PlanChoice>(["diy", "hire", "existing", "undecided"]);
 
@@ -14,21 +13,6 @@ export async function saveDecorPlan(eventId: string, formData: FormData) {
   if (!user) redirect("/login");
   const { data: ownedEvent } = await supabase.from("events").select("id").eq("id", eventId).eq("client_id", user.id).maybeSingle();
   if (!ownedEvent) throw new Error("This event is not available.");
-  const productLists = new Map<string,DecorProduct[]>();
-  if (formData.get("no_decor") !== "on") {
-    try {
-      for (const item of DECOR_PLAN_ITEMS) {
-        if (formData.get(`selected__${item.key}`) !== "on") continue;
-        const raw = formData.get(`diy_products__${item.key}`);
-        if (typeof raw === "string") {
-          if (raw.length > 100000) throw new Error("Too many product details. Please shorten your list.");
-          productLists.set(item.key, normalizeProducts(JSON.parse(raw)));
-        }
-      }
-    } catch (error) {
-      redirect(`/events/${eventId}/plan/decor?error=${encodeURIComponent(error instanceof Error ? error.message : "Please check your item details.")}`);
-    }
-  }
   const { data: existingRows } = await supabase.from("event_plan_items").select("id,item_key").eq("event_id", eventId).eq("chapter", "decor");
   const existing = new Map((existingRows ?? []).map((row) => [row.item_key, row]));
   const skipChapter = formData.get("no_decor") === "on";
@@ -54,7 +38,6 @@ export async function saveDecorPlan(eventId: string, formData: FormData) {
 
     const { data: planItem, error } = await supabase.from("event_plan_items").upsert({
       event_id: eventId, chapter: "decor", item_key: item.key, label, choice,
-      ...(productLists.has(item.key) ? {diy_products:productLists.get(item.key)!} : {}),
       vendor_category: item.vendorCategory, notes, updated_at: new Date().toISOString(),
     }, { onConflict: "event_id,chapter,item_key" }).select("id").single();
     if (error || !planItem) throw new Error("Your decor plan could not be saved. Please try again.");
@@ -75,7 +58,7 @@ export async function saveDecorPlan(eventId: string, formData: FormData) {
     await supabase.from("event_plan_items").delete().in("id", removedIds);
   }
 
-  revalidatePath(`/events/${eventId}`); revalidatePath(`/events/${eventId}/plan`); revalidatePath(`/events/${eventId}/plan/decor`); revalidatePath(`/events/${eventId}/services`);
+  revalidatePath(`/events/${eventId}`); revalidatePath(`/events/${eventId}/plan`); revalidatePath(`/events/${eventId}/plan/decor`); revalidatePath(`/events/${eventId}/diy`); revalidatePath(`/events/${eventId}/services`);
   const intent = String(formData.get("intent") ?? "save");
   if (intent === "continue") redirect(`/events/${eventId}/plan/food-drinks`);
   redirect(`/events/${eventId}/plan/decor?saved=1`);

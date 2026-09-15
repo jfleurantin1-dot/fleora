@@ -61,6 +61,7 @@ export type Vendor = {
   business_name: string;
   description: string | null;
   location: string | null;
+  postal_code: string | null;
   location_type: "home" | "venue" | "tbd";
   needs_venue: boolean;
   latitude: number | null;

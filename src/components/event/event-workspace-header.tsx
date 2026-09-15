@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { CalendarIcon, MapPinIcon } from "@/components/icons";
 import { shortDate, timeRange } from "@/lib/format";
-import { EventWorkspaceNav } from "./event-workspace-nav";
 
-export function EventWorkspaceHeader({ event, active, eyebrow }: { event: any; active: string; eyebrow?: string }) {
-  return <div className="space-y-5">
+export function EventWorkspaceHeader({ event, eyebrow }: { event: any; active: string; eyebrow?: string }) {
+  return <div>
     <div className="flex flex-wrap items-end justify-between gap-4">
       <div>
         <p className="fleora-kicker">{eyebrow ?? "Event workspace"}</p>
@@ -16,6 +15,5 @@ export function EventWorkspaceHeader({ event, active, eyebrow }: { event: any; a
       </div>
       <Link href={`/events/${event.id}/edit`} className="rounded-full border border-plum-100 bg-white px-4 py-2 text-sm font-semibold text-plum-700 shadow-sm hover:bg-plum-50">Edit event details</Link>
     </div>
-    <EventWorkspaceNav eventId={event.id} active={active}/>
   </div>;
 }

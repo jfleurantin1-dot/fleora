@@ -50,9 +50,9 @@ export function VendorForm({
         <Field label="Description" hint="What you do, your style, who you're a fit for.">
           <Textarea name="description" rows={3} defaultValue={vendor?.description ?? ""} />
         </Field>
-        <div className="grid grid-cols-2 gap-4">
-          <Field label="Base location" hint="Town or city">
-            <Input name="location" defaultValue={vendor?.location ?? ""} placeholder="Quincy, MA" />
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field label="Service location" hint="Enter the ZIP code where your business is based. Fleora will identify the city for clients.">
+            <Input name="postal_code" inputMode="numeric" pattern="[0-9]{5}(-[0-9]{4})?" defaultValue={vendor?.postal_code ?? ""} placeholder="02118" required={!vendor} />
           </Field>
           <Field label="Service radius (miles)">
             <Input
@@ -203,7 +203,7 @@ export function VendorForm({
 
       <Card className="space-y-3">
         <div><p className="fleora-kicker">Portfolio</p><h2 className="mt-1 font-display text-2xl text-ink-900">Show your best work</h2><p className="mt-1 text-sm text-ink-600">
-          Show your best work — clients see these on your profile and in match results.
+          Show your best work. Clients see these on your profile and in match results.
         </p></div>
         <PhotoUploader userId={userId} initial={photos} />
       </Card>
