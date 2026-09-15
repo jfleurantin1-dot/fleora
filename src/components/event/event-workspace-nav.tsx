@@ -17,8 +17,8 @@ import {
 
 const items = [
   ["", "Event Home", HomeIcon],
-  ["/summary", "Party Plan Summary", CardIcon],
   ["/plan", "My Party Plan", SparkleIcon],
+  ["/summary", "Party Plan Summary", CardIcon],
   ["/diy", "DIY Shopping", ImageFrameIcon],
   ["/vendors", "Vendors", StoreIcon],
   ["/guests", "Guests & Invitations", UsersIcon],
