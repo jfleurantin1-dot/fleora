@@ -41,11 +41,11 @@ export default async function Landing() {
         <section className={styles.hero} aria-labelledby="hero-title">
           <div className={styles.heroCopy}>
             <h1 id="hero-title">Plan the party.<br /><em>Find the <span className={styles.lilacWord}>people</span></em> to bring it to life.</h1>
-            <p>Fleora combines a party-planning workspace with a trusted local vendor marketplace — so you can organize every detail, find the right vendors, compare quotes, book, and pay in one place.</p>
+            <p>Fleora combines a party-planning workspace with a trusted local vendor marketplace, so you can organize every detail, find the right vendors, compare quotes, book, and pay in one place.</p>
             <div className={styles.actions}><Link href={appDest} className={styles.button}>{cta}</Link><Link href="/signup?as=vendor" className={`${styles.button} ${styles.vendorButton}`}>Vendor sign up</Link></div>
           </div>
           <div className={styles.heroPhoto}>
-            <Image src="/images/landing/celebration.jpg" alt="Friends celebrating together around a garden dinner table" fill priority sizes="(max-width: 767px) 100vw, 55vw" className={styles.cover} />
+            <Image src="/images/landing/celebration-empty.jpg" alt="An elegant sunlit dinner table prepared for a celebration" fill priority sizes="(max-width: 767px) 100vw, 55vw" className={styles.cover} />
           </div>
         </section>
         <section id="how" className={`${styles.container} ${styles.how}`} aria-labelledby="how-title">

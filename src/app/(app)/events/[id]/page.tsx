@@ -10,7 +10,6 @@ import { CategoryIcon } from "@/components/category-icon";
 import type { Vendor } from "@/lib/types";
 import { EventMoodCover } from "@/components/event/event-mood-cover";
 import { EventStatusControls } from "@/components/event/event-status-controls";
-import { EventWorkspaceNav } from "@/components/event/event-workspace-nav";
 
 export default async function EventPage({
   params,
@@ -170,8 +169,6 @@ export default async function EventPage({
           </div>
         </Card>
       )}
-
-      <EventWorkspaceNav eventId={event.id} active="home" />
 
       <section id="vendors" className="scroll-mt-28">
         <div>

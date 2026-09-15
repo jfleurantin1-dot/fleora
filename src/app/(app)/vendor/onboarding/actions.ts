@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { geocodeMa } from "@/lib/geo";
+import { geocodeZip, normalizeUsZip } from "@/lib/geo";
 
 export type VendorOnboardingState = { error?: string; ok?: boolean };
 
@@ -33,7 +33,8 @@ export async function saveVendorProfile(
 
   const businessName = String(formData.get("business_name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
-  const location = String(formData.get("location") ?? "").trim() || null;
+  const rawPostalCode = String(formData.get("postal_code") ?? "").trim();
+  const postalCode = rawPostalCode ? normalizeUsZip(rawPostalCode) : null;
   const radius = Number(formData.get("service_radius_miles")) || 25;
   const website = normalizeWebsite(String(formData.get("website") ?? ""));
   const instagram = normalizeInstagram(String(formData.get("instagram") ?? ""));
@@ -62,14 +63,20 @@ export async function saveVendorProfile(
 
   if (!businessName) return { error: "Enter your business name." };
   if (categories.length === 0) return { error: "Pick at least one service category." };
-
-  const coords = location ? geocodeMa(location) : null;
+  if (rawPostalCode && !postalCode) return { error: "Enter a valid 5-digit ZIP code." };
 
   const { data: existing } = await supabase
     .from("vendors")
-    .select("id")
+    .select("id,location,postal_code,latitude,longitude")
     .eq("user_id", user.id)
     .maybeSingle();
+
+  if (!existing && !postalCode) return { error: "Enter the ZIP code for your service location." };
+  const geocoded = postalCode ? await geocodeZip(postalCode) : null;
+  const location = postalCode ? (geocoded?.label ?? postalCode) : (existing?.location ?? null);
+  const savedPostalCode = postalCode ?? existing?.postal_code ?? null;
+  const latitude = geocoded?.lat ?? existing?.latitude ?? null;
+  const longitude = geocoded?.lng ?? existing?.longitude ?? null;
 
   let vendorId = existing?.id;
 
@@ -80,8 +87,9 @@ export async function saveVendorProfile(
         business_name: businessName,
         description,
         location,
-        latitude: coords?.lat ?? null,
-        longitude: coords?.lng ?? null,
+        postal_code: savedPostalCode,
+        latitude,
+        longitude,
         service_radius_miles: radius,
         website,
         instagram,
@@ -98,8 +106,9 @@ export async function saveVendorProfile(
         business_name: businessName,
         description,
         location,
-        latitude: coords?.lat ?? null,
-        longitude: coords?.lng ?? null,
+        postal_code: savedPostalCode,
+        latitude,
+        longitude,
         service_radius_miles: radius,
         website,
         instagram,
