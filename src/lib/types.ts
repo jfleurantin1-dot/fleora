@@ -358,6 +358,7 @@ export type Guest = {
   plus_one_name: string | null;
   rsvp_token: string;
   rsvp_responded_at: string | null;
+  invitation_shared_at: string | null;
   created_at: string;
 };
 
@@ -483,8 +484,16 @@ export type Database = {
         }>;
       };
       claim_public_potluck_item: {
-        Args: { p_token: string; p_item_id: string | null };
+        Args: { p_token: string; p_item_id: string | null; p_custom_item?: string | null };
         Returns: boolean;
+      };
+      get_public_rsvp_extras: {
+        Args: { p_token: string };
+        Returns: Array<{
+          event_start_time: string | null;
+          event_end_time: string | null;
+          selected_potluck_item: string | null;
+        }>;
       };
     };
     Enums: {
