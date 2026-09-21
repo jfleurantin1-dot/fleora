@@ -16,6 +16,7 @@ export async function submitRsvp(token:string,fd:FormData){
   if(!data)redirect(`/rsvp/${token}?closed=1`);
 
   const selectedDish=r==="yes"?String(fd.get("potluck_item_id")??"")||null:null;
-  const{data:potluckSaved}=await s.rpc("claim_public_potluck_item",{p_token:token,p_item_id:selectedDish});
-  redirect(`/rsvp/${token}?saved=1${selectedDish&&!potluckSaved?"&potluck_unavailable=1":""}`);
+  const customDish=r==="yes"?String(fd.get("potluck_custom_item")??"").trim()||null:null;
+  const{data:potluckSaved}=await s.rpc("claim_public_potluck_item",{p_token:token,p_item_id:selectedDish,p_custom_item:customDish});
+  redirect(`/rsvp/${token}?saved=1${(selectedDish||customDish)&&!potluckSaved?"&potluck_unavailable=1":""}`);
 }
