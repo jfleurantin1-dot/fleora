@@ -8,7 +8,7 @@ import { shortDate } from "@/lib/format";
 export default async function PlanningToolsPage(){
   const profile=await requireProfile("/planning");
   if(profile.account_type==="vendor")redirect("/vendor/dashboard");
-  const supabase=createClient();
+  const supabase=await createClient();
   const {data:events}=await supabase.from("events").select("id,name,event_date,location,status").eq("client_id",profile.id).order("event_date",{ascending:true});
   const active=(events??[]).filter((e)=>e.status!=="cancelled"&&e.status!=="completed");
   return <div className="space-y-7">

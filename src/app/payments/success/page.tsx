@@ -6,7 +6,8 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { Button, Card } from "@/components/ui";
 import { money } from "@/lib/format";
 
-export default async function PaymentSuccess({ searchParams }:{searchParams:{session_id?:string}}) {
+export default async function PaymentSuccess(props:{searchParams: Promise<{session_id?:string}>}) {
+  const searchParams = await props.searchParams;
   if (!searchParams.session_id) redirect("/dashboard");
   const session = await retrieveCheckoutSession(searchParams.session_id);
   await reconcilePaidCheckout(session);

@@ -13,7 +13,7 @@ export async function sendQuote(
   _prev: SendQuoteState,
   formData: FormData,
 ): Promise<SendQuoteState> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

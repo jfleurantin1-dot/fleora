@@ -11,7 +11,7 @@ function prettyDate(value: string) {
 export default async function VendorAvailabilityPage() {
   const { vendor } = await requireVendor();
   if (!vendor) redirect("/vendor/onboarding");
-  const supabase = createClient();
+  const supabase = await createClient();
   const today = new Date().toISOString().slice(0, 10);
   const { data } = await supabase
     .from("vendor_unavailable_dates")

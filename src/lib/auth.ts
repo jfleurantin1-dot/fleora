@@ -4,7 +4,7 @@ import type { Profile, Vendor } from "@/lib/types";
 
 /** Returns the signed-in user's profile, or null. */
 export async function getProfile(): Promise<Profile | null> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -27,7 +27,7 @@ export async function requireVendor(): Promise<{ profile: Profile; vendor: Vendo
   if (profile.account_type !== "vendor" && profile.account_type !== "admin") {
     redirect("/dashboard");
   }
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: vendor } = await supabase
     .from("vendors")
     .select("*")

@@ -5,7 +5,7 @@ import { Card, Empty, PageHeader, Badge, ButtonLink } from "@/components/ui";
 import { timeAgo, money } from "@/lib/format";
 
 export default async function MessagesPage() {
-  const profile = await requireProfile(); const supabase = createClient();
+  const profile = await requireProfile(); const supabase = await createClient();
   const {data:myVendor}=profile.account_type==="vendor"?await supabase.from("vendors").select("id").eq("user_id",profile.id).maybeSingle():{data:null};
   const {data:networkConvos}=myVendor?await (supabase.from("vendor_network_conversations") as any).select("*").or(`vendor_a_id.eq.${myVendor.id},vendor_b_id.eq.${myVendor.id}`).order("created_at",{ascending:false}):{data:[]};
   const networkList=(networkConvos??[]) as any[]; const networkOtherIds=myVendor?[...new Set(networkList.map(c=>c.vendor_a_id===myVendor.id?c.vendor_b_id:c.vendor_a_id))]:[]; const networkIds=networkList.map(c=>c.id);

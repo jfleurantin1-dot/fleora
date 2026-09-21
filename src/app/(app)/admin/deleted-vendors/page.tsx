@@ -8,7 +8,7 @@ import { shortDate } from "@/lib/format";
 export default async function DeletedVendorsReport(){
   const profile=await requireProfile("/admin/deleted-vendors");
   if(profile.account_type!=="admin")redirect("/dashboard");
-  const supabase=createClient();
+  const supabase=await createClient();
   const {data:rows}=await supabase.from("vendor_admin_actions").select("id,vendor_id,vendor_user_id,business_name_snapshot,reason,admin_id,created_at").eq("action","deleted").order("created_at",{ascending:false});
   const adminIds=[...new Set((rows??[]).map((r)=>r.admin_id))];
   const {data:admins}=adminIds.length?await supabase.from("profiles").select("id,first_name,last_name").in("id",adminIds):{data:[] as {id:string;first_name:string|null;last_name:string|null}[]};

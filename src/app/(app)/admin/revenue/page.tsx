@@ -18,7 +18,7 @@ export default async function RevenuePage() {
   const profile = await requireProfile("/admin/revenue");
   if (profile.account_type !== "admin") redirect("/dashboard");
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const [{ data: payments }, { data: settings }] = await Promise.all([
     supabase.from("payments").select("*").order("created_at", { ascending: false }),
     supabase.from("payment_settings").select("*").eq("id", 1).maybeSingle(),

@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export async function messageVendor(targetVendorId:string){
- const s=createClient(); const {data:{user}}=await s.auth.getUser(); if(!user) redirect("/login");
+ const s=await createClient(); const {data:{user}}=await s.auth.getUser(); if(!user) redirect("/login");
  const {data:mine}=await s.from("vendors").select("id").eq("user_id",user.id).maybeSingle();
  if(!mine||mine.id===targetVendorId) return;
  const [vendor_a_id,vendor_b_id]=[mine.id,targetVendorId].sort();

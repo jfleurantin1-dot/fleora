@@ -8,7 +8,7 @@ import { EventMoodCover } from "@/components/event/event-mood-cover";
 
 export default async function EventsPage() {
   const profile = await requireProfile();
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: events } = await supabase.from("events").select("*").eq("client_id", profile.id);
   const rows = events ?? [];
   const ids = rows.map((e) => e.id);

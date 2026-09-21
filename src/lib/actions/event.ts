@@ -4,17 +4,17 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export async function toggleChecklistItem(eventId:string,itemId:string,done:boolean){const s=createClient();await s.from("checklist_items").update({done}).eq("id",itemId);revalidatePath(`/events/${eventId}`)}
-export async function addChecklistItem(eventId:string,formData:FormData){const s=createClient();const title=String(formData.get("title")??"").trim();if(!title)return;const {data:rows}=await s.from("checklist_items").select("sort").eq("event_id",eventId).order("sort",{ascending:false}).limit(1);await s.from("checklist_items").insert({event_id:eventId,title,sort:(rows?.[0]?.sort??0)+1});revalidatePath(`/events/${eventId}`)}
-export async function removeChecklistItem(eventId:string,itemId:string){const s=createClient();await s.from("checklist_items").delete().eq("id",itemId);revalidatePath(`/events/${eventId}`)}
+export async function toggleChecklistItem(eventId:string,itemId:string,done:boolean){const s=await createClient();await s.from("checklist_items").update({done}).eq("id",itemId);revalidatePath(`/events/${eventId}`)}
+export async function addChecklistItem(eventId:string,formData:FormData){const s=await createClient();const title=String(formData.get("title")??"").trim();if(!title)return;const {data:rows}=await s.from("checklist_items").select("sort").eq("event_id",eventId).order("sort",{ascending:false}).limit(1);await s.from("checklist_items").insert({event_id:eventId,title,sort:(rows?.[0]?.sort??0)+1});revalidatePath(`/events/${eventId}`)}
+export async function removeChecklistItem(eventId:string,itemId:string){const s=await createClient();await s.from("checklist_items").delete().eq("id",itemId);revalidatePath(`/events/${eventId}`)}
 
-export async function addGuest(eventId:string,formData:FormData){const s=createClient();const name=String(formData.get("name")??"").trim();if(!name)return;const invited=Math.max(1,Number(formData.get("party_size"))||1);await s.from("guests").insert({event_id:eventId,name,invitation_name:String(formData.get("invitation_name")??"").trim()||null,email:String(formData.get("email")??"").trim()||null,phone:String(formData.get("phone")??"").trim()||null,party_size:invited,invited_party_size:invited,plus_one_allowed:formData.get("plus_one_allowed")==="on"});revalidatePath(`/events/${eventId}`)}
-export async function updateRsvpSettings(eventId:string,formData:FormData){const s=createClient();await s.from("events").update({rsvp_title:String(formData.get("rsvp_title")??"").trim()||null,rsvp_deadline:String(formData.get("rsvp_deadline")??"").trim()||null}).eq("id",eventId);revalidatePath(`/events/${eventId}`)}
-export async function setGuestRsvp(eventId:string,guestId:string,rsvp:"pending"|"yes"|"no"){const s=createClient();await s.from("guests").update({rsvp,rsvp_responded_at:rsvp==="pending"?null:new Date().toISOString()}).eq("id",guestId);revalidatePath(`/events/${eventId}`)}
-export async function removeGuest(eventId:string,guestId:string){const s=createClient();await s.from("guests").delete().eq("id",guestId);revalidatePath(`/events/${eventId}`)}
+export async function addGuest(eventId:string,formData:FormData){const s=await createClient();const name=String(formData.get("name")??"").trim();if(!name)return;const invited=Math.max(1,Number(formData.get("party_size"))||1);await s.from("guests").insert({event_id:eventId,name,invitation_name:String(formData.get("invitation_name")??"").trim()||null,email:String(formData.get("email")??"").trim()||null,phone:String(formData.get("phone")??"").trim()||null,party_size:invited,invited_party_size:invited,plus_one_allowed:formData.get("plus_one_allowed")==="on"});revalidatePath(`/events/${eventId}`)}
+export async function updateRsvpSettings(eventId:string,formData:FormData){const s=await createClient();await s.from("events").update({rsvp_title:String(formData.get("rsvp_title")??"").trim()||null,rsvp_deadline:String(formData.get("rsvp_deadline")??"").trim()||null}).eq("id",eventId);revalidatePath(`/events/${eventId}`)}
+export async function setGuestRsvp(eventId:string,guestId:string,rsvp:"pending"|"yes"|"no"){const s=await createClient();await s.from("guests").update({rsvp,rsvp_responded_at:rsvp==="pending"?null:new Date().toISOString()}).eq("id",guestId);revalidatePath(`/events/${eventId}`)}
+export async function removeGuest(eventId:string,guestId:string){const s=await createClient();await s.from("guests").delete().eq("id",guestId);revalidatePath(`/events/${eventId}`)}
 
 async function eventClosureContext(eventId:string){
-  const s=createClient();
+  const s=await createClient();
   const [{data:event},{data:pendingQuotes},{data:conversations},{data:bookings}] = await Promise.all([
     s.from("events").select("name").eq("id",eventId).single(),
     s.from("quotes").select("vendor_id,status").eq("event_id",eventId).eq("status","sent"),
@@ -29,7 +29,7 @@ async function eventClosureContext(eventId:string){
   return {s,event,outstandingVendorIds};
 }
 
-async function notifyVendors(s:ReturnType<typeof createClient>,vendorIds:string[],kind:string,title:string,body:string){
+async function notifyVendors(s:Awaited<ReturnType<typeof createClient>>,vendorIds:string[],kind:string,title:string,body:string){
   if(!vendorIds.length)return;
   const {data:vendors}=await s.from("vendors").select("user_id").in("id",vendorIds);
   const notices=(vendors??[]).filter(v=>v.user_id).map(v=>({user_id:v.user_id!,kind,title,body,href:"/vendor/leads"}));
@@ -59,4 +59,4 @@ export async function cancelEvent(eventId:string){
   revalidatePath(`/events/${eventId}`);revalidatePath("/events");revalidatePath("/dashboard");revalidatePath("/vendor/leads");
 }
 
-export async function deleteEvent(eventId:string){const s=createClient();await s.from("events").delete().eq("id",eventId);revalidatePath("/events");revalidatePath("/dashboard");redirect("/events")}
+export async function deleteEvent(eventId:string){const s=await createClient();await s.from("events").delete().eq("id",eventId);revalidatePath("/events");revalidatePath("/dashboard");redirect("/events")}

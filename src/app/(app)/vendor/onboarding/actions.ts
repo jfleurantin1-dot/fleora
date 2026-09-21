@@ -25,7 +25,7 @@ export async function saveVendorProfile(
   _prev: VendorOnboardingState,
   formData: FormData,
 ): Promise<VendorOnboardingState> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

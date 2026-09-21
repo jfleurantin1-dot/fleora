@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   if (profile.account_type === "vendor") redirect("/vendor/dashboard");
   if (profile.account_type === "admin") redirect("/admin");
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: events } = await supabase
     .from("events")
     .select("*")

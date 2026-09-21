@@ -11,15 +11,16 @@ import type { Vendor } from "@/lib/types";
 import { EventMoodCover } from "@/components/event/event-mood-cover";
 import { EventStatusControls } from "@/components/event/event-status-controls";
 
-export default async function EventPage({
-  params,
-  searchParams,
-}: {
-  params: { id: string };
-  searchParams: { booked?: string };
-}) {
+export default async function EventPage(
+  props: {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ booked?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   await requireProfile();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: event } = await supabase.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();

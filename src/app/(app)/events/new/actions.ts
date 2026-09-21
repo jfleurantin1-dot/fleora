@@ -8,7 +8,7 @@ import { geocodeMa } from "@/lib/geo";
 export type NewEventState = { error?: string };
 
 export async function createEvent(_prev: NewEventState, formData: FormData): Promise<NewEventState> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

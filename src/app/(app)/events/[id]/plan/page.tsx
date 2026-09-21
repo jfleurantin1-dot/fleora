@@ -6,9 +6,10 @@ import { Card, Progress, Badge } from "@/components/ui";
 import { EventWorkspaceHeader } from "@/components/event/event-workspace-header";
 import { SparkleIcon, ImageFrameIcon, UtensilsIcon, StoreIcon, MusicIcon, MapPinIcon, ChevronRightIcon, CheckIcon } from "@/components/icons";
 
-export default async function PartyPlanPage({ params }: { params: { id: string } }) {
-  await requireProfile(); const supabase=createClient();
-  const {data:event}=await supabase.from("events").select("*").eq("id",params.id).single(); if(!event) notFound();
+export default async function PartyPlanPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
+  await requireProfile();const supabase=await createClient();
+  const {data:event}=await supabase.from("events").select("*").eq("id",params.id).single();if(!event) notFound();
   const [{data:photos},{data:requests},{data:planItems}]=await Promise.all([
     supabase.from("event_inspiration_photos").select("id").eq("event_id",params.id),
     supabase.from("event_requests").select("id").eq("event_id",params.id),

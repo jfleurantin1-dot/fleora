@@ -23,7 +23,7 @@ export async function signup(_prev: SignupState, formData: FormData): Promise<Si
   }
   if (password !== confirmPassword) return { error: "Your passwords do not match." };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: signupData, error } = await supabase.auth.signUp({
     email,
     password,

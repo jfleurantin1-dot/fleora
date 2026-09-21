@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 async function loadQuoteForClient(quoteId: string) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: quote } = await supabase.from("quotes").select("*").eq("id", quoteId).single();
   return { supabase, quote };
 }

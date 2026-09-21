@@ -13,9 +13,10 @@ type Status = "needed" | "searching" | "inquired" | "quote" | "payment" | "booke
 const tone = (status: Status) => status === "booked" ? "green" : status === "payment" || status === "quote" ? "amber" : status === "inquired" || status === "searching" ? "plum" : "slate";
 const statusText = (status: Status) => status === "booked" ? "Booked" : status === "payment" ? "Awaiting payment" : status === "quote" ? "Quote received" : status === "inquired" ? "Inquiry sent" : status === "searching" ? "Searching" : "Needed";
 
-export default async function VendorsPage({ params }: { params: { id: string } }) {
+export default async function VendorsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireProfile();
-  const db = createClient();
+  const db = await createClient();
   const { data: event } = await db.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();
 

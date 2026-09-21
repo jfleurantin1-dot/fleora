@@ -8,7 +8,7 @@ import { categoryLabel } from "@/lib/constants";
 import { vendorProfileCompletion } from "@/lib/vendor-profile";
 
 export default async function VendorDashboard(){
- const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=createClient(); const today=new Date().toISOString().slice(0,10);
+ const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=await createClient(); const today=new Date().toISOString().slice(0,10);
  const [{data:convos},{data:quotes},{data:bookings},{data:events},{data:categories},{data:photos},{data:services},{data:packages}] = await Promise.all([
   supabase.from("conversations").select("*").eq("vendor_id",vendor.id),
   supabase.from("quotes").select("id,event_id,status,total,category").eq("vendor_id",vendor.id),

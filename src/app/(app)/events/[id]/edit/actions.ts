@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { geocodeMa } from "@/lib/geo";
 
 export async function updateEvent(eventId: string, fd: FormData) {
-  const s = createClient();
+  const s = await createClient();
   const location = String(fd.get("location") ?? "").trim() || null;
   const coords = location ? geocodeMa(location) : null;
   const locationType = String(fd.get("location_type") ?? "tbd");
@@ -45,7 +45,7 @@ export async function updateEvent(eventId: string, fd: FormData) {
 }
 
 export async function uploadMoodPhotos(eventId: string, fd: FormData): Promise<{ error?: string }> {
-  const s = createClient();
+  const s = await createClient();
   const { data: { user } } = await s.auth.getUser();
   if (!user) return { error: "Please sign in again before uploading." };
 
@@ -93,7 +93,7 @@ export async function uploadMoodPhotos(eventId: string, fd: FormData): Promise<{
 }
 
 export async function removeMoodPhoto(eventId: string, photoId: string) {
-  const s = createClient();
+  const s = await createClient();
   await s.from("event_inspiration_photos").delete().eq("id", photoId).eq("event_id", eventId);
   revalidatePath(`/events/${eventId}/edit`);
   revalidatePath(`/events/${eventId}`);
@@ -102,7 +102,7 @@ export async function removeMoodPhoto(eventId: string, photoId: string) {
 }
 
 export async function reorderMoodPhotos(eventId: string, photoIds: string[]) {
-  const s = createClient();
+  const s = await createClient();
   for (let i = 0; i < photoIds.length; i++) {
     await s.from("event_inspiration_photos").update({ sort: i }).eq("id", photoIds[i]).eq("event_id", eventId);
   }

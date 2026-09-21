@@ -1,4 +1,5 @@
-"use client";
+"use client";;
+import { use } from "react";
 
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
@@ -11,7 +12,8 @@ function Submit() {
   return <Button type="submit" size="lg" className="w-full" disabled={pending}>{pending ? "Signing in…" : "Welcome back"}</Button>;
 }
 
-export default function LoginPage({ searchParams }: { searchParams: { next?: string; check?: string } }) {
+export default function LoginPage(props: { searchParams: Promise<{ next?: string; check?: string }> }) {
+  const searchParams = use(props.searchParams);
   const [state, formAction] = useFormState<AuthState, FormData>(login, {});
   return (
     <main className="relative min-h-screen overflow-hidden bg-ivory-50">

@@ -24,7 +24,7 @@ export async function startStripeOnboarding() {
   const { vendor } = await requireVendor();
   if (!vendor) redirect("/vendor/onboarding");
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   let accountId = vendor.stripe_account_id;
 

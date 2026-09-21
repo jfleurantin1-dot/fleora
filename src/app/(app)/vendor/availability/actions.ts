@@ -44,7 +44,7 @@ export async function blockDateRange(formData: FormData) {
     note,
   }));
 
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.from("vendor_unavailable_dates").upsert(rows, {
     onConflict: "vendor_id,unavailable_date",
   });
@@ -58,7 +58,7 @@ export async function removeBlockedDate(formData: FormData) {
   const id = String(formData.get("id") ?? "");
   if (!id) return;
 
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.from("vendor_unavailable_dates").delete().eq("id", id).eq("vendor_id", vendor.id);
   revalidatePath("/vendor/availability");
 }

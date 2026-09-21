@@ -8,8 +8,11 @@ import {ChevronRightIcon,MapPinIcon,SearchIcon,CalendarIcon} from "@/components/
 import {money} from "@/lib/format";
 import {FavoriteButton} from "@/components/favorite-button";
 
-export default async function BrowseVendors({searchParams}:{searchParams:{q?:string;category?:string;location?:string;max?:string;date?:string;saved?:string}}){
- const profile=await requireProfile();const supabase=createClient();
+export default async function BrowseVendors(
+ props:{searchParams: Promise<{q?:string;category?:string;location?:string;max?:string;date?:string;saved?:string}>}
+) {
+ const searchParams = await props.searchParams;
+ const profile=await requireProfile();const supabase=await createClient();
  const q=(searchParams.q??"").trim().toLowerCase();const category=(searchParams.category??"").trim();const location=(searchParams.location??"").trim().toLowerCase();const maxPrice=Number(searchParams.max)||null;const date=(searchParams.date??"").trim();const savedOnly=searchParams.saved==="1";
  const {data:allVendors}=await supabase.from("vendors").select("*").eq("status","approved").order("rating",{ascending:false});
  const ids=(allVendors??[]).map(v=>v.id);const safeIds=ids.length?ids:["00000000-0000-0000-0000-000000000000"];

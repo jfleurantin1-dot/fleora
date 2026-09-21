@@ -9,15 +9,16 @@ import { acceptQuote, declineQuote } from "../actions";
 import { startQuotePayment } from "./pay/actions";
 
 const statusTone={sent:"amber",accepted:"green",declined:"rose",expired:"slate"} as const;
-export default async function QuotePage({params}:{params:{id:string}}){
- const profile=await requireProfile(); const supabase=createClient();
- const {data:quote}=await supabase.from("quotes").select("*").eq("id",params.id).single(); if(!quote) notFound();
+export default async function QuotePage(props:{params: Promise<{id:string}>}) {
+ const params = await props.params;
+ const profile=await requireProfile();const supabase=await createClient();
+ const {data:quote}=await supabase.from("quotes").select("*").eq("id",params.id).single();if(!quote) notFound();
  const [{data:items},{data:vendor},{data:event}] = await Promise.all([
   supabase.from("quote_items").select("*").eq("quote_id",quote.id).order("sort"),
   supabase.from("vendors").select("id,business_name,location").eq("id",quote.vendor_id).single(),
   supabase.from("events").select("id,name,client_id,event_date,location").eq("id",quote.event_id).single(),
  ]);
- const isClient=profile.id===event?.client_id; const canDecide=isClient&&quote.status==="sent"; const accept=acceptQuote.bind(null,quote.id); const decline=declineQuote.bind(null,quote.id);
+ const isClient=profile.id===event?.client_id;const canDecide=isClient&&quote.status==="sent";const accept=acceptQuote.bind(null,quote.id);const decline=declineQuote.bind(null,quote.id);
  const [{data:booking},{data:vendorPay}] = await Promise.all([
   supabase.from("bookings").select("*").eq("quote_id",quote.id).maybeSingle(),
   supabase.from("vendors").select("stripe_account_id,stripe_onboarding_status,stripe_payouts_enabled").eq("id",quote.vendor_id).single(),

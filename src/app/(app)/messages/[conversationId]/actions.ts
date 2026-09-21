@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const REASONS=new Set(["plans_changed","found_another_vendor","no_longer_needed","timing_changed","other"]);
 export async function cancelRequest(conversationId:string, formData:FormData){
- const s=createClient(); const {data:{user}}=await s.auth.getUser(); if(!user) redirect("/login");
+ const s=await createClient(); const {data:{user}}=await s.auth.getUser(); if(!user) redirect("/login");
  const {data:convo}=await s.from("conversations").select("*").eq("id",conversationId).single(); if(!convo||convo.client_id!==user.id) return;
  const {data:booking}=await s.from("bookings").select("id").eq("event_id",convo.event_id).eq("vendor_id",convo.vendor_id).neq("status","cancelled").maybeSingle(); if(booking) return;
  const {data:sentQuote}=await s.from("quotes").select("id,status").eq("event_id",convo.event_id).eq("vendor_id",convo.vendor_id).eq("status","sent").order("created_at",{ascending:false}).limit(1).maybeSingle(); if(sentQuote) redirect(`/quotes/${sentQuote.id}`);

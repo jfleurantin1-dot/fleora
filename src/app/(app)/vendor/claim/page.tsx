@@ -6,15 +6,16 @@ import { Badge, ButtonLink, Card, Empty, PageHeader } from "@/components/ui";
 import { categoryLabel } from "@/lib/constants";
 import { MapPinIcon, SearchIcon } from "@/components/icons";
 
-export default async function ClaimBusinessPage({
-  searchParams,
-}: {
-  searchParams: { q?: string };
-}) {
+export default async function ClaimBusinessPage(
+  props: {
+    searchParams: Promise<{ q?: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const profile = await requireProfile("/vendor/claim");
   if (profile.account_type !== "vendor" && profile.account_type !== "admin") redirect("/dashboard");
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const q = (searchParams.q ?? "").trim();
 
   const [{ data: vendors }, { data: myClaims }] = await Promise.all([

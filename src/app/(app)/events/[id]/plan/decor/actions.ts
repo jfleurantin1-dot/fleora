@@ -8,7 +8,7 @@ import { DECOR_PLAN_ITEMS, type PlanChoice } from "@/lib/planning";
 const VALID_CHOICES = new Set<PlanChoice>(["diy", "hire", "existing", "undecided"]);
 
 export async function saveDecorPlan(eventId: string, formData: FormData) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
   const { data: ownedEvent } = await supabase.from("events").select("id").eq("id", eventId).eq("client_id", user.id).maybeSingle();
@@ -65,7 +65,7 @@ export async function saveDecorPlan(eventId: string, formData: FormData) {
 }
 
 export async function uploadDecorPhotos(eventId: string, planItemId: string | null, itemKey: string, fd: FormData): Promise<{ error?: string; planItemId?: string; photos?: {id:string;url:string;sort:number}[] }> {
-  const s = createClient();
+  const s = await createClient();
   const { data: { user } } = await s.auth.getUser();
   if (!user) return { error: "Please sign in again before uploading." };
   const def = DECOR_PLAN_ITEMS.find((item) => item.key === itemKey);
@@ -97,7 +97,7 @@ export async function uploadDecorPhotos(eventId: string, planItemId: string | nu
 }
 
 export async function removeDecorPhoto(eventId: string, planItemId: string, photoId: string) {
-  const s = createClient();
+  const s = await createClient();
   await s.from("event_plan_item_photos").delete().eq("id", photoId).eq("event_id", eventId).eq("plan_item_id", planItemId);
   revalidatePath(`/events/${eventId}/plan/decor`);
 }

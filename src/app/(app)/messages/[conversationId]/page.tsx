@@ -8,16 +8,20 @@ import { categoryLabel } from "@/lib/constants";
 import { MessageComposer } from "@/components/message-composer";
 import { cancelRequest } from "./actions";
 
-export default async function ThreadPage({ params, searchParams }: { params: { conversationId: string }; searchParams?: { from?: string } }) {
- const profile=await requireProfile(); const supabase=createClient();
- const {data:convo}=await supabase.from("conversations").select("*").eq("id",params.conversationId).single(); if(!convo) notFound();
+export default async function ThreadPage(
+ props: { params: Promise<{ conversationId: string }>; searchParams?: Promise<{ from?: string }> }
+) {
+ const searchParams = await props.searchParams;
+ const params = await props.params;
+ const profile=await requireProfile();const supabase=await createClient();
+ const {data:convo}=await supabase.from("conversations").select("*").eq("id",params.conversationId).single();if(!convo) notFound();
  const [{data:event},{data:vendor},{data:messages},{data:quotes}] = await Promise.all([
   supabase.from("events").select("*").eq("id",convo.event_id).single(),
   supabase.from("vendors").select("id,business_name,user_id").eq("id",convo.vendor_id).single(),
   supabase.from("messages").select("*").eq("conversation_id",params.conversationId).order("created_at"),
   supabase.from("quotes").select("*").eq("event_id",convo.event_id).eq("vendor_id",convo.vendor_id).order("created_at",{ascending:false}),
  ]);
- const isVendorSide=vendor?.user_id===profile.id; const otherName=isVendorSide?event?.name:vendor?.business_name; const latestQuote=quotes?.[0]; const clientCancelled=String((convo as any).client_inquiry_status??"active")==="cancelled"; const vendorDeclined=String((convo as any).vendor_inquiry_status??"active")==="declined"; const closed=clientCancelled||vendorDeclined; const canCancel=!isVendorSide&&!closed&&!latestQuote;
+ const isVendorSide=vendor?.user_id===profile.id;const otherName=isVendorSide?event?.name:vendor?.business_name;const latestQuote=quotes?.[0];const clientCancelled=String((convo as any).client_inquiry_status??"active")==="cancelled";const vendorDeclined=String((convo as any).vendor_inquiry_status??"active")==="declined";const closed=clientCancelled||vendorDeclined;const canCancel=!isVendorSide&&!closed&&!latestQuote;
  return <div className="mx-auto max-w-3xl">
   <Link href={isVendorSide&&searchParams?.from==="inquiry"?`/vendor/inquiries/${params.conversationId}`:"/messages"} className="mb-5 inline-flex text-sm font-semibold text-plum-700 hover:underline">{isVendorSide&&searchParams?.from==="inquiry"?"← Back to inquiry":"← Messages"}</Link>
   <Card variant="feature" className="mb-4"><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="fleora-kicker">{isVendorSide?"Event conversation":"Vendor conversation"}</p><h1 className="mt-1 font-display text-3xl text-ink-900">{otherName}</h1><p className="mt-2 text-sm text-ink-600">{event?.name} · {shortDate(event?.event_date)} · {event?.guest_count??"?"} guests · {money(event?.budget)}</p></div>{isVendorSide?<ButtonLink href={`/vendor/quote/${params.conversationId}${searchParams?.from==="inquiry"?"?from=inquiry":""}`} size="sm">{latestQuote?"Send another quote":"Create quote"}</ButtonLink>:latestQuote&&latestQuote.status==="sent"?<ButtonLink href={`/quotes/${latestQuote.id}`} size="sm">View quote · {money(latestQuote.total)}</ButtonLink>:null}</div></Card>

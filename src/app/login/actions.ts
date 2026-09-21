@@ -12,7 +12,7 @@ export async function login(_prev: AuthState, formData: FormData): Promise<AuthS
 
   if (!email || !password) return { error: "Enter your email and password." };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { error: error.message };
 

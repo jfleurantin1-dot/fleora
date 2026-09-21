@@ -9,7 +9,7 @@ function cents(value: number) { return Math.round(Number(value) * 100); }
 
 export async function startQuotePayment(quoteId: string, type: "deposit"|"full"|"balance") {
   const profile = await requireProfile();
-  const supabase = createClient();
+  const supabase = await createClient();
   const admin = createAdminClient();
   const { data: quote } = await supabase.from("quotes").select("*").eq("id", quoteId).single();
   if (!quote || quote.status !== "accepted") throw new Error("This quote is not ready for payment.");

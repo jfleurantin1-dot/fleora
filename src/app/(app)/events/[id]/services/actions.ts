@@ -12,7 +12,7 @@ function refresh(id:string){
   revalidatePath(`/events/${id}/summary`);
 }
 export async function saveServicePlan(eventId:string, fd:FormData){
-  const s=createClient();
+  const s=await createClient();
   const {data:old}=await s.from("event_plan_items").select("id,item_key").eq("event_id",eventId).eq("chapter","services");
   const existing=new Map((old??[]).map(r=>[r.item_key,r]));
   if(fd.get("no_services")==="on"){
@@ -50,7 +50,7 @@ export async function saveServicePlan(eventId:string, fd:FormData){
   redirect(`/events/${eventId}/services?saved=1`);
 }
 export async function uploadServicePhotos(eventId:string,planItemId:string|null,itemKey:string,fd:FormData):Promise<{error?:string;planItemId?:string;photos?:{id:string;url:string;sort:number}[]}>{
-  const s=createClient(); const {data:{user}}=await s.auth.getUser(); if(!user)return{error:"Please sign in again before uploading."};
+  const s=await createClient(); const {data:{user}}=await s.auth.getUser(); if(!user)return{error:"Please sign in again before uploading."};
   const def=SERVICE_PLAN_ITEMS.find(item=>item.key===itemKey);if(!def)return{error:"That service could not be found."};
   let id=planItemId;if(!id){const {data:row,error}=await s.from("event_plan_items").upsert({event_id:eventId,chapter:"services",item_key:def.key,label:def.label,choice:"undecided",vendor_category:def.vendorCategory,notes:null,updated_at:new Date().toISOString()},{onConflict:"event_id,chapter,item_key"}).select("id").single();if(error||!row)return{error:error?.message??"Could not prepare this service for photos."};id=row.id;}
   const files=fd.getAll("photos").filter((v):v is File=>v instanceof File&&v.size>0).slice(0,6);
@@ -59,4 +59,4 @@ export async function uploadServicePhotos(eventId:string,planItemId:string|null,
   refresh(eventId);return{planItemId:id,photos:uploaded};
 }
 
-export async function removeServicePhoto(eventId:string,planItemId:string,photoId:string){ const s=createClient(); await s.from("event_plan_item_photos").delete().eq("id",photoId).eq("event_id",eventId).eq("plan_item_id",planItemId); refresh(eventId); }
+export async function removeServicePhoto(eventId:string,planItemId:string,photoId:string){ const s=await createClient(); await s.from("event_plan_item_photos").delete().eq("id",photoId).eq("event_id",eventId).eq("plan_item_id",planItemId); refresh(eventId); }
