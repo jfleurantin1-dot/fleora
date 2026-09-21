@@ -12,9 +12,13 @@ import { ClaimForm } from "./claim-form";
 import { messageVendor } from "./network-actions";
 import { vendorProfileCompletion } from "@/lib/vendor-profile";
 
-export default async function VendorProfile({ params, searchParams }: { params: { id: string }; searchParams?: { eventId?: string; category?: string } }) {
+export default async function VendorProfile(
+  props: { params: Promise<{ id: string }>; searchParams?: Promise<{ eventId?: string; category?: string }> }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const profile = await requireProfile();
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: vendor } = await supabase.from("vendors").select("*").eq("id", params.id).single();
   if (!vendor) notFound();
   const isOwnVendor = profile.account_type === "vendor" && vendor.user_id === profile.id;

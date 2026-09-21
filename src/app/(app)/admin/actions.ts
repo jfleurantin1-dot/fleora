@@ -19,7 +19,7 @@ export async function moderateVendor(vendorId: string, action: "suspended" | "de
   const reason = rawReason.trim();
   if (reason.length < 5) return { error: "A reason of at least 5 characters is required." };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: vendor, error: vendorError } = await supabase
     .from("vendors")
     .select("id,user_id,business_name,status,location,contact_email,contact_phone")
@@ -52,7 +52,7 @@ export async function moderateVendor(vendorId: string, action: "suspended" | "de
 
 export async function setVendorStatus(vendorId: string, status: Extract<VendorStatus, "pending" | "approved">) {
   await assertAdmin();
-  const supabase = createClient();
+  const supabase = await createClient();
   await supabase.from("vendors").update({ status }).eq("id", vendorId);
   revalidatePath("/admin");
   revalidatePath(`/vendors/${vendorId}`);
@@ -65,7 +65,7 @@ export async function createDirectoryVendor(
   formData: FormData,
 ): Promise<AdminVendorState> {
   await assertAdmin();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const businessName = String(formData.get("business_name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
@@ -140,7 +140,7 @@ export async function reviewVendorClaim(
   decision: "approved" | "rejected",
 ) {
   await assertAdmin();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   if (decision === "approved") {
     const { data: vendor } = await supabase.from("vendors").select("user_id").eq("id", vendorId).single();
@@ -211,7 +211,7 @@ export async function reviewVendorClaim(
 
 export async function updateDirectoryVendor(vendorId: string, formData: FormData) {
   await assertAdmin();
-  const supabase = createClient();
+  const supabase = await createClient();
   const businessName = String(formData.get("business_name") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim() || null;
   const location = String(formData.get("location") ?? "").trim() || null;

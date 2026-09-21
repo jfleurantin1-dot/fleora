@@ -213,6 +213,7 @@ export type EventPotluckItem = {
   item: string;
   category: string;
   assigned_to: string | null;
+  guest_id: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -357,6 +358,7 @@ export type Guest = {
   plus_one_name: string | null;
   rsvp_token: string;
   rsvp_responded_at: string | null;
+  invitation_shared_at: string | null;
   created_at: string;
 };
 
@@ -469,6 +471,29 @@ export type Database = {
       submit_public_rsvp: {
         Args: { p_token: string; p_rsvp: RsvpStatus; p_party_size: number; p_dietary?: string | null; p_plus_one_name?: string | null };
         Returns: boolean;
+      };
+      get_public_potluck_options: {
+        Args: { p_token: string };
+        Returns: Array<{
+          potluck_item_id: string;
+          item: string;
+          category: string;
+          notes: string | null;
+          available: boolean;
+          is_mine: boolean;
+        }>;
+      };
+      claim_public_potluck_item: {
+        Args: { p_token: string; p_item_id: string | null; p_custom_item?: string | null };
+        Returns: boolean;
+      };
+      get_public_rsvp_extras: {
+        Args: { p_token: string };
+        Returns: Array<{
+          event_start_time: string | null;
+          event_end_time: string | null;
+          selected_potluck_item: string | null;
+        }>;
       };
     };
     Enums: {

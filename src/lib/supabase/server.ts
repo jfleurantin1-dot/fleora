@@ -6,8 +6,8 @@ import type { Database } from "@/lib/types";
  * Supabase client for use in Server Components, Route Handlers and Server Actions.
  * Reads/writes the auth cookie so sessions stay in sync.
  */
-export function createClient() {
-  const cookieStore = cookies();
+export async function createClient() {
+  const cookieStore = await cookies();
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,

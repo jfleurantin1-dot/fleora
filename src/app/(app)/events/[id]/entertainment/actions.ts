@@ -15,7 +15,7 @@ function refresh(eventId: string) {
 }
 
 export async function saveEntertainmentPlan(eventId: string, fd: FormData) {
-  const s = createClient();
+  const s = await createClient();
   const { data: old } = await s
     .from("event_plan_items")
     .select("id,item_key")
@@ -127,7 +127,7 @@ export async function saveEntertainmentPlan(eventId: string, fd: FormData) {
 export async function uploadEntertainmentPhotos(
   eventId: string, planItemId: string | null, itemKey: string, fd: FormData
 ): Promise<{ error?: string; planItemId?: string; photos?: {id:string;url:string;sort:number}[] }> {
-  const s = createClient(); const { data: { user } } = await s.auth.getUser();
+  const s = await createClient(); const { data: { user } } = await s.auth.getUser();
   if (!user) return { error: "Please sign in again before uploading." };
   const def=ENTERTAINMENT_PLAN_ITEMS.find(item=>item.key===itemKey); if(!def)return{error:"That entertainment item could not be found."};
   let id=planItemId; if(!id){const {data:row,error}=await s.from("event_plan_items").upsert({event_id:eventId,chapter:"entertainment",item_key:def.key,label:def.label,choice:"undecided",vendor_category:def.vendorCategory,notes:null,updated_at:new Date().toISOString()},{onConflict:"event_id,chapter,item_key"}).select("id").single();if(error||!row)return{error:error?.message??"Could not prepare this entertainment item for photos."};id=row.id;}
@@ -139,7 +139,7 @@ export async function uploadEntertainmentPhotos(
 }
 
 export async function removeEntertainmentPhoto(eventId: string, planItemId: string, photoId: string) {
-  const s = createClient();
+  const s = await createClient();
   await s
     .from("event_plan_item_photos")
     .delete()

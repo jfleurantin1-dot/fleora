@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, use } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { signup, type SignupState } from "./actions";
 import { Button, Card, Field, Input, FormError } from "@/components/ui";
@@ -12,7 +12,8 @@ function Submit({ isVendor }: { isVendor: boolean }) {
   return <Button type="submit" size="lg" className="w-full" disabled={pending}>{pending ? "Creating your account…" : isVendor ? "Create vendor account" : "Start planning"}</Button>;
 }
 
-export default function SignupPage({ searchParams }: { searchParams: { as?: string } }) {
+export default function SignupPage(props: { searchParams: Promise<{ as?: string }> }) {
+  const searchParams = use(props.searchParams);
   const [state, formAction] = useFormState<SignupState, FormData>(signup, {});
   const [accountType, setAccountType] = useState(searchParams.as === "vendor" ? "vendor" : "client");
   const isVendor = accountType === "vendor";

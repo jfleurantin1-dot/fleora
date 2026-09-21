@@ -6,9 +6,13 @@ import { EVENT_TYPES, STYLE_OPTIONS } from "@/lib/constants";
 import { MoodPhotoManager } from "@/components/event/mood-photo-manager";
 import { updateEvent } from "./actions";
 
-export default async function EditEvent({ params, searchParams }: { params: { id: string }; searchParams?: { saved?: string } }) {
+export default async function EditEvent(
+  props: { params: Promise<{ id: string }>; searchParams?: Promise<{ saved?: string }> }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   await requireProfile();
-  const s = createClient();
+  const s = await createClient();
   const [{ data: e }, { data: photos }] = await Promise.all([
     s.from("events").select("*").eq("id", params.id).single(),
     s.from("event_inspiration_photos").select("id,url,sort").eq("event_id", params.id).order("sort"),

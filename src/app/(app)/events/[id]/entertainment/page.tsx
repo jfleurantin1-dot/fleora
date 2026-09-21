@@ -10,8 +10,12 @@ import { EntertainmentPhotoManager } from "@/components/event/entertainment-phot
 import { saveEntertainmentPlan } from "./actions";
 import { ChapterInteractions } from "@/components/event/chapter-interactions";
 
-export default async function EntertainmentPage({params,searchParams}:{params:{id:string};searchParams?:{saved?:string}}){
- await requireProfile();const s=createClient();const {data:event}=await s.from("events").select("*").eq("id",params.id).single();if(!event)notFound();
+export default async function EntertainmentPage(
+ props:{params: Promise<{id:string}>;searchParams?: Promise<{saved?:string}>}
+) {
+ const searchParams = await props.searchParams;
+ const params = await props.params;
+ await requireProfile();const s=await createClient();const {data:event}=await s.from("events").select("*").eq("id",params.id).single();if(!event)notFound();
  const [{data:rows},{data:needs},{data:itemPhotos}]=await Promise.all([s.from("event_plan_items").select("*").eq("event_id",params.id).eq("chapter","entertainment"),s.from("event_vendor_needs").select("id,label,category,status").eq("event_id",params.id).eq("status","needed"),s.from("event_plan_item_photos").select("id,plan_item_id,url,sort").eq("event_id",params.id).order("sort")]);
  const byKey=new Map((rows??[]).map(r=>[r.item_key,r]));const none=byKey.has("no_entertainment");const selected=(rows??[]).filter(r=>r.item_key!=="no_entertainment").length;const decided=(rows??[]).filter(r=>r.item_key!=="no_entertainment"&&r.choice!=="undecided").length;const progress=none?100:selected?Math.round(decided/selected*100):0;const photos=new Map<string,any[]>();for(const p of itemPhotos??[])photos.set(p.plan_item_id,[...(photos.get(p.plan_item_id)??[]),p]);const opts:[PlanChoice,string][]=[["hire","Hire"],["existing","I already have someone"],["undecided","Undecided"]];
  return <div className="space-y-7"><EventWorkspaceHeader event={event} active="/entertainment" eyebrow="My Party Plan · Entertainment"/><div className="flex flex-wrap items-end justify-between gap-4"><div><p className="fleora-kicker">Chapter 5</p><h1 className="mt-1 font-display text-4xl text-ink-900">Plan the entertainment.</h1><p className="mt-2 max-w-2xl text-sm text-ink-600">Select only the entertainment you are considering. Fleora will expand those choices so you can plan, save inspiration and find the right vendors.</p></div><Link href={`/events/${event.id}/plan`} className="text-sm font-semibold text-plum-700 hover:underline">← Back to Party Plan</Link></div>

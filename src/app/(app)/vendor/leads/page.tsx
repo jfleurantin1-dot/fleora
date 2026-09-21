@@ -5,7 +5,7 @@ import { Badge, ButtonLink, Card, Empty, PageHeader, StatCard } from "@/componen
 import { money, shortDate } from "@/lib/format";
 
 export default async function VendorLeads(){
- const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=createClient();
+ const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=await createClient();
  const {data:convos}=await supabase.from("conversations").select("*").eq("vendor_id",vendor.id).order("created_at",{ascending:false}); const allList=(convos??[]) as any[]; const declined=allList.filter(c=>c.vendor_inquiry_status==="declined"&&c.client_inquiry_status!=="cancelled"); const cancelled=allList.filter(c=>c.client_inquiry_status==="cancelled"); const list=allList.filter(c=>c.vendor_inquiry_status!=="declined"&&c.client_inquiry_status!=="cancelled");
  const eventIds=[...new Set(allList.map(c=>c.event_id))] as string[];
  const [{data:events},{data:quotes},{data:bookings}] = await Promise.all([

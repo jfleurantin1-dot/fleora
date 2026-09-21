@@ -45,9 +45,10 @@ function Row({label,status,notes,href}:{label:string;status:SummaryStatus;notes?
   return <li>{href?<Link href={href} className="group flex flex-wrap items-start justify-between gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-plum-50">{content}<ChevronRightIcon size={15} className="mt-1 text-ink-300 transition-transform group-hover:translate-x-0.5 group-hover:text-plum-600"/></Link>:<div className="flex flex-wrap items-start justify-between gap-3 px-2 py-2.5">{content}</div>}</li>
 }
 
-export default async function PartyPlanSummary({params}:{params:{id:string}}){
-  await requireProfile(); const s=createClient();
-  const {data:event}=await s.from("events").select("*").eq("id",params.id).single(); if(!event)notFound();
+export default async function PartyPlanSummary(props:{params: Promise<{id:string}>}) {
+  const params = await props.params;
+  await requireProfile();const s=await createClient();
+  const {data:event}=await s.from("events").select("*").eq("id",params.id).single();if(!event)notFound();
   const [{data:planItems},{data:needs},{data:requests},{data:quotes},{data:bookings},{data:vendors},{data:guests},{data:potluck},{data:menu}]=await Promise.all([
     s.from("event_plan_items").select("*").eq("event_id",params.id).order("created_at"),
     s.from("event_vendor_needs").select("*").eq("event_id",params.id),
@@ -64,14 +65,14 @@ export default async function PartyPlanSummary({params}:{params:{id:string}}){
   const allCategories=new Set([...(requests??[]).map(r=>r.category),...(needs??[]).filter(n=>n.status!=="dismissed").map(n=>n.category),...activeBookings.map(b=>b.category)]);
   const planByCategory=new Map((planItems??[]).filter(p=>p.vendor_category).map(p=>[p.vendor_category,p]));
   const serviceRows=[...allCategories].filter(c=>!planByCategory.has(c) && c!=="venue");
-  const groups=new Map<string,any[]>(); for(const item of planItems??[]){ if(item.chapter==="event_details") continue; groups.set(item.chapter,[...(groups.get(item.chapter)??[]),item]); }
-  const invited=(guests??[]).reduce((n,g)=>n+Number(g.party_size??1),0); const attending=(guests??[]).filter(g=>g.rsvp==="yes").reduce((n,g)=>n+Number(g.party_size??1),0);
+  const groups=new Map<string,any[]>();for(const item of planItems??[]){ if(item.chapter==="event_details") continue; groups.set(item.chapter,[...(groups.get(item.chapter)??[]),item]); }
+  const invited=(guests??[]).reduce((n,g)=>n+Number(g.party_size??1),0);const attending=(guests??[]).filter(g=>g.rsvp==="yes").reduce((n,g)=>n+Number(g.party_size??1),0);
   const pending=(guests??[]).filter(g=>g.rsvp==="pending").length;
   const attention:any[]=[];
   for(const b of activeBookings.filter(b=>b.status==="pending_deposit")) attention.push({label:categoryLabel(b.category),text:`Payment needed${vendorNames.get(b.vendor_id)?` · ${vendorNames.get(b.vendor_id)}`:""}`,href:`/events/${event.id}/payments`});
   for(const q of (quotes??[]).filter(q=>q.status==="sent")) attention.push({label:categoryLabel(q.category),text:`Quote ready to review${vendorNames.get(q.vendor_id)?` · ${vendorNames.get(q.vendor_id)}`:""}`,href:`/quotes/${q.id}`});
   for(const p of (planItems??[]).filter(p=>p.choice==="undecided")) attention.push({label:p.label,text:"Decision needed",href:p.chapter==="food_drinks"?`/events/${event.id}/plan/food-drinks`:p.chapter==="services"?`/events/${event.id}/services`:p.chapter==="entertainment"?`/events/${event.id}/entertainment`:p.chapter==="venue_logistics"?`/events/${event.id}/venue-logistics`:`/events/${event.id}/plan/decor`});
-  const venueBooking=activeBookings.find(b=>b.category==="venue"); const venueStatus:SummaryStatus=venueBooking?statusFor("venue",undefined,activeBookings,quotes??[],requests??[],vendorNames):event.location_type==="home"?{label:"Planned",tone:"green",detail:event.location??"Home"}:event.needs_venue?{label:"Searching",tone:"plum",detail:event.location??"Venue needed"}:event.location_type==="venue"&&event.location?{label:"Planned",tone:"green",detail:event.location}:{label:"TBD",tone:"slate",detail:event.location??undefined};
+  const venueBooking=activeBookings.find(b=>b.category==="venue");const venueStatus:SummaryStatus=venueBooking?statusFor("venue",undefined,activeBookings,quotes??[],requests??[],vendorNames):event.location_type==="home"?{label:"Planned",tone:"green",detail:event.location??"Home"}:event.needs_venue?{label:"Searching",tone:"plum",detail:event.location??"Venue needed"}:event.location_type==="venue"&&event.location?{label:"Planned",tone:"green",detail:event.location}:{label:"TBD",tone:"slate",detail:event.location??undefined};
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/summary" eyebrow="Party Plan Summary"/>
     <div className="flex flex-wrap items-end justify-between gap-4"><div><p className="fleora-kicker">One-page event plan</p><h1 className="mt-1 font-display text-4xl text-ink-900">Everything you’ve planned, at a glance.</h1><p className="mt-2 max-w-2xl text-sm text-ink-600">Booked vendors, DIY decisions, open searches and TBDs all roll up here automatically as your party plan changes.</p></div><Link href={`/events/${event.id}/plan`} className="text-sm font-bold text-plum-700 hover:underline">Edit Party Plan →</Link></div>

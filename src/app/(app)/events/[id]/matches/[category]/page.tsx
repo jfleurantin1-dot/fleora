@@ -12,9 +12,10 @@ import type { VendorMatch } from "@/lib/types";
 import { requestQuote, requestQuotes } from "./actions";
 import { MultiVendorSelector } from "./multi-vendor-selector";
 
-export default async function MatchesPage({ params }: { params: { id: string; category: string } }) {
+export default async function MatchesPage(props: { params: Promise<{ id: string; category: string }> }) {
+  const params = await props.params;
   await requireProfile();
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: event } = await supabase.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();

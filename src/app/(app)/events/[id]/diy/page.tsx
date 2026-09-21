@@ -7,9 +7,13 @@ import { DecorCollage, DecorDiyProducts, DecorDiyProvider } from "@/components/e
 import { ImageFrameIcon, SparkleIcon } from "@/components/icons";
 import { saveDiyShopping } from "./actions";
 
-export default async function DiyShoppingPage({params,searchParams}:{params:{id:string};searchParams?:{saved?:string;error?:string}}) {
+export default async function DiyShoppingPage(
+  props:{params: Promise<{id:string}>;searchParams?: Promise<{saved?:string;error?:string}>}
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   await requireProfile();
-  const supabase=createClient();
+  const supabase=await createClient();
   const {data:event}=await supabase.from("events").select("*").eq("id",params.id).single();
   if(!event) notFound();
   const [{data:rows},{data:photos}]=await Promise.all([

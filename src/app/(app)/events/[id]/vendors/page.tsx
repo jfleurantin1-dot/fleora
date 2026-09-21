@@ -13,9 +13,10 @@ type Status = "needed" | "searching" | "inquired" | "quote" | "payment" | "booke
 const tone = (status: Status) => status === "booked" ? "green" : status === "payment" || status === "quote" ? "amber" : status === "inquired" || status === "searching" ? "plum" : "slate";
 const statusText = (status: Status) => status === "booked" ? "Booked" : status === "payment" ? "Awaiting payment" : status === "quote" ? "Quote received" : status === "inquired" ? "Inquiry sent" : status === "searching" ? "Searching" : "Needed";
 
-export default async function VendorsPage({ params }: { params: { id: string } }) {
+export default async function VendorsPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   await requireProfile();
-  const db = createClient();
+  const db = await createClient();
   const { data: event } = await db.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();
 
@@ -51,35 +52,6 @@ export default async function VendorsPage({ params }: { params: { id: string } }
   return <div className="space-y-7">
     <EventWorkspaceHeader event={event} active="/vendors" eyebrow="Vendor Needs" />
 
-    <div className="flex flex-wrap items-end justify-between gap-4">
-      <div>
-        <p className="fleora-kicker">Source it</p>
-        <h1 className="mt-1 font-display text-4xl">Find My Vendors</h1>
-        <p className="mt-2 max-w-2xl text-sm text-ink-600">Build your event team from your Party Plan choices, or add any service you want to explore.</p>
-      </div>
-      <ButtonLink href={`/events/${event.id}/summary`} variant="secondary">View Party Plan Summary</ButtonLink>
-    </div>
-
-    <Card variant="feature" className="border-plum-100 bg-brand-soft">
-      <div className="flex items-start gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-plum-700"><StoreIcon size={21} /></span>
-        <div>
-          <p className="fleora-kicker">Add a vendor need</p>
-          <h2 className="mt-1 font-display text-2xl text-ink-900">What else would you like to find?</h2>
-          <p className="mt-1 text-sm text-ink-600">Choose any event service. Fleora will add it to this list and show you matching vendors.</p>
-        </div>
-      </div>
-      <form action={addVendorNeed.bind(null, event.id)} className="mt-5 flex flex-col gap-3 sm:flex-row">
-        <Select name="category" required defaultValue="" aria-label="Vendor service" className="flex-1">
-          <option value="" disabled>Search event services</option>
-          {CATEGORY_GROUPS.map((group) => <optgroup key={group.key} label={group.label}>
-            {CATEGORIES.filter((category) => category.group === group.key).map((category) => <option key={category.key} value={category.key}>{category.label}</option>)}
-          </optgroup>)}
-        </Select>
-        <Button type="submit" className="shrink-0">Add &amp; find vendors</Button>
-      </form>
-    </Card>
-
     <div className="grid gap-4 sm:grid-cols-3">
       <Card><p className="text-xs font-bold uppercase text-ink-400">Vendor needs</p><p className="mt-1 font-display text-3xl">{rows.length}</p></Card>
       <Card><p className="text-xs font-bold uppercase text-ink-400">Still sourcing</p><p className="mt-1 font-display text-3xl">{rows.length - booked}</p></Card>
@@ -87,7 +59,7 @@ export default async function VendorsPage({ params }: { params: { id: string } }
     </div>
 
     {rows.length === 0 ? <Empty title="No vendor needs yet">
-      <p>Add a service above or mark <b>Hire someone</b> inside My Party Plan.</p>
+      <p>Add a service below or mark <b>Hire someone</b> inside My Party Plan.</p>
     </Empty> : <div className="space-y-4">
       <div><p className="fleora-kicker">Your sourcing list</p><h2 className="mt-1 font-display text-3xl">What your party needs</h2></div>
       <div className="grid gap-4 lg:grid-cols-2">
@@ -109,5 +81,36 @@ export default async function VendorsPage({ params }: { params: { id: string } }
         </Card>)}
       </div>
     </div>}
+
+    <section className="space-y-4">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="fleora-kicker">Source it</p>
+          <h1 className="mt-1 font-display text-4xl">Find My Vendors</h1>
+          <p className="mt-2 max-w-2xl text-sm text-ink-600">Build your event team from your Party Plan choices, or add any service you want to explore.</p>
+        </div>
+        <ButtonLink href={`/events/${event.id}/summary`} variant="secondary">View Party Plan Summary</ButtonLink>
+      </div>
+
+      <Card variant="feature" className="border-plum-100 bg-brand-soft">
+        <div className="flex items-start gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-white text-plum-700"><StoreIcon size={21} /></span>
+          <div>
+            <p className="fleora-kicker">Add a vendor need</p>
+            <h2 className="mt-1 font-display text-2xl text-ink-900">What else would you like to find?</h2>
+            <p className="mt-1 text-sm text-ink-600">Choose any event service. Fleora will add it to this list and show you matching vendors.</p>
+          </div>
+        </div>
+        <form action={addVendorNeed.bind(null, event.id)} className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <Select name="category" required defaultValue="" aria-label="Vendor service" className="flex-1">
+            <option value="" disabled>Search event services</option>
+            {CATEGORY_GROUPS.map((group) => <optgroup key={group.key} label={group.label}>
+              {CATEGORIES.filter((category) => category.group === group.key).map((category) => <option key={category.key} value={category.key}>{category.label}</option>)}
+            </optgroup>)}
+          </Select>
+          <Button type="submit" className="shrink-0">Add &amp; find vendors</Button>
+        </form>
+      </Card>
+    </section>
   </div>;
 }

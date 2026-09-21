@@ -18,7 +18,7 @@ export async function requestVendorClaim(
     return { error: "Create or switch to a vendor account before claiming a business profile." };
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: vendor } = await supabase.from("vendors").select("id,user_id,business_name").eq("id", vendorId).single();
   if (!vendor) return { error: "Vendor profile not found." };
   if (vendor.user_id) return { error: "This business profile has already been claimed." };

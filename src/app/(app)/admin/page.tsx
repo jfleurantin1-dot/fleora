@@ -14,7 +14,7 @@ export default async function AdminPage() {
   const profile = await requireProfile("/admin");
   if (profile.account_type !== "admin") redirect("/dashboard");
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const [
     { data: vendors },
     { data: categories },

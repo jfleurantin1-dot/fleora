@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { normalizeProducts } from "@/lib/decor-products";
 
 export async function saveDiyShopping(eventId:string,formData:FormData) {
-  const supabase=createClient();
+  const supabase=await createClient();
   const {data:{user}}=await supabase.auth.getUser();
   if(!user) redirect("/login");
   const {data:event}=await supabase.from("events").select("id").eq("id",eventId).eq("client_id",user.id).maybeSingle();

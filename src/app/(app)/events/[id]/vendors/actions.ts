@@ -11,7 +11,7 @@ export async function addVendorNeed(eventId: string, formData: FormData) {
   const category = String(formData.get("category") ?? "");
   if (!validCategories.has(category as never)) redirect(`/events/${eventId}/vendors?error=category`);
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 

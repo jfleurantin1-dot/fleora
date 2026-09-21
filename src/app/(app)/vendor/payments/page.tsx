@@ -11,7 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function VendorPaymentsPage() {
   const { vendor } = await requireVendor();
   if (!vendor) redirect("/vendor/onboarding");
-  const supabase = createClient();
+  const supabase = await createClient();
   const [{ data: settings }, { data: payments }] = await Promise.all([
     supabase.from("payment_settings").select("*").eq("id", 1).maybeSingle(),
     supabase.from("payments").select("*").eq("vendor_id", vendor.id).order("created_at", { ascending: false }).limit(50),

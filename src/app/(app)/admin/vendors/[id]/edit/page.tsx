@@ -9,10 +9,11 @@ import { PhotoUploader } from "@/components/vendor/photo-uploader";
 import { updateDirectoryVendor } from "../../../actions";
 import { CopyClaimLink } from "../../../copy-claim-link";
 
-export default async function EditAdminVendorPage({ params }: { params: { id: string } }) {
+export default async function EditAdminVendorPage(props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   const profile = await requireProfile(`/admin/vendors/${params.id}/edit`);
   if (profile.account_type !== "admin") redirect("/dashboard");
-  const supabase = createClient();
+  const supabase = await createClient();
   const [{ data: vendor }, { data: cats }, { data: photos }] = await Promise.all([
     supabase.from("vendors").select("*").eq("id", params.id).single(),
     supabase.from("vendor_categories").select("category").eq("vendor_id", params.id),

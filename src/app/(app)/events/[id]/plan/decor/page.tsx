@@ -11,9 +11,13 @@ import { saveDecorPlan } from "./actions";
 import { DecorPhotoManager } from "@/components/event/decor-photo-manager";
 import { ChapterInteractions } from "@/components/event/chapter-interactions";
 
-export default async function DecorPlanPage({ params, searchParams }: { params: { id: string }; searchParams?: { saved?: string; error?: string } }) {
+export default async function DecorPlanPage(
+  props: { params: Promise<{ id: string }>; searchParams?: Promise<{ saved?: string; error?: string }> }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   await requireProfile();
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: event } = await supabase.from("events").select("*").eq("id", params.id).single();
   if (!event) notFound();
 

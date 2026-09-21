@@ -13,8 +13,9 @@ function cleanClientMessage(body?:string|null){
  return body.split("\nInquiry summary:")[0].trim();
 }
 
-export default async function VendorInquiryDetail({params}:{params:{conversationId:string}}){
- const {vendor}=await requireVendor(); if(!vendor) redirect("/vendor/onboarding"); const supabase=createClient();
+export default async function VendorInquiryDetail(props:{params: Promise<{conversationId:string}>}) {
+ const params = await props.params;
+ const {vendor}=await requireVendor();if(!vendor) redirect("/vendor/onboarding");const supabase=await createClient();
  const {data:convo}=await supabase.from("conversations").select("*").eq("id",params.conversationId).single();
  if(!convo||convo.vendor_id!==vendor.id) notFound();
  const [{data:event},{data:requests},{data:myCats},{data:quotes},{data:bookings},{data:messages},{data:moodPhotos}] = await Promise.all([
@@ -32,7 +33,7 @@ export default async function VendorInquiryDetail({params}:{params:{conversation
  const {data:needs}=inquiryCategory?await supabase.from("event_vendor_needs").select("id,plan_item_id,category,label,notes").eq("event_id",convo.event_id).eq("category",inquiryCategory):{data:[] as any[]};
  const planIds=(needs??[]).map(n=>n.plan_item_id).filter(Boolean);
  const {data:itemPhotos}=planIds.length?await supabase.from("event_plan_item_photos").select("id,url,plan_item_id,sort").in("plan_item_id",planIds).order("sort",{ascending:true}):{data:[] as any[]};
- const quote=quotes?.[0]; const booking=bookings?.[0];
+ const quote=quotes?.[0];const booking=bookings?.[0];
  const vendorStatus=String((convo as any).vendor_inquiry_status??"active");
  const clientStatus=String((convo as any).client_inquiry_status??"active");
  const closed=vendorStatus==="declined"||clientStatus==="cancelled";

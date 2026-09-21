@@ -12,7 +12,7 @@ const label = (type:string) => type === "deposit" ? "Deposit" : type === "balanc
 
 export default async function ClientPaymentsPage(){
   const profile = await requireProfile();
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: payments } = await supabase.from("payments").select("*").eq("client_id", profile.id).order("created_at", { ascending:false });
   const rows = payments ?? [];
   const eventIds=[...new Set(rows.map(p=>p.event_id))];

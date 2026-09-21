@@ -11,7 +11,7 @@ export async function declineInquiry(formData: FormData) {
   const reason = String(formData.get("reason") || "");
   const note = String(formData.get("note") || "").trim().slice(0,1000);
   if (!conversationId || !reasons.has(reason)) redirect(`/vendor/inquiries/${conversationId}?error=reason`);
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: convo } = await supabase.from("conversations").select("id,vendor_id").eq("id", conversationId).single();
   if (!convo || convo.vendor_id !== vendor.id) redirect("/vendor/leads");
   const { error } = await (supabase.from("conversations") as any).update({vendor_inquiry_status:"declined",vendor_decline_reason:reason,vendor_decline_note:note||null,vendor_declined_at:new Date().toISOString()}).eq("id",conversationId);
