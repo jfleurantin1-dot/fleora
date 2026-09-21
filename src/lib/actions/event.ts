@@ -32,6 +32,17 @@ export async function importGuestsFromContacts(eventId:string,contacts:Array<{na
   revalidatePath(`/events/${eventId}/guests`);
   return {added:additions.length,skipped:clean.length-additions.length};
 }
+export async function updateGuest(eventId:string,guestId:string,formData:FormData){
+  const s=await createClient();
+  const name=String(formData.get("name")??"").trim();if(!name)return;
+  const invited=Math.max(1,Number(formData.get("party_size"))||1);
+  const {data:guest}=await s.from("guests").select("rsvp").eq("id",guestId).eq("event_id",eventId).maybeSingle();
+  const update:Record<string,unknown>={name,invitation_name:String(formData.get("invitation_name")??"").trim()||null,email:String(formData.get("email")??"").trim()||null,phone:String(formData.get("phone")??"").trim()||null,invited_party_size:invited,plus_one_allowed:formData.get("plus_one_allowed")==="on"};
+  if(guest?.rsvp==="pending")update.party_size=invited;
+  await s.from("guests").update(update).eq("id",guestId).eq("event_id",eventId);
+  revalidatePath(`/events/${eventId}`);revalidatePath(`/events/${eventId}/guests`);
+}
+export async function markGuestInvitationShared(eventId:string,guestId:string){const s=await createClient();await s.from("guests").update({invitation_shared_at:new Date().toISOString()}).eq("id",guestId).eq("event_id",eventId);revalidatePath(`/events/${eventId}/guests`)}
 export async function updateRsvpSettings(eventId:string,formData:FormData){const s=await createClient();await s.from("events").update({rsvp_title:String(formData.get("rsvp_title")??"").trim()||null,rsvp_deadline:String(formData.get("rsvp_deadline")??"").trim()||null}).eq("id",eventId);revalidatePath(`/events/${eventId}`)}
 export async function setGuestRsvp(eventId:string,guestId:string,rsvp:"pending"|"yes"|"no"){const s=await createClient();await s.from("guests").update({rsvp,rsvp_responded_at:rsvp==="pending"?null:new Date().toISOString()}).eq("id",guestId);revalidatePath(`/events/${eventId}`)}
 export async function removeGuest(eventId:string,guestId:string){const s=await createClient();await s.from("guests").delete().eq("id",guestId);revalidatePath(`/events/${eventId}`)}
