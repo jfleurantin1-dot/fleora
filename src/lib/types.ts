@@ -213,6 +213,7 @@ export type EventPotluckItem = {
   item: string;
   category: string;
   assigned_to: string | null;
+  guest_id: string | null;
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -468,6 +469,21 @@ export type Database = {
       };
       submit_public_rsvp: {
         Args: { p_token: string; p_rsvp: RsvpStatus; p_party_size: number; p_dietary?: string | null; p_plus_one_name?: string | null };
+        Returns: boolean;
+      };
+      get_public_potluck_options: {
+        Args: { p_token: string };
+        Returns: Array<{
+          potluck_item_id: string;
+          item: string;
+          category: string;
+          notes: string | null;
+          available: boolean;
+          is_mine: boolean;
+        }>;
+      };
+      claim_public_potluck_item: {
+        Args: { p_token: string; p_item_id: string | null };
         Returns: boolean;
       };
     };
