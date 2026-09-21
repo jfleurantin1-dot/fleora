@@ -2,6 +2,9 @@
 alter table public.event_potluck_items
   add column if not exists guest_id uuid references public.guests(id) on delete set null;
 
+alter table public.guests
+  add column if not exists invitation_shared_at timestamptz;
+
 create index if not exists event_potluck_items_guest_idx
   on public.event_potluck_items(guest_id);
 
@@ -33,7 +36,11 @@ as $$
   order by p.created_at;
 $$;
 
-create or replace function public.claim_public_potluck_item(p_token uuid, p_item_id uuid default null)
+create or replace function public.claim_public_potluck_item(
+  p_token uuid,
+  p_item_id uuid default null,
+  p_custom_item text default null
+)
 returns boolean
 language plpgsql
 security definer
@@ -45,6 +52,7 @@ declare
   v_guest_name text;
   v_current_guest_id uuid;
   v_current_assignee text;
+  v_custom_item text;
 begin
   select g.id, g.event_id, coalesce(g.invitation_name, g.name)
     into v_guest_id, v_event_id, v_guest_name
@@ -55,17 +63,28 @@ begin
 
   if v_guest_id is null then return false; end if;
 
+  if not exists (
+    select 1 from public.event_plan_items
+    where event_id = v_event_id and item_key = 'potluck'
+  ) then return false; end if;
+
+  v_custom_item := nullif(left(trim(coalesce(p_custom_item, '')), 160), '');
+
+  if v_custom_item is not null then
+    update public.event_potluck_items
+      set guest_id = null, assigned_to = null, updated_at = now()
+      where event_id = v_event_id and guest_id = v_guest_id;
+    insert into public.event_potluck_items(event_id, item, category, assigned_to, guest_id, notes)
+      values(v_event_id, v_custom_item, 'other', v_guest_name, v_guest_id, 'Suggested by guest');
+    return true;
+  end if;
+
   if p_item_id is null then
     update public.event_potluck_items
       set guest_id = null, assigned_to = null, updated_at = now()
       where event_id = v_event_id and guest_id = v_guest_id;
     return true;
   end if;
-
-  if not exists (
-    select 1 from public.event_plan_items
-    where event_id = v_event_id and item_key = 'potluck'
-  ) then return false; end if;
 
   select p.guest_id, p.assigned_to
     into v_current_guest_id, v_current_assignee
@@ -88,5 +107,24 @@ begin
 end;
 $$;
 
+create or replace function public.get_public_rsvp_extras(p_token uuid)
+returns table (
+  event_start_time time,
+  event_end_time time,
+  selected_potluck_item text
+)
+language sql
+security definer
+set search_path = public
+as $$
+  select e.event_start_time, e.event_end_time,
+         (select p.item from public.event_potluck_items p where p.guest_id = g.id limit 1)
+  from public.guests g
+  join public.events e on e.id = g.event_id
+  where g.rsvp_token = p_token and e.status <> 'cancelled'
+  limit 1;
+$$;
+
 grant execute on function public.get_public_potluck_options(uuid) to anon, authenticated;
-grant execute on function public.claim_public_potluck_item(uuid, uuid) to anon, authenticated;
+grant execute on function public.claim_public_potluck_item(uuid, uuid, text) to anon, authenticated;
+grant execute on function public.get_public_rsvp_extras(uuid) to anon, authenticated;
