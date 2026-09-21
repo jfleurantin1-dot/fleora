@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRef } from "react";
 import {
   CalendarIcon,
   CardIcon,
@@ -36,18 +37,23 @@ function selectedPath(pathname: string, eventId: string, suffix: string) {
   return pathname === `${base}${suffix}` || pathname.startsWith(`${base}${suffix}/`);
 }
 
-function Links({eventId}:{eventId:string}) {
+function Links({eventId,onNavigate}:{eventId:string;onNavigate?:()=>void}) {
   const pathname = usePathname();
   return <nav aria-label="Event workspace" className="space-y-1">
     {items.map(([suffix,label,Icon])=>{
       const selected=selectedPath(pathname,eventId,suffix);
-      return <Link key={suffix||"home"} href={`/events/${eventId}${suffix}`} aria-current={selected?"page":undefined} className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors duration-200 active:scale-[.98] ${selected?"bg-brand text-brand-ink":"text-ink-600 hover:bg-plum-50 hover:text-plum-800"}`}><Icon size={18}/><span>{label}</span></Link>;
+      return <Link key={suffix||"home"} href={`/events/${eventId}${suffix}`} onClick={onNavigate} aria-current={selected?"page":undefined} className={`flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors duration-200 active:scale-[.98] ${selected?"bg-brand text-brand-ink":"text-ink-600 hover:bg-plum-50 hover:text-plum-800"}`}><Icon size={18}/><span>{label}</span></Link>;
     })}
-    <Link href="/messages" className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-ink-600 transition-colors duration-200 hover:bg-plum-50 hover:text-plum-800 active:scale-[.98]"><MessageIcon size={18}/><span>Messages</span></Link>
+    <Link href="/messages" onClick={onNavigate} className="flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-ink-600 transition-colors duration-200 hover:bg-plum-50 hover:text-plum-800 active:scale-[.98]"><MessageIcon size={18}/><span>Messages</span></Link>
   </nav>;
 }
 
 export function EventWorkspaceNav({eventId}:{eventId:string}) {
+  const mobileMenu = useRef<HTMLDetailsElement>(null);
+  const closeMobileMenu = () => {
+    if (mobileMenu.current) mobileMenu.current.open = false;
+  };
+
   return <>
     <aside className="hidden lg:block">
       <div className="sticky top-24 rounded-xl border border-[#E8E1ED] bg-white p-3 shadow-fleora">
@@ -55,11 +61,11 @@ export function EventWorkspaceNav({eventId}:{eventId:string}) {
         <Links eventId={eventId}/>
       </div>
     </aside>
-    <details className="group mb-6 rounded-xl border border-[#E8E1ED] bg-white p-2 shadow-fleora lg:hidden">
+    <details ref={mobileMenu} className="group mb-6 rounded-xl border border-[#E8E1ED] bg-white p-2 shadow-fleora lg:hidden">
       <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-lg px-3 text-sm font-semibold text-ink-900 marker:content-none">
         <span>Event menu</span><span className="text-plum-600 transition-transform duration-200 group-open:rotate-45">+</span>
       </summary>
-      <div className="border-t border-plum-100 px-1 pb-1 pt-2"><Links eventId={eventId}/></div>
+      <div className="border-t border-plum-100 px-1 pb-1 pt-2"><Links eventId={eventId} onNavigate={closeMobileMenu}/></div>
     </details>
   </>;
 }
