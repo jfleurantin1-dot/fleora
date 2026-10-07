@@ -1,3 +1,4 @@
+import { ExistingVendorBudget } from "@/components/event/existing-vendor-budget";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
@@ -86,7 +87,7 @@ export default async function DecorPlanPage({ params, searchParams }: { params: 
                   </div>
                   {item.vendorCategory && <p className="mt-2 text-[11px] text-ink-400">Hire option → {categoryLabel(item.vendorCategory)} vendor need</p>}
                   {item.key === "other_custom" && <input name="custom_label__other_custom" defaultValue={row?.label === item.label ? "" : row?.label ?? ""} placeholder="What are you planning? e.g. Champagne wall" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />}
-                  <textarea name={`notes__${item.key}`} defaultValue={row?.notes ?? ""} rows={2} placeholder="Optional notes — size, quantity, style, ideas…" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />
+                  <ExistingVendorBudget eventId={event.id} itemKey={item.key} planKey={`decor:${item.key}`} label={row?.label || item.label} category="Décor" /><textarea name={`notes__${item.key}`} defaultValue={row?.notes ?? ""} rows={2} placeholder="Optional notes — size, quantity, style, ideas…" className="mt-3 w-full rounded-xl border border-plum-100 bg-ivory-50/60 px-3 py-2.5 text-sm text-ink-800 outline-none focus:border-plum-300 focus:ring-2 focus:ring-plum-100" />
                   <div data-choice-details-for={item.key} data-choice-value="diy" className="mt-4 rounded-xl border border-plum-100 bg-brand-soft p-4">
                     <p className="text-sm font-semibold text-ink-900">Shopping links have their own workspace.</p>
                     <p className="mt-1 text-xs leading-relaxed text-ink-600">Save this chapter, then add products, quantities, prices and pictures on your DIY Shopping page.</p>

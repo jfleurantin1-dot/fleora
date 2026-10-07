@@ -57,9 +57,20 @@ export async function saveExpense(eventId: string, fd: FormData) {
   let created: string | null = null;
   const { s, user } = await owned(eventId);
   try {
-    const expenseId = String(fd.get("expense_id") ?? "");
+    let expenseId = String(fd.get("expense_id") ?? "");
+    const planKey = String(fd.get("source_plan_key") ?? "");
+    if (planKey && !/^(decor|food_drinks|services|entertainment|venue_logistics):[a-z0-9_]{1,100}$/.test(planKey))
+      throw new Error("Invalid planning item.");
+    if (planKey) {
+      const { data: linked, error } = await s.from("event_budget_expenses")
+        .select("id").eq("event_id", eventId).eq("source_plan_key", planKey).maybeSingle();
+      if (error) throw new Error("Could not load this vendor’s budget details.");
+      if (expenseId && expenseId !== linked?.id) throw new Error("Budget item does not match this planning item.");
+      expenseId = linked?.id ?? "";
+    }
     const bookingId = String(fd.get("booking_id") ?? "");
     const file = invoiceFile(fd);
+    if (bookingId && planKey) throw new Error("Choose one budget item.");
     if (bookingId && expenseId) throw new Error("Choose one budget item.");
     if (bookingId) {
       const { data: b } = await s
@@ -93,6 +104,7 @@ export async function saveExpense(eventId: string, fd: FormData) {
         throw new Error("Amount paid cannot exceed the total cost.");
       const row = {
         event_id: eventId,
+        ...(planKey ? { source_plan_key: planKey } : {}),
         description,
         category,
         vendor_name,
@@ -199,4 +211,12 @@ export async function deleteInvoice(eventId: string, id: string) {
     .eq("event_id", eventId);
   refresh(eventId);
   return error ? { error: "Could not remove invoice." } : { success: true };
+}
+
+export async function getExistingVendorExpense(eventId: string, planKey: string) {
+  const { s } = await owned(eventId);
+  const { data, error } = await s.from("event_budget_expenses").select("*")
+    .eq("event_id", eventId).eq("source_plan_key", planKey).maybeSingle();
+  if (error) throw new Error("Could not load vendor details. Please try again.");
+  return { expense: data, readerEnabled: Boolean(process.env.OPENAI_API_KEY) };
 }

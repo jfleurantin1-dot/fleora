@@ -17,24 +17,30 @@ export function ExpenseForm({
   bookings = [],
   readerEnabled = false,
   onSaved,
+  planKey,
+  initialDescription = "",
+  initialCategory = "Other",
 }: {
   eventId: string;
   expense?: BudgetExpense;
   bookings?: Array<{ id: string; label: string }>;
   readerEnabled?: boolean;
   onSaved?: () => void;
+  planKey?: string;
+  initialDescription?: string;
+  initialCategory?: string;
 }) {
   const router = useRouter();
   const form = useRef<HTMLFormElement>(null);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [target, setTarget] = useState("");
-  const [description, setDescription] = useState(expense?.description ?? "");
+  const [description, setDescription] = useState(expense?.description ?? initialDescription);
   const [vendor, setVendor] = useState(expense?.vendor_name ?? "");
   const [amount, setAmount] = useState(expense ? String(expense.amount) : "");
   const [paid, setPaid] = useState(String(expense?.paid_amount ?? 0));
   const [hasFile, setHasFile] = useState(false);
-  const [showDetails, setShowDetails] = useState(Boolean(expense));
+  const [showDetails, setShowDetails] = useState(Boolean(expense || planKey));
   const [reading, setReading] = useState(false);
   async function submit(fd: FormData) {
     setBusy(true);
@@ -107,7 +113,8 @@ export function ExpenseForm({
         {expense && (
           <input type="hidden" name="expense_id" value={expense.id} />
         )}
-        {!expense && (
+        {planKey && <input type="hidden" name="source_plan_key" value={planKey} />}
+        {!expense && !planKey && (
           <Field label="Add to">
             <Select
               name="booking_id"
@@ -190,7 +197,7 @@ export function ExpenseForm({
               <Field label="Category">
                 <Select
                   name="category"
-                  defaultValue={expense?.category ?? "Other"}
+                  defaultValue={expense?.category ?? initialCategory}
                 >
                   {BUDGET_CATEGORIES.map((c) => (
                     <option key={c}>{c}</option>
