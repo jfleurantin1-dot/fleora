@@ -34,6 +34,8 @@ export function ExpenseForm({
   const [amount, setAmount] = useState(expense ? String(expense.amount) : "");
   const [paid, setPaid] = useState(String(expense?.paid_amount ?? 0));
   const [hasFile, setHasFile] = useState(false);
+  const [showDetails, setShowDetails] = useState(Boolean(expense));
+  const [reading, setReading] = useState(false);
   async function submit(fd: FormData) {
     setBusy(true);
     setMessage("");
@@ -50,6 +52,7 @@ export function ExpenseForm({
           setAmount("");
           setPaid("0");
           setHasFile(false);
+          setShowDetails(false);
           setTarget("");
         }
         onSaved?.();
@@ -60,12 +63,16 @@ export function ExpenseForm({
       setBusy(false);
     }
   }
-  async function read() {
+  async function read(file?: File) {
     if (!form.current) return;
+    const fd = new FormData(form.current);
+    if (file) fd.set("invoice", file);
+    setShowDetails(true);
     setBusy(true);
-    setMessage("");
+    setReading(true);
+    setMessage("Reading invoice…");
     try {
-      const result = await extractInvoice(eventId, new FormData(form.current));
+      const result = await extractInvoice(eventId, fd);
       if (result.error) setMessage(result.error);
       else if (result.data) {
         setVendor(result.data.vendor_name);
@@ -91,6 +98,7 @@ export function ExpenseForm({
       setMessage("Could not read this invoice. Enter the details manually.");
     } finally {
       setBusy(false);
+      setReading(false);
     }
   }
   return (
@@ -115,8 +123,49 @@ export function ExpenseForm({
             </Select>
           </Field>
         )}
+        <Field
+          label={target ? "Upload invoice for this booking" : "Upload invoice"}
+          hint="PDF, JPG, PNG or WebP · up to 3 MB. Attachments are private."
+        >
+          <Input
+            name="invoice"
+            type="file"
+            required={Boolean(target)}
+            accept="application/pdf,image/jpeg,image/png,image/webp"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              setHasFile(Boolean(file));
+              setMessage("");
+              if (!file) return;
+              setShowDetails(true);
+              if (readerEnabled && !target && !expense) void read(file);
+              else if (!target && !readerEnabled)
+                setMessage("Invoice selected. Enter its details below, then save it to your budget.");
+            }}
+          />
+        </Field>
         {!target && (
+          <div className="space-y-2">
+            <p className="text-sm text-ink-600">
+              {readerEnabled
+                ? "Upload an invoice to fill in the details, then review and save."
+                : "Upload an invoice, then enter its details below. Automatic reading is not available yet."}
+            </p>
+            {readerEnabled && (
+              <p className="text-xs text-ink-500">
+                {expense ? "Read invoice sends" : "Selecting an invoice sends"} the file to OpenAI to prepare details for your review.
+              </p>
+            )}
+            {!showDetails && (
+              <Button type="button" variant="secondary" onClick={() => setShowDetails(true)}>
+                Enter manually
+              </Button>
+            )}
+          </div>
+        )}
+        {!target && showDetails && (
           <>
+            <p className="font-medium text-ink-900">{hasFile ? "Review invoice details" : "Expense details"}</p>
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Item">
                 <Input
@@ -175,55 +224,37 @@ export function ExpenseForm({
             </div>
           </>
         )}
-        <Field
-          label={target ? "Attach invoice" : "Invoice (optional)"}
-          hint="PDF, JPG, PNG or WebP · up to 3 MB. Attachments are private."
-        >
-          <Input
-            name="invoice"
-            type="file"
-            required={Boolean(target)}
-            accept="application/pdf,image/jpeg,image/png,image/webp"
-            onChange={(e) => setHasFile(Boolean(e.target.files?.length))}
-          />
-        </Field>
         {target ? (
           <p className="text-sm text-ink-600">
             This invoice will attach to your existing booking without adding
             another expense.
           </p>
-        ) : (
+        ) : showDetails ? (
           <p className="text-sm text-ink-600">
             Enter the full cost once. Deposits go under amount paid.
           </p>
-        )}
+        ) : null}
         <div className="flex flex-wrap gap-3">
-          {readerEnabled && !target && (
+          {readerEnabled && !target && hasFile && (
             <Button
               type="button"
               variant="secondary"
               disabled={!hasFile}
-              onClick={read}
+              onClick={() => void read()}
             >
               Read invoice
             </Button>
           )}
-          <Button type="submit">
-            {busy
+          {(target || showDetails) && <Button type="submit">
+            {reading ? "Reading invoice…" : busy
               ? "Working…"
               : target
                 ? "Attach invoice"
                 : expense
                   ? "Save changes"
-                  : "Add to budget"}
-          </Button>
+                  : "Save to budget"}
+          </Button>}
         </div>
-        {readerEnabled && !target && (
-          <p className="text-xs text-ink-500">
-            Read invoice sends the selected file to OpenAI to extract a draft
-            for your review.
-          </p>
-        )}
       </fieldset>
       <p role="status" aria-live="polite" className="text-sm text-plum-700">
         {message}
