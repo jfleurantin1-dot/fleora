@@ -430,6 +430,8 @@ export type Database = {
       messages: TableDef<Message>;
       quotes: TableDef<Quote>;
       quote_items: TableDef<QuoteItem>;
+      event_budget_expenses: TableDef<BudgetExpense>;
+      event_budget_invoices: TableDef<BudgetInvoice>;
       bookings: TableDef<Booking>;
       payment_settings: TableDef<PaymentSettings>;
       payments: TableDef<PaymentRecord>;
@@ -482,4 +484,13 @@ export type Database = {
     };
     CompositeTypes: Record<string, never>;
   };
+};
+
+export type BudgetExpense = {
+ id: string; event_id: string; description: string; vendor_name: string;
+ category: string; amount: number; paid_amount: number; created_at: string;
+};
+export type BudgetInvoice = {
+ id: string; event_id: string; expense_id: string | null; booking_id: string | null;
+ storage_path: string; filename: string; created_at: string;
 };
