@@ -1,0 +1,12 @@
+begin;
+alter table public.checklist_items add column if not exists source_key text;
+alter table public.checklist_items add column if not exists due_date date;
+alter table public.checklist_items add column if not exists completed_at timestamptz;
+alter table public.event_shopping_items add column if not exists source_key text;
+alter table public.event_shopping_items add column if not exists url text;
+alter table public.event_shopping_items add column if not exists total_cost numeric(12,2) check (total_cost >= 0);
+alter table public.event_shopping_items add column if not exists paid_amount numeric(12,2) not null default 0 check (paid_amount >= 0);
+alter table public.event_shopping_items add constraint shopping_paid_within_cost check (paid_amount <= coalesce(total_cost,0));
+create index if not exists checklist_source_key_idx on public.checklist_items(event_id,source_key);
+create index if not exists shopping_source_key_idx on public.event_shopping_items(event_id,source_key);
+commit;

@@ -46,7 +46,8 @@ export default async function EventPage({
   const bookedCats = new Set(bk.map((b) => b.category));
   const quotedCats = new Set(openQuotes.map((q) => q.category));
   const { data: outsideExpenses, error: budgetError } = await supabase.from("event_budget_expenses").select("amount,paid_amount").eq("event_id", params.id);
-  const committed = budgetTotals(Number(event.budget ?? 0), bk, outsideExpenses ?? []).total;
+  const {data:shoppingCosts,error:shoppingError}=await supabase.from("event_shopping_items").select("total_cost,paid_amount,purchased").eq("event_id",params.id);
+  const committed = budgetTotals(Number(event.budget ?? 0), bk, [...(outsideExpenses ?? []),...(shoppingCosts??[]).filter(i=>i.purchased||Number(i.paid_amount)>0).map(i=>({amount:Number(i.total_cost??0),paid_amount:Number(i.paid_amount)}))]).total;
   const budget = Number(event.budget ?? 0);
   const attending = (guests ?? []).filter((g) => g.rsvp === "yes").reduce((s, g) => s + Number(g.party_size ?? 1), 0);
   const invited = (guests ?? []).reduce((s, g) => s + Number(g.party_size ?? 1), 0);
@@ -130,7 +131,7 @@ export default async function EventPage({
                   <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                     <OverviewRow icon={<UsersIcon size={17} />} label="Guests" value={invited ? `${attending} attending · ${awaiting} awaiting` : `${event.guest_count ?? "?"} expected`} accent="blush" />
                     <OverviewRow icon={<StoreIcon size={17} />} label="Vendors" value={`${bk.length} booked · ${stillNeeded} to find`} accent="sage" />
-                    <OverviewRow icon={<WalletIcon size={17} />} label="Budget" value={budgetError ? "Budget unavailable" : `${money(committed)} of ${money(budget)}`} />
+                    <OverviewRow icon={<WalletIcon size={17} />} label="Budget" value={budgetError||shoppingError ? "Budget unavailable" : `${money(committed)} of ${money(budget)}`} />
                     <OverviewRow icon={<CheckIcon size={17} />} label="Checklist" value={`${doneTasks} of ${(checklist ?? []).length} complete`} accent="sage" />
                   </div>
                 </div>

@@ -1,0 +1,6 @@
+import {createClient} from "@/lib/supabase/server";
+import {EventWorkspaceHeader} from "@/components/event/event-workspace-header";
+import {notFound} from "next/navigation";
+import Services from "@/components/event/services-plan";
+import Entertainment from "@/components/event/entertainment-plan";
+export default async function Page({params,searchParams}:{params:{id:string};searchParams?:{saved?:string}}){const {data:event}=await createClient().from("events").select("*").eq("id",params.id).single();if(!event)notFound();return <div className="space-y-12"><EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/><div><p className="fleora-kicker">Chapter 5</p><h1 className="font-display text-4xl">Services & Entertainment</h1><nav className="mt-4 flex gap-4 text-sm text-plum-700"><a href="#services">Services</a><a href="#entertainment">Entertainment</a></nav></div><section id="services" className="scroll-mt-24"><Services params={params} searchParams={searchParams}/></section><section id="entertainment" className="scroll-mt-24"><Entertainment params={params} searchParams={searchParams}/></section></div>;}

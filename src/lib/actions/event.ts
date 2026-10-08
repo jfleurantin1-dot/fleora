@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
-export async function toggleChecklistItem(eventId:string,itemId:string,done:boolean){const s=createClient();await s.from("checklist_items").update({done}).eq("id",itemId);revalidatePath(`/events/${eventId}`)}
+export async function toggleChecklistItem(eventId:string,itemId:string,done:boolean){const s=createClient();await s.from("checklist_items").update({done,completed_at:done?new Date().toISOString():null}).eq("id",itemId).eq("event_id",eventId);revalidatePath(`/events/${eventId}`)}
 export async function addChecklistItem(eventId:string,formData:FormData){const s=createClient();const title=String(formData.get("title")??"").trim();if(!title)return;const {data:rows}=await s.from("checklist_items").select("sort").eq("event_id",eventId).order("sort",{ascending:false}).limit(1);await s.from("checklist_items").insert({event_id:eventId,title,sort:(rows?.[0]?.sort??0)+1});revalidatePath(`/events/${eventId}`)}
 export async function removeChecklistItem(eventId:string,itemId:string){const s=createClient();await s.from("checklist_items").delete().eq("id",itemId);revalidatePath(`/events/${eventId}`)}
 

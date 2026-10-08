@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import {
   CalendarIcon,
@@ -31,7 +32,7 @@ const items = [
 function selectedPath(pathname: string, eventId: string, suffix: string) {
   const base = `/events/${eventId}`;
   if (!suffix) return pathname === base;
-  if (suffix === "/plan") return pathname === `${base}/plan` || pathname.startsWith(`${base}/plan/`) || pathname === `${base}/services` || pathname === `${base}/entertainment` || pathname === `${base}/venue-logistics`;
+  if (suffix === "/plan") return pathname === `${base}/plan` || pathname.startsWith(`${base}/plan/`) || pathname === `${base}/rentals` || pathname === `${base}/services-entertainment` || pathname === `${base}/services` || pathname === `${base}/entertainment` || pathname === `${base}/venue-logistics`;
   if (suffix === "/vendors") return pathname === `${base}/vendors` || pathname.startsWith(`${base}/matches/`);
   return pathname === `${base}${suffix}` || pathname.startsWith(`${base}${suffix}/`);
 }
@@ -48,6 +49,9 @@ function Links({eventId}:{eventId:string}) {
 }
 
 export function EventWorkspaceNav({eventId}:{eventId:string}) {
+  const menu=useRef<HTMLDetailsElement>(null);
+  const pathname=usePathname();
+  useEffect(()=>{if(menu.current)menu.current.open=false},[pathname]);
   return <>
     <aside className="hidden lg:block">
       <div className="sticky top-24 rounded-xl border border-[#E8E1ED] bg-white p-3 shadow-fleora">
@@ -55,7 +59,7 @@ export function EventWorkspaceNav({eventId}:{eventId:string}) {
         <Links eventId={eventId}/>
       </div>
     </aside>
-    <details className="group mb-6 rounded-xl border border-[#E8E1ED] bg-white p-2 shadow-fleora lg:hidden">
+    <details ref={menu} onClick={e=>{if((e.target as HTMLElement).closest("a")&&menu.current)menu.current.open=false}} className="group mb-6 rounded-xl border border-[#E8E1ED] bg-white p-2 shadow-fleora lg:hidden">
       <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between rounded-lg px-3 text-sm font-semibold text-ink-900 marker:content-none">
         <span>Event menu</span><span className="text-plum-600 transition-transform duration-200 group-open:rotate-45">+</span>
       </summary>

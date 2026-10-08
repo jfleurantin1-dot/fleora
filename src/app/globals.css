@@ -19,3 +19,16 @@ body { @apply bg-ivory-50 text-ink-900 antialiased font-sans; background-image:n
 }
 .scroll-thin::-webkit-scrollbar{width:6px;height:6px}.scroll-thin::-webkit-scrollbar-thumb{@apply rounded-full bg-plum-200}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+@media print {
+ body:has(#budget-print) header, body:has(#budget-print) nav, body:has(#budget-print) aside, body:has(#budget-print) details, body:has(#budget-print) footer { display:none!important; }
+ body:has(#budget-print) main {padding:0!important;max-width:none!important;}
+ body:has(#budget-print) .lg\:grid {display:block!important;}
+ #budget-print {color:#21172b; font-size:10pt;}
+ #budget-print table {min-width:0!important;font-size:9pt;}
+ #budget-print th,#budget-print td {padding:7pt;}
+ #budget-print tr {break-inside:avoid;}
+ #budget-print thead {display:table-header-group;}
+ #budget-print .overflow-x-auto {overflow:visible;}
+ @page {size:landscape;margin:12mm;}
+}

@@ -4,7 +4,6 @@ import { usePathname } from "next/navigation";
 import { CalendarIcon, HomeIcon, MessageIcon, SearchIcon, UserIcon, WalletIcon } from "@/components/icons";
 
 const clientLinks=[
-  {href:"/dashboard",label:"Home",Icon:HomeIcon},
   {href:"/events",label:"Events",Icon:CalendarIcon},
   {href:"/vendors/browse",label:"Discover Vendors",Icon:SearchIcon},
   {href:"/messages",label:"Messages",Icon:MessageIcon},

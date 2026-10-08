@@ -1,0 +1,10 @@
+"use client";
+import {useState} from "react";
+import {Button} from "@/components/ui";
+export function BudgetExport({eventId}:{eventId:string}){
+ const [menu,setMenu]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState("");
+ async function download(format:"pdf"|"xlsx",invoices=false,print=false){
+ const preview=print?window.open("","_blank"):null;if(preview)preview.document.body.textContent="Preparing your budget and invoices…";setBusy(true);setError("");
+ try{const response=await fetch(`/events/${eventId}/budget/export?format=${format}&invoices=${invoices?1:0}`);if(!response.ok){const result=await response.json();throw Error(result.error||"Could not create the download.");}const url=URL.createObjectURL(await response.blob());if(preview)preview.location.href=url;else{const a=document.createElement("a");a.href=url;a.download=`fleora-budget.${format}`;a.click();}setTimeout(()=>URL.revokeObjectURL(url),60000);setMenu(false);}catch(e){preview?.close();setError(e instanceof Error?e.message:"Could not export.");}finally{setBusy(false);}}
+ return <div className="print:hidden"><div className="flex flex-wrap gap-2"><Button variant="secondary" disabled={busy} onClick={()=>void download("pdf")}>Download PDF</Button><Button variant="secondary" disabled={busy} onClick={()=>void download("xlsx")}>Download Excel</Button><Button disabled={busy} aria-expanded={menu} onClick={()=>setMenu(!menu)}>Print</Button></div>{menu&&<div className="mt-3 space-y-3 rounded-xl border border-plum-100 bg-white p-4"><p className="text-sm font-semibold">What would you like to print?</p><div className="flex flex-wrap gap-2"><Button variant="secondary" onClick={()=>window.print()}>Budget table only</Button><Button disabled={busy} onClick={()=>void download("pdf",true,true)}>Budget + attached invoices</Button></div><p className="text-xs text-ink-500">With invoices, a combined PDF opens. Use the PDF viewer’s print button.</p></div>}{busy&&<p role="status" className="mt-2 text-sm">Preparing your file…</p>}{error&&<p role="alert" className="mt-2 text-sm text-rose-700">{error}</p>}</div>
+}

@@ -49,7 +49,7 @@ export async function saveEntertainmentPlan(eventId: string, fd: FormData) {
 
     refresh(eventId);
     if (String(fd.get("intent")) === "continue") redirect(`/events/${eventId}/venue-logistics`);
-    redirect(`/events/${eventId}/entertainment?saved=1`);
+    redirect(`/events/${eventId}/services-entertainment?saved=1#entertainment`);
   }
 
   const noEntertainmentRow = existing.get("no_entertainment");
@@ -121,7 +121,7 @@ export async function saveEntertainmentPlan(eventId: string, fd: FormData) {
 
   refresh(eventId);
   if (String(fd.get("intent")) === "continue") redirect(`/events/${eventId}/venue-logistics`);
-  redirect(`/events/${eventId}/entertainment?saved=1`);
+  redirect(`/events/${eventId}/services-entertainment?saved=1#entertainment`);
 }
 
 export async function uploadEntertainmentPhotos(

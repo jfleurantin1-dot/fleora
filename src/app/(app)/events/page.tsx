@@ -13,11 +13,12 @@ export default async function EventsPage() {
   const rows = events ?? [];
   const ids = rows.map((e) => e.id);
   const safeIds = ids.length ? ids : ["00000000-0000-0000-0000-000000000000"];
-  const [{ data: requests }, { data: bookings }, { data: inspirationPhotos }, { data: expenses, error: budgetError }] = await Promise.all([
+  const [{ data: requests }, { data: bookings }, { data: inspirationPhotos }, { data: expenses, error: budgetError }, {data:shoppingCosts,error:shoppingError}] = await Promise.all([
     supabase.from("event_requests").select("event_id").in("event_id", safeIds),
     supabase.from("bookings").select("event_id,total,status").in("event_id", safeIds),
     supabase.from("event_inspiration_photos").select("event_id,url,sort").in("event_id", safeIds).order("sort"),
     supabase.from("event_budget_expenses").select("event_id,amount").in("event_id", safeIds),
+    supabase.from("event_shopping_items").select("event_id,total_cost,paid_amount,purchased").in("event_id",safeIds),
   ]);
 
   const byDateAsc = (a: (typeof rows)[number], b: (typeof rows)[number]) => String(a.event_date ?? "9999-12-31").localeCompare(String(b.event_date ?? "9999-12-31"));
@@ -32,7 +33,7 @@ export default async function EventsPage() {
         {list.map((e) => {
           const reqCount = (requests ?? []).filter((r) => r.event_id === e.id).length;
           const eventBookings = (bookings ?? []).filter((b) => b.event_id === e.id && b.status !== "cancelled");
-          const committed = (eventBookings.reduce((sum, b) => sum + Math.round(Number(b.total ?? 0) * 100), 0) + (expenses ?? []).filter(x => x.event_id === e.id).reduce((sum, x) => sum + Math.round(Number(x.amount) * 100), 0)) / 100;
+          const committed = (eventBookings.reduce((sum, b) => sum + Math.round(Number(b.total ?? 0) * 100), 0) + (expenses ?? []).filter(x => x.event_id === e.id).reduce((sum, x) => sum + Math.round(Number(x.amount) * 100), 0) + (shoppingCosts??[]).filter(i=>i.event_id===e.id&&(i.purchased||Number(i.paid_amount)>0)).reduce((sum,i)=>sum+Math.round(Number(i.total_cost??0)*100),0)) / 100;
           const pct = reqCount ? Math.round((eventBookings.length / reqCount) * 100) : 0;
           const tone = e.status === "completed" ? "green" : e.status === "cancelled" ? "rose" : "plum";
           return (
@@ -47,7 +48,7 @@ export default async function EventsPage() {
                 <div className="p-5">
                   <div className="flex justify-between text-xs font-semibold text-ink-600"><span>{pct}% planned</span><span>{e.status === "planning" || e.status === "active" ? relativeDay(e.event_date) : e.status}</span></div>
                   <div className="mt-2"><Progress value={pct} /></div>
-                  <div className="mt-5 flex items-center justify-between border-t fleora-divider pt-4"><div><p className="text-[11px] uppercase tracking-wide text-ink-400">Committed</p><p className="font-semibold text-ink-900">{budgetError ? "Unavailable" : money(committed)} <span className="font-normal text-ink-400">/ {money(e.budget)}</span></p></div><ChevronRightIcon size={18} className="text-plum-600" /></div>
+                  <div className="mt-5 flex items-center justify-between border-t fleora-divider pt-4"><div><p className="text-[11px] uppercase tracking-wide text-ink-400">Committed</p><p className="font-semibold text-ink-900">{budgetError||shoppingError ? "Unavailable" : money(committed)} <span className="font-normal text-ink-400">/ {money(e.budget)}</span></p></div><ChevronRightIcon size={18} className="text-plum-600" /></div>
                 </div>
               </Link>
             </Card>

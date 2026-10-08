@@ -17,7 +17,7 @@ export async function saveServicePlan(eventId:string, fd:FormData){
   const existing=new Map((old??[]).map(r=>[r.item_key,r]));
   if(fd.get("no_services")==="on"){
     const ids=(old??[]).map(r=>r.id);if(ids.length){await s.from("event_plan_item_photos").delete().in("plan_item_id",ids);await s.from("event_vendor_needs").delete().in("plan_item_id",ids).eq("status","needed");await s.from("event_plan_items").delete().in("id",ids)}
-    await s.from("event_plan_items").upsert({event_id:eventId,chapter:"services",item_key:"no_services",label:"No additional services needed",choice:"diy",vendor_category:null,notes:null,updated_at:new Date().toISOString()},{onConflict:"event_id,chapter,item_key"});refresh(eventId);if(String(fd.get("intent"))==="continue")redirect(`/events/${eventId}/entertainment`);redirect(`/events/${eventId}/services?saved=1`)
+    await s.from("event_plan_items").upsert({event_id:eventId,chapter:"services",item_key:"no_services",label:"No additional services needed",choice:"diy",vendor_category:null,notes:null,updated_at:new Date().toISOString()},{onConflict:"event_id,chapter,item_key"});refresh(eventId);if(String(fd.get("intent"))==="continue")redirect(`/events/${eventId}/services-entertainment#entertainment`);redirect(`/events/${eventId}/services-entertainment?saved=1#services`)
   }
   const skipRow=existing.get("no_services");if(skipRow)await s.from("event_plan_items").delete().eq("id",skipRow.id);
   const selected=new Set<string>();
@@ -46,8 +46,8 @@ export async function saveServicePlan(eventId:string, fd:FormData){
     await s.from("event_plan_items").delete().in("id",removed);
   }
   refresh(eventId);
-  if(String(fd.get("intent"))==="continue") redirect(`/events/${eventId}/entertainment`);
-  redirect(`/events/${eventId}/services?saved=1`);
+  if(String(fd.get("intent"))==="continue") redirect(`/events/${eventId}/services-entertainment#entertainment`);
+  redirect(`/events/${eventId}/services-entertainment?saved=1#services`);
 }
 export async function uploadServicePhotos(eventId:string,planItemId:string|null,itemKey:string,fd:FormData):Promise<{error?:string;planItemId?:string;photos?:{id:string;url:string;sort:number}[]}>{
   const s=createClient(); const {data:{user}}=await s.auth.getUser(); if(!user)return{error:"Please sign in again before uploading."};

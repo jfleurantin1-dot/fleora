@@ -220,7 +220,7 @@ export type EventPotluckItem = {
 
 
 export type EventMenuItem = { id:string; event_id:string; name:string; category:string; notes:string|null; created_at:string; };
-export type EventShoppingItem = { id:string; event_id:string; name:string; category:string; quantity:string|null; source_chapter:string|null; purchased:boolean; created_at:string; };
+export type EventShoppingItem = { id:string; event_id:string; name:string; category:string; quantity:string|null; source_chapter:string|null; source_key:string|null; url:string|null; total_cost:number|null; paid_amount:number; purchased:boolean; created_at:string; };
 
 export type EventVendorNeed = {
   id: string;
@@ -364,6 +364,9 @@ export type ChecklistItem = {
   id: string;
   event_id: string;
   title: string;
+  source_key: string | null;
+  due_date: string | null;
+  completed_at: string | null;
   weeks_before: number | null;
   done: boolean;
   sort: number;

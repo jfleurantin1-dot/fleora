@@ -24,6 +24,7 @@ export async function saveDiyShopping(eventId:string,formData:FormData) {
   } catch(error) {
     redirect(`/events/${eventId}/diy?error=${encodeURIComponent(error instanceof Error?error.message:"Please check your shopping details.")}`);
   }
+  revalidatePath(`/events/${eventId}/budget`);
   revalidatePath(`/events/${eventId}/diy`);
   revalidatePath(`/events/${eventId}/plan/decor`);
   redirect(`/events/${eventId}/diy?saved=1`);

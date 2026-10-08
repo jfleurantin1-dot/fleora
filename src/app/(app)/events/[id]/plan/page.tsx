@@ -1,76 +1,11 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { requireProfile } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
-import { Card, Progress, Badge } from "@/components/ui";
-import { EventWorkspaceHeader } from "@/components/event/event-workspace-header";
-import { SparkleIcon, ImageFrameIcon, UtensilsIcon, StoreIcon, MusicIcon, MapPinIcon, ChevronRightIcon, CheckIcon } from "@/components/icons";
-
-export default async function PartyPlanPage({ params }: { params: { id: string } }) {
-  await requireProfile(); const supabase=createClient();
-  const {data:event}=await supabase.from("events").select("*").eq("id",params.id).single(); if(!event) notFound();
-  const [{data:photos},{data:requests},{data:planItems}]=await Promise.all([
-    supabase.from("event_inspiration_photos").select("id").eq("event_id",params.id),
-    supabase.from("event_requests").select("id").eq("event_id",params.id),
-    supabase.from("event_plan_items").select("chapter,item_key,choice").eq("event_id",params.id),
-  ]);
-  const decorAll=(planItems??[]).filter(item=>item.chapter==="decor");
-  const decorNone=decorAll.some(item=>item.item_key==="no_decor");
-  const decorItems=decorAll.filter(item=>item.item_key!=="no_decor");
-  const decorDecided=decorItems.filter(item=>item.choice!=="undecided").length;
-  const foodAll=(planItems??[]).filter(item=>item.chapter==="food_drinks");
-  const foodNone=foodAll.some(item=>item.item_key==="skip_food_drinks");
-  const foodItems=foodAll.filter(item=>item.item_key!=="skip_food_drinks");
-  const foodDecided=foodItems.filter(item=>item.choice!=="undecided").length;
-  const serviceAll=(planItems??[]).filter(item=>item.chapter==="services");
-  const serviceNone=serviceAll.some(item=>item.item_key==="no_services");
-  const serviceItems=serviceAll.filter(item=>item.item_key!=="no_services");
-  const serviceDecided=serviceItems.filter(item=>item.choice!=="undecided").length;
-  const venueItems=(planItems??[]).filter(item=>item.chapter==="venue_logistics");
-  const venueNone=venueItems.some(item=>item.item_key==="no_venue_logistics");
-  const venueSelected=venueItems.filter(item=>item.item_key!=="no_venue_logistics");
-  const venueDecided=venueSelected.filter(item=>item.choice!=="undecided").length;
-  const entertainmentItems=(planItems??[]).filter(item=>item.chapter==="entertainment");
-  const entertainmentNone=entertainmentItems.some(item=>item.item_key==="no_entertainment");
-  const entertainmentSelected=entertainmentItems.filter(item=>item.item_key!=="no_entertainment");
-  const entertainmentDecided=entertainmentSelected.filter(item=>item.choice!=="undecided").length;
-  const chapters=[
-    {title:"Event Details & Vision",desc:"Event essentials, theme, colors, mood board and Party Blueprints.",icon:<ImageFrameIcon size={23}/>,status:"Edit",href:`/events/${event.id}/edit`,live:true},
-    {title:"Decor",desc:"Welcome signs, focal backdrops, tablescapes, centerpieces, balloons, favors and custom signage.",icon:<SparkleIcon size={23}/>,status:decorNone?"Complete":decorItems.length?`${decorDecided}/${decorItems.length} decided`:"Plan decor",href:`/events/${event.id}/plan/decor`,live:true},
-    {title:"Food & Drinks",desc:"Potluck, catering, chefs, food trucks, cake, desserts, drinks and bartenders.",icon:<UtensilsIcon size={23}/>,status:foodNone?"Complete":foodItems.length?`${foodDecided}/${foodItems.length} decided`:"Plan food & drinks",href:`/events/${event.id}/plan/food-drinks`,live:true},
-    {title:"Services",desc:"Photography, videography, photo booths, planning, beauty, staffing and custom services.",icon:<StoreIcon size={23}/>,status:serviceNone?"Complete":serviceItems.length?`${serviceDecided}/${serviceItems.length} decided`:"Plan services",href:`/events/${event.id}/services`,live:true},
-    {title:"Entertainment",desc:"DJ, live music, kids entertainment, performers, games, inflatables and interactive experiences.",icon:<MusicIcon size={23}/>,status:entertainmentNone?"Complete":entertainmentSelected.length?`${entertainmentDecided}/${entertainmentSelected.length} decided`:"Plan entertainment",href:`/events/${event.id}/entertainment`,live:true},
-    {title:"Venue & Logistics",desc:"Rentals, setup, access, parking, transportation and event-day logistics.",icon:<MapPinIcon size={23}/>,status:venueNone?"Complete":venueSelected.length?`${venueDecided}/${venueSelected.length} decided`:"Plan logistics",href:`/events/${event.id}/venue-logistics`,live:true},
-  ];
-  const started=(photos??[]).length?1:0;
-  const decorProgress=decorNone?1:(decorItems.length ? decorDecided/decorItems.length : 0);
-  const foodProgress=foodNone?1:(foodItems.length ? foodDecided/foodItems.length : 0);
-  const serviceProgress=serviceNone?1:(serviceItems.length ? serviceDecided/serviceItems.length : 0);
-  const entertainmentProgress=entertainmentNone?1:(entertainmentSelected.length?entertainmentDecided/entertainmentSelected.length:0);
-  const venueProgress=venueNone?1:(venueSelected.length?venueDecided/venueSelected.length:0);
-  const pct=Math.round(((started+decorProgress+foodProgress+serviceProgress+entertainmentProgress+venueProgress)/chapters.length)*100);
-  const complete=(i:number)=>{
-    if(i===0) return Boolean(event.name&&event.event_type&&event.event_date);
-    if(i===1) return decorNone||(decorItems.length>0&&decorDecided===decorItems.length);
-    if(i===2) return foodNone||(foodItems.length>0&&foodDecided===foodItems.length);
-    if(i===3) return serviceNone||(serviceItems.length>0&&serviceDecided===serviceItems.length);
-    if(i===4) return entertainmentNone||(entertainmentSelected.length>0&&entertainmentDecided===entertainmentSelected.length);
-    if(i===5) return venueNone||(venueSelected.length>0&&venueDecided===venueSelected.length);
-    return false;
-  };
-  return <div className="space-y-7">
-    <EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/>
-    <Card variant="feature" className="overflow-hidden bg-brand-soft">
-      <p className="fleora-kicker">Dream it → plan it</p><h1 className="mt-2 font-display text-4xl text-ink-900">Build your party, chapter by chapter.</h1>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-ink-600">Tell Fleora what you want to DIY, what you already have, and what you want to hire. Your choices will eventually become shopping items, tasks and vendor needs automatically.</p>
-      <div className="mt-6 max-w-xl"><div className="mb-2 flex justify-between text-xs font-semibold text-ink-500"><span>Party Plan progress</span><span>{pct}%</span></div><Progress value={pct}/></div>
-    </Card>
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {chapters.map((c,i)=><Card key={c.title} variant="interactive" className="flex min-h-[210px] flex-col">
-        <div className="flex items-start justify-between gap-3"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-plum-50 text-plum-700">{c.icon}</span><span className="text-xs font-bold text-ink-400">Chapter {i+1}</span></div>
-        <div className="mt-4 flex items-center gap-2"><h2 className="font-display text-2xl text-ink-900">{c.title}</h2>{complete(i)&&<Badge tone="green"><span className="inline-flex items-center gap-1"><CheckIcon size={12}/> Complete</span></Badge>}</div><p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">{c.desc}</p>
-        {c.live?<Link href={c.href} className={`mt-4 inline-flex items-center gap-1 text-sm font-bold hover:underline ${complete(i)?"text-sage-700":"text-plum-700"}`}>{i===0?"Edit":complete(i)?"Edit chapter":c.status}<ChevronRightIcon size={14}/></Link>:<span className="mt-4 text-xs font-bold uppercase tracking-wide text-ink-400">{c.status}</span>}
-      </Card>)}
-    </div>
-  </div>;
-}
+import {notFound} from "next/navigation";
+import {requireProfile} from "@/lib/auth";
+import {createClient} from "@/lib/supabase/server";
+import {Card,Progress,Badge} from "@/components/ui";
+import {EventWorkspaceHeader} from "@/components/event/event-workspace-header";
+import {VENUE_LOGISTICS_PLAN_ITEMS} from "@/lib/planning";
+export default async function Page({params}:{params:{id:string}}){await requireProfile();const s=createClient();const {data:event}=await s.from("events").select("*").eq("id",params.id).single();if(!event)notFound();const {data:items}=await s.from("event_plan_items").select("chapter,item_key,choice").eq("event_id",params.id);
+function progress(chapter:string,skip:string,group?:string){const all=(items??[]).filter(i=>i.chapter===chapter);if(all.some(i=>i.item_key===skip||chapter==="venue_logistics"&&i.item_key==="no_venue_logistics"))return 1;const rows=all.filter(i=>!i.item_key.startsWith("no_")&&!i.item_key.startsWith("skip_")&&(!group||VENUE_LOGISTICS_PLAN_ITEMS.some(d=>d.key===i.item_key&&d.group===group)));return rows.length?rows.filter(i=>i.choice!=="undecided").length/rows.length:0;}
+const chapters=[{title:"Event Details & Vision",desc:"Your date, venue, theme, colors and inspiration.",path:"/edit",value:event.name&&event.event_date?1:0},{title:"Decor",desc:"Backdrops, centerpieces, balloons, signs and finishing touches.",path:"/plan/decor",value:progress("decor","no_decor")},{title:"Rentals",desc:"Tables, chairs, linens, tents, staging and other rental pieces.",path:"/rentals",value:progress("venue_logistics","no_rentals","rentals")},{title:"Food & Drinks",desc:"Meals, cakes, treats, drinks and shared dishes.",path:"/plan/food-drinks",value:progress("food_drinks","skip_food_drinks")},{title:"Services & Entertainment",desc:"Photography, planning, beauty, DJs, performers and activities.",path:"/services-entertainment",value:(progress("services","no_services")+progress("entertainment","no_entertainment"))/2},{title:"Venue & Logistics",desc:"Setup, deliveries, access, parking and event-day details.",path:"/venue-logistics",value:progress("venue_logistics","no_logistics","logistics")}];const pct=Math.round(chapters.reduce((n,c)=>n+c.value,0)/chapters.length*100);
+return <div className="space-y-7"><EventWorkspaceHeader event={event} active="/plan" eyebrow="My Party Plan"/><Card variant="feature" className="bg-brand-soft"><p className="fleora-kicker">Dream it → plan it</p><h1 className="mt-2 font-display text-4xl">Build your party, chapter by chapter.</h1><p className="mt-3 text-sm text-ink-600">Choose what to DIY, who to hire, and what you already have. Add tasks and shopping within each category.</p><div className="mt-6"><p className="mb-2 text-sm">{pct}% planned</p><Progress value={pct}/></div></Card><div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{chapters.map((c,i)=><Card key={c.title} variant="interactive" className="flex flex-col"><div className="flex justify-between"><p className="fleora-kicker">Chapter {i+1}</p>{c.value===1&&<Badge tone="green">Complete</Badge>}</div><h2 className="mt-4 font-display text-2xl">{c.title}</h2><p className="mt-2 flex-1 text-sm text-ink-600">{c.desc}</p><Link className="mt-5 font-semibold text-plum-700" href={`/events/${event.id}${c.path}`}>{c.value===1?"Edit chapter":"Open chapter"} →</Link></Card>)}</div></div>;}
