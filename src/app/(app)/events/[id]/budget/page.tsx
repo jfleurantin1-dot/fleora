@@ -5,7 +5,7 @@ import {BudgetExport} from "@/components/event/budget-export";
 import {PlanningList} from "@/components/event/planning-list";
 import {loadBudget} from "@/lib/budget-data";
 import {sheetTotals} from "@/lib/budget-sheet";
-import {money} from "@/lib/format";
+const money=(value:number)=>new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(value);
 import {ExpenseForm,ExpenseControls,RemoveInvoice} from "./expense-form";
 export const dynamic="force-dynamic";
 export default async function Page({params}:{params:{id:string}}){
